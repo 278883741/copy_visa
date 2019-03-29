@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionSchoolMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionSchool">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="school_area" jdbcType="VARCHAR" property="schoolArea" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="end_date" jdbcType="TIMESTAMP" property="endDate" />
+    <result column="study_week" jdbcType="VARCHAR" property="studyWeek" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="course_type" jdbcType="VARCHAR" property="courseType" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="tuition" jdbcType="DECIMAL" property="tuition" />
+    <result column="tuition_currency" jdbcType="VARCHAR" property="tuitionCurrency" />
+    <result column="commission_currency" jdbcType="VARCHAR" property="commissionCurrency" />
+    <result column="course_remark" jdbcType="VARCHAR" property="courseRemark" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="paid_fee" jdbcType="DECIMAL" property="paidFee" />
+    <result column="school_rate" jdbcType="DECIMAL" property="schoolRate" />
+    <result column="gst_rate" jdbcType="DECIMAL" property="gstRate" />
+    <result column="course_property" jdbcType="VARCHAR" property="courseProperty" />
+    <result column="student_property" jdbcType="VARCHAR" property="studentProperty" />
+    <result column="commission_belong" jdbcType="VARCHAR" property="commissionBelong" />
+    <result column="healthy_fee" jdbcType="DECIMAL" property="healthyFee" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="offer_file" jdbcType="VARCHAR" property="offerFile" />
+    <result column="coe_file" jdbcType="VARCHAR" property="coeFile" />
+    <result column="email_file" jdbcType="VARCHAR" property="emailFile" />
+    <result column="consulter" jdbcType="VARCHAR" property="consulter" />
+    <result column="transfer_consulter" jdbcType="VARCHAR" property="transferConsulter" />
+    <result column="consulter_branch" jdbcType="VARCHAR" property="consulterBranch" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="update_id" jdbcType="VARCHAR" property="updateId" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="special_id" jdbcType="INTEGER" property="specialId" />
+    <result column="school_no" jdbcType="VARCHAR" property="schoolNo" />
+    <result column="agency_no" jdbcType="INTEGER" property="agencyNo" />
+    <result column="agency_name" jdbcType="VARCHAR" property="agencyName" />
+  </resultMap>
+    <select id="getSchoolInviceVOList" resultType="com.aoji.vo.SchoolInvoiceVO">
+      SELECT
+        school.agency_no AS agencyNo,
+        school.agency_name AS agencyName,
+        school.id,
+        invoice.id AS invoiceId,
+        school.college_type AS collegeType,
+        school.school_name AS schoolName,
+        school.course_name AS courseName,
+        school.major_name AS majorName,
+        school.start_date AS startDate,
+        invoice.invoice_no AS invoiceNo,
+        invoice.return_date AS returnDate,
+        invoice.account_gst AS accountGst,
+        school.gst_rate AS gstRate,
+        invoice.invoice_sum AS invoiceSum,
+        invoice.account_money AS accountMoney,
+        invoice.actual_amount AS actualAmount,
+        school.`status`,
+        invoice.invoice_remark AS schoolRemark,
+        invoice.account_sum AS accountSum,
+        invoice.channel_return_status AS channelReturnStatus,
+        channelCommission.payment_date as paymentDate
+      FROM
+        commission_school school
+      LEFT JOIN (
+        SELECT
+            *
+        FROM
+            commission_invoice
+        WHERE
+            (
+                delete_status = 0
+                OR delete_status IS NULL
+            )
+      ) invoice ON school.id = invoice.school_id
+      LEFT JOIN (SELECT invoice_id,payment_date FROM channel_commission WHERE delete_status = 0 )channelCommission
+      on  channelCommission.invoice_id = invoice.id
+      WHERE
+        school.student_id = #{studentId} and school.delete_status = 0
+    </select>
+</mapper>

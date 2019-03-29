@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.UserGroupRelationMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.UserGroupRelation">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="oaid" jdbcType="VARCHAR" property="oaid" />
+    <result column="leader_status" jdbcType="BIT" property="leaderStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="group_id" jdbcType="INTEGER" property="groupId" />
+  </resultMap>
+
+  <update id="deleteUserGroup">
+    update user_group_relation set update_time= now(),delete_status = 1 where oaid = #{oaid}
+  </update>
+    <update id="updateByOaid">
+      update user_group_relation set leader_status = #{leaderStatus} where oaid = #{oaid}
+    </update>
+
+    <select id="getOaIdsByOAIdAndLeader" resultType="string" parameterType="string">
+    select oaid from user_group_relation where group_id in(select group_id from user_group_relation where oaid =#{oaId} and leader_status=1)
+  </select>
+  <select id="getUserGroupRelationByOaid" resultType="com.aoji.model.UserGroupRelation">
+    select id,oaid,leader_status leaderStatus,operator_no opteratorNo,group_id groupId from user_group_relation where oaid = #{oaid} and delete_status = 0 group by leader_status
+  </select>
+  <select id="getOaIdsByOaId" resultType="java.lang.String">
+    select oaid from user_group_relation where group_id in(select group_id from user_group_relation where oaid =#{oaId})
+  </select>
+  <select id="getPlanningConsultantsByOaid" resultType="java.lang.String">
+    select oaid from user_group_relation where group_id in (
+      select group_id from user_group_relation where group_id = '142' and leader_status =1 and delete_status=0 and oaid = #{oaid}
+    ) and delete_status = 0
+  </select>
+
+
+</mapper>

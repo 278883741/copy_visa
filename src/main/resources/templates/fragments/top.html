@@ -1,0 +1,89 @@
+<div th:fragment="top">
+<div class="navbar navbar-default" id="navbar" style="height:45px">
+    <script type="text/javascript">
+        try{ace.settings.check('navbar' , 'fixed')}catch(e){}
+    </script>
+
+    <div class="navbar-container" id="navbar-container" >
+        <div class="navbar-header pull-left">
+            <a href="#" class="navbar-brand">
+                <small>
+                    <i class="icon-leaf"></i>
+                    文签项目后台管理系统
+                </small>
+            </a><!-- /.brand -->
+            <!--<a href="/logout" class="navbar-brand" style="float: right">退出</a><i class="icon-leaf"></i>-->
+        </div><!-- /.navbar-header -->
+
+        <div class="navbar-header pull-right" role="navigation">
+            <ul class="nav ace-nav">
+                <li class="light-blue">
+                    <a href="/webim/login" target="_blank">
+                        <i class="icon-envelope"></i>
+                        <span>聊天</span>
+                    </a>
+                </li>
+                <li class="light-blue">
+                    <a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <img class="nav-user-photo" th:src="@{/assets/avatars/user.jpg}" alt="Jason's Photo" />
+                        <span class="user-info">
+									<!--<small>欢迎</small>-->
+                                    <small th:text="${session.user.oaid}"></small>
+									<span class="menu-text" th:text="${session.user.username}"></span>
+                          <!-- <span class="menu-text" ><shiro:principal/></span>-->
+						</span>
+                        <i class="icon-caret-down"></i>
+                    </a>
+
+                    <ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                        <!--<li>-->
+                            <!--<a href="#">-->
+                                <!--<i class="icon-cog"></i>-->
+                                <!--Settings-->
+                            <!--</a>-->
+                        <!--</li>-->
+
+                        <!--<li>-->
+                            <!--<a href="#">-->
+                                <!--<i class="icon-user"></i>-->
+                                <!--Profile-->
+                            <!--</a>-->
+                        <!--</li>-->
+
+                        <!--<li class="divider"></li>-->
+
+                        <li >
+                            <!--<a href="/sso/logout">-->
+                            <!--<i class="icon-off"></i>-->
+                            <!--退出-->
+                            <!--</a>-->
+                            <a href="javascript:void(0)" onclick="logout()" >
+                                <i class="icon-off"  ></i>
+                                退出
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul><!-- /.ace-nav -->
+        </div><!-- /.navbar-header -->
+    </div><!-- /.container -->
+</div>
+
+
+<script type="text/javascript">
+    function logout() {
+        $.ajax({
+            type: "POST",
+            url: "/logout",
+            data: {},
+            success: function(data){
+                window.location.href = "/sso/logout";
+            },
+            error : function(err) {
+                return false;
+            }
+        });
+    }
+</script>
+</div>
+

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.StudentNoteRelationMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.StudentNoteRelation">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="templete_id" jdbcType="INTEGER" property="templeteId" />
+    <result column="send_oaid" jdbcType="VARCHAR" property="sendOaid" />
+    <result column="send_name" jdbcType="VARCHAR" property="sendName" />
+    <result column="receive_student_no" jdbcType="VARCHAR" property="receiveStudentNo" />
+    <result column="receive_student_name" jdbcType="VARCHAR" property="receiveStudentName" />
+    <result column="receive_message" jdbcType="VARCHAR" property="receiveMessage" />
+    <result column="receive_url" jdbcType="VARCHAR" property="receiveUrl" />
+    <result column="read_status" jdbcType="BIT" property="readStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+  </resultMap>
+</mapper>

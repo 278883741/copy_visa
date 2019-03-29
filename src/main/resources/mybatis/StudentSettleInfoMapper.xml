@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.StudentSettleInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.StudentSettleInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="reason" jdbcType="INTEGER" property="reason" />
+    <result column="audit_status" jdbcType="INTEGER" property="auditStatus" />
+    <result column="close_letter" jdbcType="VARCHAR" property="closeLetter" />
+  </resultMap>
+
+  <resultMap id="settleList" type="com.aoji.model.StudentInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id"/>
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo"/>
+    <result column="student_name" jdbcType="VARCHAR" property="studentName"/>
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo"/>
+    <result column="contract_type" jdbcType="INTEGER" property="contractType"/>
+    <result column="branch_id" jdbcType="INTEGER" property="branchId"/>
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus"/>
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo"/>
+    <result column="nation_id" jdbcType="INTEGER" property="nationId"/>
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName"/>
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate"/>
+    <result column="status" jdbcType="INTEGER" property="status"/>
+    <result column="first_bonus_status" jdbcType="INTEGER" property="firstBonusStatus"/>
+    <result column="finally_bonus_status" jdbcType="INTEGER" property="finallyBonusStatus"/>
+    <result column="copy_operator" jdbcType="VARCHAR" property="copyOperator"/>
+    <result column="copy_maker" jdbcType="VARCHAR" property="copyMaker"/>
+    <result column="student_status" jdbcType="INTEGER" property="studentStatus"/>
+    <result column="usa_status" jdbcType="INTEGER" property="usaStatus"/>
+    <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant"/>
+    <result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo"/>
+    <result column="channel_status" jdbcType="INTEGER" property="channelStatus"/>
+    <result column="channel_transfer_status" jdbcType="INTEGER" property="channelTransferStatus"/>
+    <result column="copy_no" jdbcType="VARCHAR" property="copyNo"/>
+    <result column="copy" jdbcType="VARCHAR" property="copy"/>
+    <result column="visa_operator_no" jdbcType="VARCHAR" property="visaOperatorNo"/>
+    <result column="visa_operator" jdbcType="VARCHAR" property="visaOperator"/>
+    <result column="copier_no" jdbcType="VARCHAR" property="copierNo"/>
+    <result column="copier" jdbcType="VARCHAR" property="copier"/>
+    <result column="last_visit_time" jdbcType="TIMESTAMP" property="lastVisitTime"/>
+    <result column="confeeid" jdbcType="VARCHAR" property="confeeid"/>
+    <result column="planning_consultant_no" jdbcType="VARCHAR" property="planningConsultantNo"/>
+    <result column="planning_consultant" jdbcType="VARCHAR" property="planningConsultant"/>
+    <result column="remark" jdbcType="VARCHAR" property="remark"/>
+  </resultMap>
+
+    <select id="getStudentSettleByOperator" resultType="com.aoji.model.StudentSettleInfo">
+--       select id,create_time createTime from student_settle_info where operator_no = 'admin1' and delete_status = 0
+select settle.id from student_info student,student_settle_info settle,visa_result_info result where
+student.student_no = settle.student_no and settle.student_no = result.student_no and student.delete_status = 0 and settle.delete_status = 0 and result.delete_status = 0
+and result.visa_status = 3 and settle.audit_status = 1 and student.`status` = 90
+
+
+    </select>
+  <select id="getSettleList" resultMap="settleList" parameterType="object">
+
+    select si.student_no studentNo,si.student_name studentName,si.pinyin pinyin,si.birthday birthday,si.status status,si.nation_id nationId,si.nation_name nationName,si.contract_no contractNo,si.sales_consultant salesConsultant,
+    si.sales_consultant_no  salesConsultantNo,si.copy_operator copyOperator,si.copy_operator_no copyOperatorNo,ssi.reason studentStatus,ssi.end_case_reason branchName
+    from student_info si,student_settle_info ssi,audit_result_info ari
+    where si.student_no = ssi.student_no AND ssi.id = ari.business_id
+    AND si.status = 90 AND si.delete_status = FALSE
+    <if test="studentInfo.studentNo != null and studentInfo.studentNo !=''">
+      AND si.student_no = #{studentInfo.studentNo}
+    </if>
+    <if test="studentInfo.studentName != null and studentInfo.studentName !=''">
+      AND (si.student_name LIKE CONCAT('%',#{studentInfo.studentName},'%' ) OR si.pinyin Like
+      CONCAT('%',#{studentInfo.studentName},'%' ))
+    </if>
+    AND ssi.delete_status = FALSE
+    <if test="studentInfo.studentStatus != null and studentInfo.studentStatus !=''">
+      AND si.student_status = #{studentInfo.studentStatus}
+    </if>
+    AND ari.case_id = 11 AND ari.delete_status = FALSE
+    <if test="studentInfo.dateStart != null and studentInfo.dateStart !=''">
+      AND ari.create_time &gt;= DATE_FORMAT(#{studentInfo.dateStart}, '%Y-%m-%d %T')
+    </if>
+    <if test="studentInfo.dateEnd != null and studentInfo.dateEnd !=''">
+      AND ari.create_time &lt;= DATE_FORMAT(#{studentInfo.dateEnd}, '%Y-%m-%d %T')
+    </if>
+    ORDER BY si.create_time DESC
+  </select>
+
+  <select id="checkAllSettleList" resultType="com.aoji.model.StudentSettleInfo">
+
+    select a.id as id,
+    a.student_no   as  studentNo,
+    b.student_name as studentName,
+    b.nation_id    as nationId,
+    b.nation_name    as nationName,
+    b.sales_consultant as salesConsultant,
+    b.copy_operator    as copyOperator,
+    b.sign_date    as signDate,
+    a.create_time  as  createTime,
+    a.audit_status as auditStatus,
+    a.reason   as  reason,
+    a.end_case_reason   as  endCaseReason
+    from student_settle_info a,student_info b
+    where
+    a.student_no = b.student_no
+    AND a.delete_status = 0 AND  b.delete_status = 0
+    <if test="studentSettleInfo.studentNo != null and studentSettleInfo.studentNo !=''">AND a.student_no = #{studentSettleInfo.studentNo}
+    </if>
+    <if test="studentSettleInfo.auditStatus != null and studentSettleInfo.auditStatus !=''">AND a.audit_status = #{studentSettleInfo.auditStatus}
+    </if>
+    <if test="nationId != null and nationId !=''">AND b.nation_id = #{nationId}
+    </if>
+    <if test="studentName != null and studentName !=''">AND b.student_name = #{studentName}
+    </if>
+    order by a.create_time desc
+  </select>
+</mapper>

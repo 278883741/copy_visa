@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.NewsInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.NewsInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+  </resultMap>
+    <select id="queryList" resultType="com.aoji.model.NewsInfo">
+       SELECT id,content,create_time createTime,update_time updateTime,delete_status deleteStatus,operator_no operatorNo
+       FROM news_info
+       where delete_status = '0' and enable_status = 1 order by create_time desc limit #{pageIndex},10
+    </select>
+</mapper>

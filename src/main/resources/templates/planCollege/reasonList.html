@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" th:href="@{/layer/skin/layer.css}" />
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <div class="page-content">
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-3 control-label no-padding-right blue"> 驳回原因：</label>-->
+                    <!--<select class="col-sm-2 form-control" id="reason">-->
+                        <!--<option value="">请选择</option>-->
+                        <!--<option value="1">截止日期错误</option>-->
+                        <!--<option value="2">专业信息有误</option>-->
+                        <!--<option value="3">专业信息不完整</option>-->
+                        <!--<option value="4">其他</option>-->
+                    <!--</select>-->
+                <!--</div>-->
+                <div class="form-group">
+                    <!--<label class="col-sm-3 control-label no-padding-right blue"> 备注：</label>-->
+                    <textarea class="col-sm-2 form-control" id="remark" style="height:120px;"></textarea>
+                    <span style="color: red">*最多100个字符</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

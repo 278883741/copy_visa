@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="col-sm-6">
+    <div class="table-responsive">
+        <table id="sample-table-3" class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <td align="center">学号</td>
+                <td align="center">学生姓名</td>
+                <td align="center">转案人</td>
+                <td align="center">转案时间</td>
+                <td align="center">接收人</td>
+                <td align="center">接受时间</td>
+                <td align="center">接受状态</td>
+            </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="record : ${transferRecord}" th:switch="${record != null}? ${record.confirmStatus}">
+                    <td align="center" th:text="${record != null}? ${record.studentNo}"></td>
+                    <td align="center" th:text="${record != null}? ${record.studentName}"></td>
+                    <td align="center" th:text="${record != null}? ${record.operatorName}"></td>
+                    <td align="center" th:text="${record != null and record.createTime != null}? ${#dates.format(record.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td align="center" th:text="${record != null}? ${record.receiverName}"></td>
+                    <td align="center" th:text="${record != null and record.confirmDate != null}? ${#dates.format(record.confirmDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td align="center" th:case="1">接受</td>
+                    <td align="center" th:case="2">拒绝</td>
+                    <td align="center" th:case="*">未操作</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

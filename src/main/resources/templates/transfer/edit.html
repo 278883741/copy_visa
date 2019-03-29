@@ -1,0 +1,127 @@
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/zTreeStyle.css}"/>
+<link rel="stylesheet" th:href="@{/webuploader/webuploader.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li><i class="icon-home home-icon"></i>首页</li>-->
+                    <!--<li>系统管理</li>-->
+                    <!--<li>转案管理</li>-->
+                    <!--<li>分配</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">转案确认信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="id" id="id" th:value="${transferSend!=null}? ${transferSend.id}"/>
+                    <input type="hidden" name="studentNo"  th:value="${transferSend!=null}? ${transferSend.studentNo}"/>
+                    <input type="hidden" id="countryBussId" name="countryBussId" th:value="${nation}"/>
+                    <input type="hidden" name="type" th:value="${queryType}"/>
+                    <input type="hidden" name="applyId" th:value="${transferSend!=null}? ${transferSend.applyId}"/>
+                    <!--弹框回调标签id-->
+                    <input type="hidden" id="callback_index" value=""/>
+                    <input type="hidden" id="operatorNo" th:value="${sysUser != null}? ${sysUser.oaid}"/>
+                    <input type="hidden" id="receive_count" th:value="${receiveNum != null}? ${receiveNum}: 0"/>
+                    <input type="hidden" id="queryType" name="queryType" th:value="${queryType != null}? ${queryType}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group one-receive" style="height:29px;">
+
+                                    <div class="one-receive">
+                                        <label class="col-sm-3 control-label no-padding-right blue receive-title" style="padding-top:1px"></label>
+                                        <input type="hidden" id="old-operator-1-no" th:value="${transfer1 != null}? ${transfer1.operatorNo}"/>
+                                        <input type="hidden" id="old-receive-1-no" th:value="${transfer1 != null}? ${transfer1.receiverNo}"/>
+                                        <input type="hidden" id="old-receive-1-status" th:value="${transfer1 != null}? ${transfer1.confirmStatus}"/>
+                                        <input class="col-sm-1" id="receive-1-name" name="transferReceiverVOList[0].receiveName" style="width: 150px"
+                                               th:value="${transfer1 != null}? ${transfer1.receiverName}: '请选择'" onclick="selectStaff('receive-1-')"/>
+                                        <input type="hidden" id="receive-1-no" name="transferReceiverVOList[0].receiveNo"
+                                               th:value="${transfer1 != null}? ${transfer1.receiverNo}"/>
+                                    </div>
+                                    <div class="two-receive" style="display:none">
+                                        <label class="col-sm-3 control-label no-padding-right blue" style="padding-top:1px"> 制作文案：</label>
+                                        <input type="hidden" id="old-receive-2-no" th:value="${transfer2 != null}? ${transfer2.receiverNo}"/>
+                                        <input type="hidden" id="old-receive-2-status" th:value="${transfer2 != null}? ${transfer2.confirmStatus}"/>
+                                        <input class="col-sm-1" id="receive-2-name" name="transferReceiverVOList[1].receiveName" style="width: 150px"
+                                               th:value="${transfer2 != null}? ${transfer2.receiverName}: '请选择'" onclick="selectStaff('receive-2-')"/>
+                                        <input type="hidden" id="receive-2-no" name="transferReceiverVOList[1].receiveNo"
+                                               th:value="${transfer2 != null}? ${transfer2.receiverNo}"/>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="height:29px;">
+                                    <label class="col-sm-3 control-label no-padding-right blue" style="padding-top:1px">分配原因：</label>
+                                    <input type="hidden" id="reason" th:value="${transferSend!=null}? ${transferSend.reason}"/>
+                                    <select class="col-sm-2 reason" name="reason" style="width: 150px; height:25px;">
+                                        <option value="1">正常分配</option>
+                                        <option value="2">休假</option>
+                                        <option value="3">工作调整</option>
+                                        <option value="4">员工离职</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="goBack()">返回</button>
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" transferSend="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" transferSend="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/business/transfer/edit.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>

@@ -1,0 +1,53 @@
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+    .Style{
+        padding-left: 23px;
+        padding-right: 19px;
+        padding-top: 30px;
+    }
+</style>
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <form id="basicEditFeeForm">
+                <div class="page-content Style">
+                    <input id="id" th:value="${costId}" type="text" name="id" style="display: none"/>
+                    <div style="margin-top: 0px">
+                        <label class="col-sm-3 blue control-label no-padding-right"> 学费：</label>
+                        <input id="basicTuition" th:value="${basicTuition}"  type="number"   name="tuition" class="col-sm-3" style="width: 168px ;height:30px;margin-left: 41px;" onclick=""/>
+                    </div>
+                    <div style="margin-top: 4px">
+                        <label class="col-sm-3   blue  control-label no-padding-right"> 注册费：</label>
+                        <input id="basicRegistrationFee" th:value=" ${basicRegistrationFee}" type="number" name="registrationFee" class="col-sm-3" style="width: 168px ;height:30px;margin-left: 27px;" onclick=""/>
+                    </div>
+                    <div style="margin-top: 6px">
+                        <label class="col-sm-3  blue control-label no-padding-right"> 押金：</label>
+                        <input id="basicDepositAmount" th:value="${basicDepositAmount}"  name="depositAmount" type="number" class="col-sm-3" style="margin-left:41px;width: 168px ;height:30px" onclick=""/>
+                    </div>
+                    <div style="position:absolute;bottom:10px; right:20px;">
+                        <button type="button" class="btn btn-primary" id="basicFeeSubmit">保存</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/workTable/fee.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script></body>

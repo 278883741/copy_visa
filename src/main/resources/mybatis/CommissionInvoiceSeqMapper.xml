@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionInvoiceSeqMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionInvoiceSeq">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="school_id" jdbcType="INTEGER" property="schoolId" />
+    <result column="number" jdbcType="INTEGER" property="number" />
+    <result column="temp_key" jdbcType="VARCHAR" property="tempKey" />
+    <result column="invoice_no" jdbcType="VARCHAR" property="invoiceNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <update id="updateInvoiceByTempKey" parameterType="java.util.Map">
+    update commission_invoice_seq set invoice_no = #{invoiceNo} where temp_key = #{tempKey}
+  </update>
+</mapper>

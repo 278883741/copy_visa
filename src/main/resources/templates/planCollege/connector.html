@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" th:href="@{/layer/skin/layer.css}" />
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <div class="page-content">
+                <select class="col-sm-2 form-control" id="connector">
+                    <option value="">请选择</option>
+                    <option th:each="user:${users}" th:value="${user.oaid}" th:text="${user.username}"></option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

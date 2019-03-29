@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.MessageQueueInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.MessageQueueInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="business_key" jdbcType="VARCHAR" property="businessKey" />
+    <result column="business_type_code" jdbcType="VARCHAR" property="businessTypeCode" />
+    <result column="message_body" jdbcType="VARCHAR" property="messageBody" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="next_retry_time" jdbcType="TIMESTAMP" property="nextRetryTime" />
+    <result column="retry_count" jdbcType="INTEGER" property="retryCount" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <!--<result column="receive_status" jdbcType="INTEGER" property="receiveStatus" />-->
+  </resultMap>
+
+  <update id="updateByBusinessKeySelective" parameterType="com.aoji.model.MessageQueueInfo">
+    update message_queue_info
+    <set>
+      <if test="businessTypeCode != null">business_type_code = #{businessTypeCode},</if>
+      <if test="messageBody != null">message_body = #{messageBody},</if>
+      <if test="retryCount != null">retry_count = #{retryCount},</if>
+      <if test="updateTime != null">update_time = #{updateTime},</if>
+      <if test="nextRetryTime != null">next_retry_time = #{nextRetryTime},</if>
+      <if test="status != null">status = #{status},</if>
+    </set>
+    where business_key = #{businessKey}
+  </update>
+</mapper>

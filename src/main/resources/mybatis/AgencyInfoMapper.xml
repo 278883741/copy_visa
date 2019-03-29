@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.AgencyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.AgencyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="agency_name" jdbcType="VARCHAR" property="agencyName" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="agency_type" jdbcType="INTEGER" property="agencyType" />
+    <result column="nation_id" jdbcType="VARCHAR" property="nationId" />
+    <result column="enable_status" jdbcType="INTEGER" property="enableStatus" />
+  </resultMap>
+
+  <select id="get" parameterType="object" resultMap="BaseResultMap">
+    SELECT *
+    FROM agency_info
+    WHERE delete_status = 0
+    <if test="agencyName != null">AND agency_name LIKE  CONCAT('%',#{agencyName},'%' ) </if>
+    <if test="agencyType != null">AND agency_type = #{agencyType} </if>
+  </select>
+</mapper>

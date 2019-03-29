@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<style type="text/css">
+    a {
+        display: inline-block;
+        line-height: 37px;
+    }
+
+</style>
+<head th:include="fragments/head::header"/>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--    <div class="breadcrumbs" id="breadcrumbs">
+               <ul class="breadcrumb">
+                      <li><i class="icon-home home-icon"></i>首页</li>
+                      <li>学生列表</li>
+                      <li>院校列表</li>
+                  </ul>
+              </div>-->
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">定校信息</h3>
+                <div class="tab-pane fade in active">
+                    <div class="container">
+                        <div class="form-horizontal">
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 院校名称：</label>
+                                <input readonly="readonly" class="col-sm-2" style="width: 560px" id="collegeName_planCollegeInfo" name="planCollegeInfo.collegeName"
+                                       th:value="${planCollegeInfo!=null}? ${planCollegeInfo.collegeName}" required="required"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                                <!--<label class="col-sm-1 control-label no-padding-right blue"> 申请类型：</label>-->
+                                <!--<select disabled="disabled" class="col-sm-2 input-sm" id="applyType_planCollegeInfo"-->
+                                        <!--name="planCollegeInfo.applyType">-->
+                                    <!--<option value="-1" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.applyType==-1}">请选择-->
+                                    <!--</option>-->
+                                    <!--<option value="1" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.applyType==1}">主课申请-->
+                                    <!--</option>-->
+                                    <!--<option value="2" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.applyType==2}">语言申请-->
+                                    <!--</option>-->
+                                    <!--<option value="3" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.applyType==2}">预备申请-->
+                                    <!--</option>-->
+                                <!--</select>-->
+                                <!--<span style="color: red;margin-left: 5px;">* </span>-->
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 专业类型：</label>
+                                <select class="col-sm-2 input-sm" id="courseType_planCollegeInfo" name="planCollegeInfo.courseType" disabled="disabled">
+                                    <option value="-1">请选择</option>
+                                    <option value="3" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==3}">主课</option>
+                                    <option value="1" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==1}">语言</option>
+                                    <option value="2" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==2}">预科</option>
+                                    <option value="4" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==4}">快捷</option>
+                                    <option value="5" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==5}">夏校</option>
+                                    <option value="6" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==6}">桥梁</option>
+                                    <option value="7" th:selected="${planCollegeInfo !=null} ? ${planCollegeInfo.collegeType==7}">top up</option>
+                                </select>
+                                <span class="col-sm-1" style="color: red;margin-left: 5px;">* </span>
+                                <label class="col-sm-1 control-label no-padding-right blue"> 目标学历：</label>
+                                <select class="col-sm-2 input-sm" id="educationSection_planCollegeInfo" name="planCollegeInfo.educationSection" disabled="disabled">
+                                    <option value="-1">请选择</option>
+                                    <option value="2" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==2}">中小学</option>
+                                    <option value="3" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==3}">本科</option>
+                                    <option value="4" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==4}">硕士</option>
+                                    <option value="5" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==5}">博士</option>
+                                    <option value="9" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==9}">专科</option>
+                                    <option value="10" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==10}">非学历</option>
+                                    <option value="11" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==11}">证书</option>
+                                    <option value="12" th:selected="${planCollegeInfo!=null}? ${planCollegeInfo.educationLevel==12}">副学士</option>
+                                </select>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"
+                                       for="courseName">专业名称：</label>
+                                <input readonly="readonly" class="col-sm-2" id="courseName_planCollegeInfo" name="planCollegeInfo.majorName"
+                                       th:value="${planCollegeInfo!=null}?  ${planCollegeInfo.majorName}" required="required"/>
+                                <span class="col-sm-1" style="color: red;margin-left: 5px;">* </span>
+                                <label class="col-sm-1 control-label no-padding-right blue" for="majorName">
+                                    学位名称：</label>
+                                <input readonly="readonly" class="col-sm-2" id="majorName_planCollegeInfo" name="planCollegeInfo.courseName"
+                                       th:value="${planCollegeInfo!=null}?  ${planCollegeInfo.courseName}" required="required"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                                <!--<label class="col-sm-2 control-label no-padding-right blue" for="collegeNo"> 申请院校编号：</label>
+                                <input readonly="readonly" class="col-sm-2" name="apply.collegeNo" th:value="${apply.apply!=null}? ${apply.apply.collegeNo}" required="required"/>-->
+                                <!--<a href="" target="_blank" id="planScheme" style="float:right">定校方案列表</a>-->
+                            </div>
+
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue" for="schoolLength">
+                                    学制：</label>
+                                <input readonly="readonly" class="col-sm-2" id="schoolLength_planCollegeInfo" name="planCollegeInfo.schoolLength"
+                                       th:value="${planCollegeInfo!=null}? ${planCollegeInfo.schoolLength}"/>
+                                <label class="col-sm-2 control-label no-padding-right blue" for=""> 开课日期：</label>
+                                <input readonly="readonly" style="width: 190px"
+                                       id="courseStartTime_planCollegeInfo" name="planCollegeInfo.courseStartTime"
+                                       th:value="${planCollegeInfo!=null &amp;&amp; planCollegeInfo.courseStartTime!=null}? ${#dates.format(planCollegeInfo.courseStartTime, 'yyyy-MM-dd')}"/>
+                                <!--<a href="" target="_blank" id="planDetail" style="float:right">定校详细信息</a>-->
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 合作机构：</label>
+                                <input class="col-sm-2" style="width: 190px; height:25px;" readonly="readonly" th:value="${planCollegeInfo!=null}?${planCollegeInfo.agencyName}"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="header smaller lighter blue">申请信息</h3>
+                <shiro:hasPermission name="院校申请列表_查看">
+                    <input type="hidden" name="checkPermission" id="checkPermission" th:value="true"/>
+                </shiro:hasPermission>
+                <br/>
+                <input type="hidden" id="currentUser" th:value="${session.user.oaid}"/>
+                <input type="hidden" name="apply.id" id="id" th:value="${apply.apply.id}"/>
+                <input type="hidden" name="apply.studentNo" id="studentNo" th:value="${apply.apply.studentNo}"/>
+                <input type="hidden" id="planId" th:value="${planId}"/>
+                <input type="hidden" id="planCollegeId" th:value="${apply.apply.planCollegeId}"/>
+                <input type="hidden" id="copy" th:value="${apply.apply.collegeCopy}"/>
+                <input type="hidden" id="material" th:value="${apply.apply.collegeMaterial}"/>
+                <input type="hidden" id="planCollegeInfoUrl" th:value="${planCollegeInfoUrl}"/>
+                <input type="hidden" id="planCollegeListUrl" th:value="${planCollegeListUrl}"/>
+                <input type="hidden" id="resDomain" th:value="${resDomain}"/>
+                <input type="hidden" id="nation" th:value="${nation}"/>
+                <input type="hidden" id="planCollegeInfo" th:value="${planCollegeInfo}"/>
+
+                <div class="tab-pane fade in active">
+                    <div class="container">
+                        <div class="form-horizontal">
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 院校名称：</label>
+                                <input readonly="readonly" class="col-sm-2" style="width: 560px" id="collegeName" name="apply.collegeName"
+                                       th:value="${apply.apply!=null}? ${apply.apply.collegeName}" required="required"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 申请类型：</label>
+                                <select disabled="disabled" class="col-sm-2 input-sm" id="applyType"
+                                        name="apply.applyType">
+                                    <option value="-1" th:selected="${apply!=null}? ${apply.apply.applyType==-1}">请选择
+                                    </option>
+                                    <option value="1" th:selected="${apply!=null}? ${apply.apply.applyType==1}">主课申请
+                                    </option>
+                                    <option value="2" th:selected="${apply!=null}? ${apply.apply.applyType==2}">语言申请
+                                    </option>
+                                    <option value="3" th:selected="${apply!=null}? ${apply.apply.applyType==2}">预备申请
+                                    </option>
+                                </select>
+                                <span class="col-sm-1" style="color: red;margin-left: 5px;">* </span>
+                                <label class="col-sm-1 control-label no-padding-right blue"> 专业类型：</label>
+                                <select class="col-sm-2 input-sm" id="courseType" name="courseType" disabled="disabled">
+                                    <option value="-1">请选择</option>
+                                    <option value="3" th:selected="${apply !=null} ? ${apply.apply.courseType==3}">主课</option>
+                                    <option value="1" th:selected="${apply !=null} ? ${apply.apply.courseType==1}">语言</option>
+                                    <option value="2" th:selected="${apply !=null} ? ${apply.apply.courseType==2}">预科</option>
+                                    <option value="4" th:selected="${apply !=null} ? ${apply.apply.courseType==4}">快捷</option>
+                                    <option value="5" th:selected="${apply !=null} ? ${apply.apply.courseType==5}">夏校</option>
+                                    <option value="6" th:selected="${apply !=null} ? ${apply.apply.courseType==6}">桥梁</option>
+                                    <option value="7" th:selected="${apply !=null} ? ${apply.apply.courseType==7}">top up</option>
+                                </select>
+                                <span style="color: red;margin-left: 5px;">* </span>
+
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 目标学历：</label>
+                                <select class="col-sm-2 input-sm" id="educationSection" name="apply.educationSection" disabled="disabled">
+                                    <option value="-1">请选择</option>
+                                    <option value="2" th:selected="${apply!=null}? ${apply.apply.educationSection==2}">中小学</option>
+                                    <option value="3" th:selected="${apply!=null}? ${apply.apply.educationSection==3}">本科</option>
+                                    <option value="4" th:selected="${apply!=null}? ${apply.apply.educationSection==4}">硕士</option>
+                                    <option value="5" th:selected="${apply!=null}? ${apply.apply.educationSection==5}">博士</option>
+                                    <option value="9" th:selected="${apply!=null}? ${apply.apply.educationSection==9}">专科</option>
+                                    <option value="10" th:selected="${apply!=null}? ${apply.apply.educationSection==10}">非学历</option>
+                                    <option value="11" th:selected="${apply!=null}? ${apply.apply.educationSection==11}">证书</option>
+                                    <option value="12" th:selected="${apply!=null}? ${apply.apply.educationSection==12}">副学士</option>
+                                </select>
+                                <span class="col-sm-1" style="color: red;margin-left: 5px;">* </span>
+                                <label class="col-sm-1 control-label no-padding-right blue"> 合作机构：</label>
+                                <input class="col-sm-2" style="width: 190px; height:25px;" readonly="readonly" th:value="${apply.apply!=null}?${apply.apply.agencyName}"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"
+                                       for="courseName">专业名称：</label>
+                                <input readonly="readonly" class="col-sm-2" id="courseName" name="apply.majorName"
+                                       th:value="${apply.apply!=null}?  ${apply.apply.majorName}" required="required"/>
+                                <span class="col-sm-1" style="color: red;margin-left: 5px;">* </span>
+                                <label class="col-sm-1 control-label no-padding-right blue" for="majorName">
+                                    学位名称：</label>
+                                <input readonly="readonly" class="col-sm-2" id="majorName" name="apply.courseName"
+                                       th:value="${apply.apply!=null}?  ${apply.apply.courseName}" required="required"/>
+                                <span style="color: red;margin-left: 5px;">* </span>
+                                <!--<label class="col-sm-2 control-label no-padding-right blue" for="collegeNo"> 申请院校编号：</label>
+                                <input readonly="readonly" class="col-sm-2" name="apply.collegeNo" th:value="${apply.apply!=null}? ${apply.apply.collegeNo}" required="required"/>-->
+                                <a href="" target="_blank" id="planScheme" style="float:right">定校方案列表</a>
+                            </div>
+
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue" for="schoolLength">
+                                    学制：</label>
+                                <input readonly="readonly" class="col-sm-2" id="schoolLength" name="apply.schoolLength"
+                                       th:value="${apply.apply!=null}? ${apply.apply.schoolLength}"/>
+                                <label class="col-sm-2 control-label no-padding-right blue" for=""> 开课日期：</label>
+                                <input readonly="readonly" style="width: 190px"
+                                       id="courseStartTime" name="apply.courseStartTime"
+                                       th:value="${apply.apply.courseStartTime!=null}? ${#dates.format(apply.apply.courseStartTime, 'yyyy-MM-dd')}"/>
+                                <a href="" target="_blank" id="planDetail" style="float:right">定校详细信息</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade in active">
+                    <div class="container">
+                        <div class="form-horizontal">
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 申请方式：</label>
+                                <select disabled="disabled" class="col-sm-2 input-sm" id="applyWay"
+                                        name="apply.applyWay">
+                                    <option value="1" th:selected="${apply.apply!=null}? ${apply.apply.applyWay==1}">
+                                        邮寄
+                                    </option>
+                                    <option value="2" th:selected="${apply.apply!=null}? ${apply.apply.applyWay==2}">
+                                        网申
+                                    </option>
+                                    <option value="3" th:selected="${apply.apply!=null}? ${apply.apply.applyWay==3}">
+                                        邮件
+                                    </option>
+                                </select>
+                                <label class="col-sm-2 control-label no-padding-right blue"> 申请提交日期：</label>
+                                <input readonly="readonly" style="width: 190px"
+                                       id="commitDate" name="apply.commitDate"
+                                       th:value="${apply.apply.commitDate!=null}? ${#dates.format(apply.apply.commitDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 审理周期：</label>
+                                <input readonly="readonly" class="col-sm-2" type="number" min="1" max="2000"
+                                       id="replyCycle" name="apply.replyCycle"
+                                       th:value="${apply.apply!=null}? ${apply.apply.replyCycle}"/> &nbsp;&nbsp;天
+                            </div>
+                            <div class="form-group copy-show" style="height:29px ; line-height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 文书内容：</label>
+                                <div class="">
+                                    <input type="hidden" id="collegeCopy" th:value="${apply.apply!=null}? ${apply.apply.collegeCopy}"/>
+                                    <a id="a_collegeCopy" target="_blank">查看</a>
+                                    <!--<a id="a_collegeCopy_download" target="_blank"-->
+                                       <!--download="下载">下载</a>-->
+                                </div>
+                            </div>
+                            <div class="form-group material-show" style="height:29px ; line-height:29px">
+                                <label class="col-sm-2 control-label no-padding-right blue"> 申请材料：</label>
+                                <div class="">
+                                    <input type="hidden" id="collegeMaterial" th:value="${apply.apply!=null}? ${apply.apply.collegeMaterial}"/>
+                                    <a id="a_collegeMaterial"
+                                       target="_blank">查看</a>
+                                    <!--<a id="a_collegeMaterial_download" target="_blank"-->
+                                       <!--download="下载">下载</a>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <h3 class="header smaller lighter blue send">寄件信息</h3>
+                    <div class="tab-pane fade in active send">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-2 control-label no-padding-right blue"> 快递公司：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="expressCompanyCode"
+                                            name="expressCompanyCode" style="width:190px;height:25px;"
+                                            required="required">
+                                        <option value="" selected="selected">请选择</option>
+                                        <option th:each="express:${apply.expressCompanyList}"
+                                                th:value="${express.companyCode}"
+                                                th:selected="${apply.supplementInfo}? ${express.companyCode==apply.supplementInfo.expressCompanyCode}"
+                                                th:text="${express.companyName}"></option>
+                                    </select>
+                                    <label class="col-sm-2 control-label no-padding-right blue"> 快递单号：</label>
+                                    <input readonly="readonly" class="col-sm-3" style="width: 190px" id="expressNo"
+                                           name="supplementInfo.expressNo"
+                                           th:value="${apply.supplementInfo!=null}? ${apply.supplementInfo.expressNo}"
+                                           required="required"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="header smaller lighter blue ">Offer列表</h3>
+                    <table id="sample-table-4" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th class="hide">id</th>
+                            <th>审批状态</th>
+                            <th>申请结果</th>
+                            <th>Offer类型</th>
+                            <th>Offer附件</th>
+                            <th>回复日期</th>
+                            <th>操作人</th>
+                            <th>操作日期</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div id="coeDivId">
+                        <h3 id="nationId" class="header smaller lighter blue ">COE列表</h3>
+                        <table id="sample-table-5" class="table table-striped table-bordered table-hover">
+                            <thead>
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th id="name2">coe申请附件</th>
+                                <th id="name3">coe结果附件</th>
+                                <th>操作人</th>
+                                <th>操作日期</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <h3 class="header smaller lighter blue ">补件信息</h3>
+                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <!--<th class="hide">id</th>-->
+                            <th>寄件类型</th>
+                            <th>寄出日期</th>
+                            <th>补件扫描件</th>
+                            <th>操作人</th>
+                            <th>操作时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <h3 class="header smaller lighter blue ">回访信息</h3>
+                    <table id="sample-table-3" class="table table-striped table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>回访类型</th>
+                            <th>发送方</th>
+                            <th>回访内容</th>
+                            <th>附件</th>
+                            <th>操作人</th>
+                            <th>操作时间</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="modal-footer">
+                        <button type="button" id="returnBack" class="btn btn-primary" data-dismiss="modal">返回</button>
+                        <!-- <button type="button" class="btn btn-primary" id="submits">保存</button>-->
+                        <!--</div>-->
+                        <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <span id="alertText"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:include="fragments/bottom::bottom"></div>
+        </div>
+
+        <a href="#" id="btn-scroll-up"
+           class="btn-scroll-up btn btn-sm btn-inverse"> <i
+                class="icon-double-angle-up icon-only bigger-110"></i>
+        </a>
+    </div>
+</div>
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/business/apply/edit.js}" charset="UTF-8"></script>
+<script th:src="@{/assets/js/date-time/moment.min.js}"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/date-time/bootstrap-datepicker.min.js}" charset="UTF-8"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+
+    var applyId = $("#id").val();
+    var studentNo = $("#studentNo").val();
+    $("#returnBack").click(function () {
+        window.history.back(-1);
+    })
+    //回访信息
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-3').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/visit/list/query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push({"name": "studentNo", "value": studentNo});
+                aoData.push({"name": "businessId", "value": applyId});
+                aoData.push({"name": "visitCase", "value": 2});
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[1, "desc"]],
+            "aoColumns": [
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.visitType == 1) return "收材料";
+                            if (data.visitType == 2) return "补件";
+                            if (data.visitType == 3) return "确认补件";
+                            if (data.visitType == 4) return "跟催";
+                            if (data.visitType == 5) return "其他";
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.senderType == 1) return "外联";
+                            if (data.senderType == 2) return "学校";
+
+                        }
+                },
+                // {"sClass": "center", "bSortable": false,sWidth: "50%", "mData": "content"},
+                {
+                    "sClass": "left", "bSortable": false, sWidth: "55%", "mData": function (data) {
+                        var html;
+                        if (data.content.length > 30) {
+                            html = "<div class='accordion-group'>" +
+                                "<div class='accordion-heading'>" +
+                                "<a class='accordion-toggle' data-toggle='collapse' data-parent='#accordion2' href='#collapseOne" + data.id + "'>" +
+                                data.content.substring(0, 30) +
+                                "</a>" +
+                                "</div>" +
+                                "<div id='collapseOne" + data.id + "' class='accordion-body collapse' style='height: 0px; '>" +
+                                "<div class='accordion-inner'>" + data.content.substring(30, data.content.length) +
+                                "</div>" +
+                                "</div>" +
+                                "</div>";
+                        } else {
+                            html = data.content;
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+//                        var attachment = "";
+//                        if (data.attachment == null || data.attachment == "") {
+//                            attachment = "无";
+//                        } else {
+//                            attachment = '<a href="' + data.attachment + '" target="_blank">查看</a>';
+//                        }
+//                        return attachment;
+                        if (data.attachment == null || data.attachment == "") {
+                            return null;
+                        }
+                        else {
+                            var showImg = '<a onclick="showAttachment(\'' + data.attachment + '\')">查看</a>';
+                            return showImg;
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": "createTime",
+                    "mRender": function (data, type, full, meta) {
+                        return moment(data).format("YYYY-MM-DD");
+                    }
+                },
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+
+    })
+    //补件信息
+    var oTable1;
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource": "/supplementInfo_query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": applyId},
+                    {"name": "expressNo", "value": $("#value").val() == "" ? null : $("#value").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+//                {"sClass": "center", "bVisible": false, "mData": "id"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.supplementType == 1) return "首次递交";
+                            if (data.supplementType == 2) return "补件";
+                            if (data.supplementType == 3) return "邮寄最终成绩单/疫苗表日期";
+                            if (data.supplementType == 4) return "邮寄录取包裹";
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "sendDate_string"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                    if (data.supplementAttachment == null || data.supplementAttachment == "") {
+                        return null;
+                    }
+                    else {
+                        var showImg = '<a onclick="showAttachment(\'' + data.supplementAttachment + '\')">查看</a>';
+                        return showImg;
+                    }
+                }},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {"sClass": "center", "bSortable": false, "mData": "createTime_string"}
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+
+    });
+
+    //coe
+    var oTable2;
+    jQuery(function ($) {
+        oTable2 = $('#sample-table-5').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource": "/coeApply_query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": $("#id").val()},
+                    {"name": "studentNo", "value": $("#studentNo").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+//                {"sClass": "center", "bVisible": false, "mData": "id"},
+                {"sClass": "center", "bSortable": false, "mData": "studentNo"},
+                {"sClass": "center", "bSortable": false, "mData": "studentName"},
+
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+//                            if (data.applyAttachment == null || data.applyAttachment == "") {
+//                                return ""
+//                            }
+//                            else {
+//                                var showImg = '<a href="' + data.applyAttachment + '" target="_blank">查看</a>';
+//                                return showImg;
+//                            }
+
+                            if (data.applyAttachment == null || data.applyAttachment == "") {
+                                return null;
+                            }
+                            else {
+                                var showImg = '<a onclick="showAttachment(\'' + data.applyAttachment + '\')">查看</a>';
+                                return showImg;
+                            }
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+//                            if (data.attachment == null || data.attachment == "") {
+//                                return ""
+//                            } else {
+//                                var showImg = '<a href="' + data.attachment + '" target="_blank">查看</a>';
+//                                return showImg;
+//                            }
+                            if (data.attachment == null || data.attachment == "") {
+                                return null;
+                            }
+                            else {
+                                var showImg = '<a onclick="showAttachment(\'' + data.attachment + '\')">查看</a>';
+                                return showImg;
+                            }
+
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.updateTime != null) {
+                                return getTimeString_day(new Date(data.updateTime))
+                            } else {
+                                return "";
+                            }
+                        }
+                },
+
+
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+
+    });
+
+    var oTable3;
+    jQuery(function ($) {
+        oTable3 = $('#sample-table-4').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/applyResult/list/query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": $("#id").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+
+                            if (data.auditStatus == 1) return "已提交";
+                            if (data.auditStatus == 2) return "审批中";
+                            if (data.auditStatus == 3) return "审批通过";
+                            if (data.auditStatus == 4) return "审批不通过";
+                            return "--";
+
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.resultType == 1) return "录取";
+                            if (data.resultType == 2) return "拒绝";
+                            if (data.resultType == 3) return "满位";
+                            if (data.resultType == 4) return "waiting list";
+                            if (data.resultType == 5) return "预录取";
+                            if (data.resultType == 6) return "其他";
+                            if (data.resultType == 7) return "收条";
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.offerType == 1) return "无条件offer";
+                            if (data.offerType == 2) return "只有语言条件offer";
+                            if (data.offerType == 3) return "只有学术条件offer";
+                            if (data.offerType == 4) return "其他条件offer";
+                            else return "无";
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+//                        var attachment = "";
+//                        if (data.offerAttachment == null || data.offerAttachment == "") {
+//                            attachment = "无";
+//                        } else {
+//                            attachment = '<a href="' + data.offerAttachment + '" target="_blank">查看</a>';
+//                        }
+//                        return attachment;
+                    if (data.offerAttachment == null || data.offerAttachment == "") {
+                        return null;
+                    }
+                    else {
+                        var showImg = '<a onclick="showAttachment(\'' + data.offerAttachment + '\')">查看</a>';
+                        return showImg;
+                    }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "resultDateString"},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {"sClass": "center", "bSortable": false, "mData": "createdString"}
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+
+    });
+
+    function getTimeString_day(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m : '0' + m;
+        var d = date.getDate();
+        d = d >= 10 ? d : '0' + d;
+        return y + '-' + m + '-' + d;
+    }
+
+    function showAttachment(showAttachment) {
+//        if (showAttachment.indexOf($("#resDomain").val()) == -1) {
+//            window.open($("#resDomain").val() + URLencode(showAttachment));
+//        } else {
+//            window.open(URLencode(showAttachment));
+//        }
+//        $.post("/getPrivateUrl",{"fileUrl":showAttachment},function (data,status) {
+//            window.open(data);
+//        });
+        window.open(showAttachment);
+    }
+
+    $("#a_collegeMaterial").click(function () {
+//        if ($("#collegeMaterial").val().indexOf($("#resDomain").val()) == -1) {
+//            window.open($("#resDomain").val() + URLencode($("#collegeMaterial").val()));
+//        } else {
+//            window.open(URLencode($("#collegeMaterial").val()));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":$("#collegeMaterial").val()},function (data,status) {
+            window.open(data);
+        });
+//        window.open($("#collegeMaterial").val());
+    });
+
+    $("#a_collegeCopy").click(function () {
+//        if ($("#collegeCopy").val().indexOf($("#resDomain").val()) == -1) {
+//            window.open($("#resDomain").val() + URLencode($("#collegeCopy").val()));
+//        } else {
+//            window.open(URLencode($("#collegeCopy").val()));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":$("#collegeCopy").val()},function (data,status) {
+            window.open(data);
+        });
+//        window.open($("#collegeCopy").val());
+    });
+
+    $("#a_collegeMaterial_download").click(function () {
+        if ($("#collegeMaterial").val().indexOf($("#resDomain").val()) == -1) {
+            $("#a_collegeMaterial_download").attr("href", $("#resDomain").val() + URLencode($("#collegeMaterial").val()));
+        } else {
+            $("#a_collegeMaterial_download").attr("href", URLencode($("#collegeMaterial").val()));
+        }
+    });
+
+    $("#a_collegeCopy_download").click(function () {
+        if ($("#collegeCopy").val().indexOf($("#resDomain").val()) == -1) {
+            $("#a_collegeCopy_download").attr("href", $("#resDomain").val() + URLencode($("#collegeCopy").val()));
+        } else {
+            $("#a_collegeCopy_download").attr("href", URLencode($("#collegeCopy").val()));
+        }
+    });
+
+    $(function(){
+        if($("#checkPermission").val() == "true"){
+            $("#planScheme").hide();
+            $("#planDetail").hide();
+        }
+    });
+
+
+    if ($("#copy").val() == "") {
+        $(".copy-show").hide();
+    }
+    if ($("#material").val() == "") {
+        $(".material-show").hide();
+    }
+    $(function () {
+        var nation = $("#nation").val();
+        if (nation == 3) {
+            $("#nationId").html("CAS列表");
+            $("#name2").html("CAS申请附件");
+            $("#name3").html("CAS结果附件");
+        } else if (nation == 1) {
+            $("#nationId").html("COE列表");
+            $("#name2").html("COE申请附件");
+            $("#name3").html("COE结果附件");
+        } else if (nation == 4) {
+            $("#nationId").html("I-20列表");
+            $("#name2").html("I-20申请附件");
+            $("#name3").html("I-20结果附件");
+        } else if (nation == 2) {
+            $("#nationId").html("Receipt列表");
+            $("#name2").html("Receipt申请附件");
+            $("#name3").html("Receipt结果附件");
+        } else if (nation == 5) {
+            $("#nationId").html("Full Offer列表");
+            $("#name2").html("Full Offer申请附件");
+            $("#name3").html("Full Offer结果附件");
+        } else {
+            $("#coeDivId").hide();
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

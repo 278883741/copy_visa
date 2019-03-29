@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysRolePermissionMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysRolePermission">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="permission_id" jdbcType="INTEGER" property="permissionId" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="deleted" jdbcType="TIMESTAMP" property="deleted" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+  </resultMap>
+
+  <select id="getPermissionIds" parameterType="int" resultType="int">
+    select permission_id from sys_role_permission  where role_id in
+    <foreach collection="list" item="permission" index="index"
+             open="(" close=")" separator=",">
+      #{permission}
+    </foreach>
+      and  delete_status=0
+  </select>
+
+  <update id="removeByRoleIdAndPermissionId" parameterType="java.lang.Integer">
+    update sys_role_permission set delete_status = 1, deleted = now() where role_id = #{roleId} and delete_status = 0
+  </update>
+
+  <select id="selectSysRolePermission" parameterType="com.aoji.vo.SysRolePermissionVO" resultType="com.aoji.vo.SysRolePermissionVO">
+    select sr.role_name roleName, sr.id roleId, srp.id rolePermissionId, srp.created, sp.id permissionId, sp.permission_name permissionName from
+    (select * from sys_role where delete_status = 0
+    <if test="roleName != null and roleName != ''">
+      and role_name like concat('%', #{roleName},'%')
+    </if>
+    ) sr,
+    (select * from sys_role_permission where delete_status = 0) srp,
+    (select * from sys_permission where delete_status = 0
+    <if test="permissionName != null and permissionName != ''">
+      and permission_name like concat('%', #{permissionName}, '%')
+    </if>
+    ) sp
+    where sr.id = srp.role_id and srp.permission_id = sp.id
+  </select>
+</mapper>

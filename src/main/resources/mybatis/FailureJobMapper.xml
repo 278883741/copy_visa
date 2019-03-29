@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.FailureJobMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.FailureJob">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="module" jdbcType="VARCHAR" property="module" />
+    <result column="method" jdbcType="VARCHAR" property="method" />
+    <result column="query_param" jdbcType="VARCHAR" property="queryParam" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+  </resultMap>
+</mapper>

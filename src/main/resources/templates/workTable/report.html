@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+	.error {
+		color: #F00
+	}
+	.rowStyle{margin-top:2%;}
+	.h300{height:300px;overflow-y:scroll;}
+	.pStyle{height:38px;line-height:38px;border-bottom:1px solid #ccc;margin:0;padding:0;}
+	.tipStyle_1{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:red;color:#fff;line-height:15px;text-align:center;}
+	.tipStyle_2{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:lime;color:#fff;line-height:15px;text-align:center;}
+	.tipStyle_3{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:gold;color:#fff;line-height:15px;text-align:center;}
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+	<div class="main-container-inner">
+		<div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+		<div class="main-content">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<ul class="breadcrumb">
+					<li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+					<li><a href="#">系统管理</a></li>
+					<li><a href="/member/list">工作台</a></li>
+				</ul>
+			</div>
+
+			<div class="page-content">
+				<div class = "page-header">
+					<h3 class="header smaller lighter blue">工作台</h3>
+					<div class="col-sm-6">
+						<a href="#" id="id-btn-dialog2" class="btn btn-info btn-sm">我的学生列表</a>&nbsp;&nbsp;
+						<a href="#" id="id-btn-dialog1" class="btn btn-purple btn-sm">各阶段学生个数</a>
+					</div>
+				</div>
+
+			</div>
+			<div id="container" style="width: 550px; height: 400px; margin: 0 auto"></div>
+
+		</div>
+
+		<div th:include="fragments/bottom::bottom"></div>
+	</div>
+
+
+	<a href="#" id="btn-scroll-up"
+	   class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="icon-double-angle-up icon-only bigger-110"></i>
+	</a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	 aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content"></div>
+	</div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/js/jquery-2.1.4.js}"></script>
+<script th:src="@{/business/workTable/table.js}"></script>
+<script th:src="@{/highcharts/highcharts.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

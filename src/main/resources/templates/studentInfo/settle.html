@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+            <!--<ul class="breadcrumb">-->
+            <!--<li>首页</li>-->
+            <!--<li>学生管理</li>-->
+            <!--<li>停办管理</li>-->
+            <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <div th:include="fragments/student_info::student_info"
+                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                <h3 class="header smaller lighter blue">结案详情</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <input type="hidden" name="updateTime" id="updateTime"
+                       th:value="${studentSettleInfo != null and studentSettleInfo.updateTime != null}? ${#dates.format(studentSettleInfo.updateTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                <input type="hidden" name="reason" id="reason_input"
+                       th:value="${studentSettleInfo != null}? ${studentSettleInfo.reason}"/>
+                <input type="hidden" id="resDomain" th:value="${resDomain}"/>
+                <input type="hidden" id="canApproveSettle" th:value="${canApproveSettle}"/>
+                <shiro:hasPermission name="结案申请_修改">
+                    <input type="hidden" id="isOperator" th:value="1"/>
+                </shiro:hasPermission>
+                <form method="post" id="edit">
+                    <input type="hidden" name="studentNo" id="studentNo"
+                           th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                    <input type="hidden" name="id" id="id"
+                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.id}"/>
+                    <input type="hidden" id="businessId" th:value="${businessId != null}? ${businessId}"/>
+                    <input type="hidden" id="attachment"
+                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.attachment}"/>
+                    <input type="hidden" id="closeLetter"
+                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.closeLetter}"/>
+                    <input type="hidden" name="attachment" id="input_fileName"
+                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.attachment}"/>
+
+                    <input type="hidden" id="input_studentNo"
+                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.studentNo}"/>
+                    <input id="input_businessUpdateTime" type="hidden"
+                           th:value="${studentSettleInfo!=null and studentSettleInfo.updateTime !=null}? ${#dates.format(studentSettleInfo.updateTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                    <div class="tab-pane fade in active" style="height:90px">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">结案原因：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm"
+                                            id="reason" name="reason" style="width:150px;height:25px;">
+                                        <option value="">请选择</option>
+                                        <option value="1"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==1}">
+                                            单文书结案
+                                        </option>
+                                        <option value="2"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==2}">
+                                            单申请结案
+                                        </option>
+                                        <option value="3"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==3}">
+                                            其他
+                                        </option>
+                                        <option value="4"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==4}">
+                                            自动结案
+                                        </option>
+                                        <option value="5"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==5}">
+                                            退费结案
+                                        </option>
+                                        <option value="6"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==6}">
+                                            套磁结案
+                                        </option>
+                                        <option value="7"
+                                                th:selected="${studentSettleInfo!=null}? ${studentSettleInfo.reason==7}">
+                                            增值服务结案
+                                        </option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">申请日期：</label>
+                                    <input class="Wdate" disabled="disabled" name="contactDate"
+                                           onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                           style="width: 150px; height:25.2px" id="delay_time"
+                                           th:value="${studentSettleInfo != null and studentSettleInfo.createTime != null}? ${#dates.format(studentSettleInfo.createTime, 'yyyy-MM-dd')}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">操作人：</label>
+                                    <input class="col-sm-1" readonly="readonly" name="operatorName" style="width: 150px"
+                                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.operatorName}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">旧系统结案原因：</label>
+                                    <input class="col-sm-1" readonly="readonly" name="endCaseReason" style="width: 150px"
+                                           th:value="${studentSettleInfo != null}? ${studentSettleInfo.endCaseReason}"/>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!--文件上传 -->
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                    <div class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group " style="height:150px;margin-top:50px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">学生确认结果：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input id="offerAttachment" name="attachment"
+                                                       th:value="${studentSettleInfo != null}? ${studentSettleInfo.attachment}"
+                                                       style="display: none"/>
+
+                                                <span id="offer_attachment" style="display: none"><span
+                                                        id="offerAttachment_show"
+                                                        th:text="${studentSettleInfo != null}? ${studentSettleInfo.attachment}"></span>
+                                                    <span class="btn btn-sm btn-primary" style="left:9%"
+                                                          id="offer_show">预览</span>
+
+                                                    <a th:href="${studentSettleInfo != null}?${studentSettleInfo.attachment}"
+                                                       download="offer信息下载" id="upload_office">
+                                                        </a></span>
+
+                                                <input  name="fileInput" multiple="" type="file"
+                                                       id="id-input-file-3"/>
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format"
+                                                           class="ace"/>
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <form method="post" action="/upload" id="form_file_close" enctype="multipart/form-data">
+                    <div class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group " style="height:150px;margin-top:50px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">特殊结案类型附件：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input id="offerAttachment_close"
+                                                       th:value="${studentSettleInfo != null}? ${studentSettleInfo.closeLetter}"
+                                                       style="display: none"/>
+
+                                                <span id="offer_attachment_close" style="display: none"><span
+                                                        id="offerAttachment_show_close"
+                                                        th:text="${studentSettleInfo != null}? ${studentSettleInfo.closeLetter}"></span>
+                                                    <span class="btn btn-sm btn-primary" style="left:9%"
+                                                          id="offer_show_close">预览</span>
+
+                                                    <a th:href="${studentSettleInfo != null}?${studentSettleInfo.closeLetter}"
+                                                       download="offer信息下载" id="upload_office_close">
+                                                        </a></span>
+
+                                                <!--<input readonly="readonly" name="fileInput" multiple="" type="file"-->
+                                                <!--id="id-input-file-3"/>-->
+                                                <!--<label>-->
+                                                <!--<input type="checkbox" name="file-format" id="id-file-format"-->
+                                                <!--class="ace"/>-->
+                                                <!--</label>-->
+                                                <!--<span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- 审核信息 -->
+                <div class="form-group auditResult_content">
+                    <div class="form-group" id="div_audit" style="float: right;">
+                    </div>
+                    <div class="form-group" style="height:29px;margin-top: 20px;">
+                        <input type="hidden" id="visa_audit_id" th:value="${toAudit!=null}?${toAudit.id}"/>
+                        <label class="col-sm-3 control-label no-padding-right blue">
+                            待审批人OA：<span
+                                th:text="${toAudit!=null}? ${toAudit.oaid + '-' +  toAudit.oaName}:当前审批流程已结束"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" style="margin-top: 40px;" th:unless="${#lists.isEmpty(list_case_11)}">
+                        <table class="table" width="450" border="1" cellspacing="4"
+                               cellpadding="1">
+                            <tr>
+                                <td align="center">审批结果</td>
+                                <td align="center">审批人</td>
+                                <td align="center">审批时间</td>
+                                <td align="center">审批意见</td>
+                            </tr>
+                            <tr th:each="item,iterStat:${list_case_11}">
+                                <td style="text-align: center; vertical-align: middle;"
+                                    th:text="${item.applyStatus_string}"></td>
+                                <td style="text-align: center; vertical-align: middle;"
+                                    th:text="${item.operatorName}"></td>
+                                <td style="text-align: center; vertical-align: middle;"
+                                    th:text="${item.createTime!=null}?${#dates.format(item.createTime, 'yyyy-MM-dd')}"></td>
+                                <td style="text-align: center; vertical-align: middle;" th:text="${item.reason}"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <input type="text" id="input_auditStatus_apply" style="display: none"
+                           th:value="${studentSettleInfo!=null}? ${studentSettleInfo.auditStatus}"/>
+                    <input type="text" id="input_auditStatus" style="display: none"
+                           th:value="${studentSettleInfo!=null}? ${studentSettleInfo.auditStatus}"/>
+                    <input type="text" id="input_isAuditUser" style="display: none;" th:value="${isAuditUser}"/>
+                    <input type="text" id="input_businessId" style="display: none;"
+                           th:value="${studentSettleInfo!=null}? ${studentSettleInfo.id}"/>
+                </div>
+
+
+                <div class="modal-footer">
+                    <shiro:hasRole name="运营人员">
+                        <button type="button" class="btn btn-primary" id="operatorCancelSettle">作废</button>
+                    </shiro:hasRole>
+                    <shiro:hasRole name="审批学生结案">
+                        <button id="button_audit" type="button" class="btn btn-primary">审批</button>
+                    </shiro:hasRole>
+                    <button type="button" class="btn btn-primary" id="returnPage">返回</button>
+                    <button type="button" class="btn btn-primary" id="submits">保存</button>
+
+                </div>
+
+                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <span id="alertText"></span>
+                </div>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/student/settle.js}" charset="UTF-8"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var canApprove = [[${canApprove}]];
+
+    var isNull = [[${isNull}]];
+
+    var studentNo = $("#studentNo").val();
+
+    var data_offer = $("#attachment").val();
+
+    var data_offer_close = $("#closeLetter").val();
+
+    $('#id-input-file-3').ace_file_input({
+        style: 'well',
+        btn_choose: 'Drop files here or click to choose',
+        btn_change: null,
+        no_icon: 'icon-cloud-upload',
+        droppable: true,
+        thumbnail: 'small',//large | fit
+        before_change: function (files, dropped) {
+            return true;
+        },
+        before_remove: function () {
+            $("#upload_offer").attr("style", "height:270px");
+            $("#offerAttachment").val(data_offer);
+            $("#input_fileName").val(data_offer);
+            return true;
+        },
+        preview_error: function (filename, error_code) {
+        }
+    }).on('change', function () {
+        uploadResult = false;
+        layer.msg('正在上传中...', {
+            icon: 16
+            , shade: 0.01
+        });
+        if (!checkUp(this)) {
+            return false;
+        }
+        $("#form_file").ajaxSubmit(function (message) {
+            console.log(message);
+            uploadResult = true;
+            var fileName = message.obj;
+            console.log(fileName);
+            var code = message.code;
+            if (code == "1") {
+                layer.msg("请上传正确的文件格式!")
+            } else if (message.success) {
+                $("#upload_offer").attr("style", "height:200px");
+                $("#input_fileName").val(fileName);
+                $("#offerAttachment").val(fileName);
+                layer.msg("上传成功!");
+            }
+        });
+    });
+
+    if (data_offer != '') {
+        $("#offerAttachment_show").text(data_offer.substring(0, 35) + "...");
+    }
+
+    $(function () {
+        if (data_offer != '') {
+            $("#upload_offer").attr("style", "height:270px");
+            $("#offer_attachment").show();
+        }
+    })
+
+    if (data_offer_close != '') {
+        $("#offerAttachment_show_close").text(data_offer.substring(0, 35) + "...");
+    }
+
+    $(function () {
+        if (data_offer_close != '') {
+            $("#upload_offer_close").attr("style", "height:270px");
+            $("#offer_attachment_close").show();
+        }
+    })
+
+    $(function () {
+        if($("#isOperator").val() == "1"){
+            $("#submits").show();
+        }
+        else{
+            $("#id-input-file-3").attr("readOnly","true");
+            $("#offerAttachment_close").attr("disabled","disabled");
+            $("#reason").attr("disabled","disabled");
+            $("#submits").hide();
+        }
+
+        if($("#reason").find("option:selected").val() == "6"){
+            $("#form_file_close").show();
+        }
+        else{
+            $("#form_file_close").hide();
+        }
+
+    })
+
+    $("#submits").click(function () {
+        $.ajax({
+            url: "/settle/save",
+            type: "post",
+            data:$("#edit").serialize(),
+            success: function (data) {
+                if (data) {
+                    layer.confirm('操作成功，是否跳转到详情页？', {
+                        btn: ['确定','取消'] //按钮
+                    }, function(){
+                        if(studentNo.indexOf('TY') == 0){
+                            location.href = "/channelStudent/detail?studentNo=" + studentNo;
+                        }
+                        else{
+                            location.href = "/student/detail?studentNo=" + studentNo;
+                        }                    }, function(){
+                        window.location.replace(window.location.href)
+                    });
+                } else {
+                    layer.confirm('操作失败，是否跳转到详情页？', {
+                        btn: ['确定','取消'] //按钮
+                    }, function(){
+                        if(studentNo.indexOf('TY') == 0){
+                            location.href = "/channelStudent/detail?studentNo=" + studentNo;
+                        }
+                        else{
+                            location.href = "/student/detail?studentNo=" + studentNo;
+                        }                    }, function(){
+                        window.location.replace(window.location.href)
+                    });
+                }
+            }
+        });
+    })
+
+//    $(function () {
+//        if($("#canApproveSettle").val() == "true"){
+//            $("#button_audit").show();
+//        }
+//        else{
+//            $("#button_audit").hide();
+//        }
+//    })
+
+    $(function () {
+        if (isNull == true) {
+            $("#operatorCancelSettle").hide();
+            layer.confirm('当前无结案申请信息！', {
+                icon: 1,
+                btn: ['返回']
+                , btn1: function (index, layero) {
+                    parent.layer.closeAll();
+                    if(studentNo.indexOf('TY') == 0){
+                        location.href = "/channelStudent/detail?studentNo=" + studentNo;
+                    }
+                else{
+                        location.href = "/student/detail?studentNo=" + studentNo;
+                    }                }
+            });
+        }
+    })
+    $(function () {
+
+
+        $("#offer_show").click(function () {
+//            if ($("#offerAttachment").val().indexOf($("#resDomain").val()) == -1) {
+//                window.open($("#resDomain").val() + URLencode($("#offerAttachment").val()));
+//            } else {
+//                window.open(URLencode($("#offerAttachment").val()));
+//            }
+//        window.open($("#offerAttachment").val());
+            $.post("/getPrivateUrl",{"fileUrl":$("#offerAttachment").val()},function (data,status) {
+                window.open(data);
+            });
+        })
+        $("#offer_upload").click(function () {
+            if ($("#offerAttachment").val().indexOf($("#resDomain").val()) == -1) {
+                $("#upload_office").attr("href", $("#resDomain").val() + URLencode($("#offerAttachment").val()));
+            } else {
+                console.log("22222");
+                $("#upload_office").attr("href", URLencode($("#offerAttachment").val()));
+            }
+//        $("#upload_office").attr("href",$("#offerAttachment").val());
+        });
+
+        $("#offer_show_close").click(function () {
+//            if ($("#closeLetter").val().indexOf($("#resDomain").val()) == -1) {
+//                window.open($("#resDomain").val() + URLencode($("#closeLetter").val()));
+//            } else {
+//                window.open(URLencode($("#closeLetter").val()));
+//            }
+//        window.open($("#offerAttachment").val());
+            $.post("/getPrivateUrl",{"fileUrl":$("#closeLetter").val()},function (data,status) {
+                window.open(data);
+            });
+        })
+        $("#offer_upload_close").click(function () {
+            if ($("#closeLetter").val().indexOf($("#resDomain").val()) == -1) {
+                $("#upload_office_close").attr("href", $("#resDomain").val() + URLencode($("#closeLetter").val()));
+            } else {
+                console.log("22222");
+                $("#upload_office_close").attr("href", URLencode($("#closeLetter").val()));
+            }
+//        $("#upload_office").attr("href",$("#offerAttachment").val());
+        });
+
+        $("#returnPage").click(function () {
+            if(studentNo.indexOf('TY') == 0){
+                location.href = "/channelStudent/detail?studentNo=" + studentNo;
+            }
+        else{
+                location.href = "/student/detail?studentNo=" + studentNo;
+            }        });
+        $(function () {
+            $("#button_audit").click(function () {
+                var businessId = $("#input_businessId").val();
+                var caseId = 11;
+                var applyId = $("#visa_audit_id").val();
+                var studentNo = $("#input_studentNo").val();
+                layer.prompt({
+                    formType: 2,
+                    title: '请添加备注',
+                    btn: ['通过', '拒绝'],
+                    yes: function (index, layero) {
+                        var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                        var reason = layero.find('.layui-layer-input').val();
+                        $.ajax({
+                            url: "/auditApply/audit",
+                            type: "post",
+                            data: {
+                                businessId: businessId,
+                                caseId: caseId,
+                                reason: reason,
+                                applyId: applyId,
+                                applyStatus: 2,
+                                studentNo: studentNo,
+                                businessUpdateTime: $("#input_businessUpdateTime").val()
+                            },
+                            success: function (data) {
+                                layer.close(loadIndex);
+                                var data = JSON.parse(data);
+                                if (data.code == 0) {
+                                    parent.layer.confirm("待审批内容已修改,请重新审批", {
+                                        icon: 7,
+                                        btn: ['确定']
+                                    }, function () {
+                                        window.location.reload();
+                                    });
+                                }
+                                else {
+                                    layer.close(index);
+                                    if (data.code == 1) {
+                                        layer.msg('操作成功', {time: 1000});
+                                        window.location.reload();
+                                    }
+                                    else
+                                        layer.msg('操作失败,请刷新页面重试!', {time: 1000});
+                                }
+                            }
+                        })
+                    },
+                    btn2: function (index, layero) {
+                        var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                        var reason = layero.find('.layui-layer-input').val();
+                        $.ajax({
+                            url: "/auditApply/audit",
+                            type: "post",
+                            data: {
+                                businessId: businessId,
+                                caseId: caseId,
+                                reason: reason,
+                                applyId: applyId,
+                                applyStatus: 1,
+                                studentNo: studentNo,
+                                businessUpdateTime: $("#input_businessUpdateTime").val()
+                            },
+                            success: function (data) {
+                                layer.close(loadIndex);
+                                var data = JSON.parse(data);
+                                if (data.code == 0) {
+                                    parent.layer.confirm("待审批内容已修改,请重新审批", {
+                                        icon: 7,
+                                        btn: ['确定']
+                                    }, function () {
+                                        window.location.reload();
+                                    });
+                                }
+                                else {
+                                    layer.close(index);
+                                    if (data.code == 1) {
+                                        layer.msg('操作成功', {time: 1000});
+                                        window.location.reload();
+                                    }
+                                    else
+                                        layer.msg('操作失败,请刷新页面重试!', {time: 1000});
+                                }
+                            }
+                        })
+                    }
+                });
+            });
+        });
+    });
+
+    //运营作废结案
+    $("#operatorCancelSettle").click(function () {
+        layer.open({
+            type: 1,
+            title: "是否作废此结案，并将学生更改为未结案状态",
+            area: ['400px', '100px'],
+            fixed: false, //不固定
+            btn: ['确定'],
+            yes: function (index) {
+//                //加载框
+//                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                $.ajax({
+                    url: "/operator/cancelSettle",
+                    type: "post",
+                    data: {
+                        studentNo: studentNo
+                    },
+                    success: function (data) {
+//                        layer.close(loadIndex);
+                        layer.close(index);
+                        if (data) {
+                            location.reload(true);
+                        } else {
+                            layer.msg('操作失败', {time: 1000});
+                        }
+                    }
+                });
+            },
+        });
+    });
+
+    /*]]>*/
+</script>
+</body>
+</html>

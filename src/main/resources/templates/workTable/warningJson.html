@@ -1,0 +1,11 @@
+<div class="widget-main padding-4" id="warningList" xmlns:th="http://www.w3.org/1999/xhtml">
+	<div class="content">
+		<input id="warning_div" th:value="${warningList}" type="text" name="warningList" style="display: none"/>
+		<ul th:each="item :${warningList}" id = "warning_item" >
+			<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==false"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span style="color:#FF0000">[未读]</span>
+				<span th:text="${item.content}"></span></a></li>
+			<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==true"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span >[已读]</span>
+				<span th:text="${item.content}"></span></a></li>
+		</ul>
+	</div>
+</div>

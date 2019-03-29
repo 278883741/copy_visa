@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li>首页</li>-->
+                    <!--<li>学生管理</li>-->
+                    <!--<li>停办管理</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">申请停办</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <input type="hidden" name="updateTime" id="updateTime" th:value="${studentDelayInfo != null and studentDelayInfo.updateTime != null}? ${#dates.format(studentDelayInfo.updateTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                <input type="hidden" name="reason" id="reason_input" th:value="${studentDelayInfo != null}? ${studentDelayInfo.reason}"/>
+                <input type="hidden"  id="delayType_input" th:value="${studentDelayInfo != null}? ${studentDelayInfo.delayType}"/>
+                <shiro:hasRole name="海外办公室">
+                    <input type="hidden" name="checkPermission" id="checkPermission" th:value="true"/>
+                </shiro:hasRole>
+                <input type="hidden"  id="resDomain" th:value="${resDomain}"/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                    <input type="hidden" name="id" id="id" th:value="${studentDelayInfo != null}? ${studentDelayInfo.id}"/>
+                    <input type="hidden" id="businessId" th:value="${businessId != null}? ${businessId}"/>
+                    <input type="hidden" id="attachment" th:value="${studentDelayInfo != null}? ${studentDelayInfo.attachment}"/>
+                    <input type="hidden" id="audit_stats" th:value="${auditApplyInfo != null}? ${auditApplyInfo.lastAudit}"/>
+                    <input type="hidden" name="attachment" id="input_fileName" th:value="${studentDelayInfo != null}? ${studentDelayInfo.attachment}"/>
+                    <input type="hidden" id="auditResultSize" name="auditResultSize" th:value="${auditResultSize}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">停办原因：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="reason" name="reason" style="width:190px;height:25px;">
+                                        <option value="" >请选择</option>
+                                        <option value="1" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.reason==1}">申请其他国家</option>
+                                        <option value="2" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.reason==2}">国内再教育</option>
+                                        <option value="3" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.reason==3}">参加工作</option>
+                                        <option value="4" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.reason==4}">成绩未达标</option>
+                                        <option value="5" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.reason==5}">其他</option>
+                                    </select>
+                                    <!--<input class="col-sm-1" name="reason" style="width:150px" id="delay_message" th:value="${studentDelayInfo != null}? ${studentDelayInfo.reason}"/>-->
+                                    <label class="col-sm-3 control-label no-padding-right blue">下次联系日期：</label>
+                                    <input class="Wdate" name="contactDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 150px; height:25.2px" id="delay_time"
+                                           th:value="${status == false}? ${#dates.format(studentDelayInfo.contactDate, 'yyyy-MM-dd')}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">停办类型：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="delayType" name="delayType" style="width:190px;height:25px;">
+                                        <option value="" >请选择</option>
+                                        <option value="1" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.delayType==1}">停办</option>
+                                        <option value="2" th:selected="${studentDelayInfo!=null}? ${studentDelayInfo.delayType==2}">缓办</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">停办备注：</label>
+                                    <textarea class="col-sm-3" style="width: 550px;height: 200px" name="remark" id="remark"
+                                    th:text="${studentDelayInfo!=null}? ${studentDelayInfo.remark}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!--文件上传 -->
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group " style="height:250px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">学生确认结果：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input id="offerAttachment" th:value ="${studentDelayInfo != null}? ${studentDelayInfo.attachment}" style="display: none"/>
+                                                <span id = "offer_attachment" style="display: none"><span id = "offerAttachment_show" th:text="${studentDelayInfo != null}? ${studentDelayInfo.attachment}"></span>
+                                        <span class="btn btn-sm btn-primary" style="left:9%" id = "offer_show">预览</span>
+                                        <a  download="offer信息下载" id="upload_office">
+                                            </a></span>
+                                                <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                <input name="privateAccess" type="hidden" value="true"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="form-group" th:style="${hasAuditInfo == true}? 'height:29px': 'display:none'">
+                    <label class="col-sm-3 control-label no-padding-right blue">
+                        待审批人OA：<span th:text="${waitAuditNo != null and waitAuditName != null}? ${waitAuditNo + '-' +  waitAuditName}"></span>
+                    </label>
+                </div>
+                <!-- 审核信息 -->
+                <div class="form-group auditResult_content">
+
+                </div>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="returnPage">返回</button>
+                        <button type="button" class="btn btn-primary" th:style="${canSave != true}? 'display:none'" id="submits">保存</button>
+                        <shiro:hasRole name="审批学生停办">
+                        <button type="button" class="btn btn-primary" th:style="${canApproveDelay != true}? 'display:none'" onclick="approve()">审批</button>
+                        </shiro:hasRole>
+                    </div>
+
+                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/student/delay.js}" charset="UTF-8"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var canApprove = [[${canApprove}]];
+
+    var canSave = [[${canSave}]];
+
+    var data_offer = $("#attachment").val();
+
+    var studentNo = $("#studentNo").val();
+
+    var boolResult = true;
+
+    var uploadResult = true;
+
+    if(data_offer != ''){
+        $("#offerAttachment_show").text(data_offer.substring(0,50)+"...");
+    }
+$(function(){
+    $("#offer_show").click(function(){
+//        if($("#offerAttachment").val().indexOf($("#resDomain").val()) ==-1){
+//            window.open($("#resDomain").val()+URLencode($("#offerAttachment").val()));
+//        }else{
+//            window.open(URLencode($("#offerAttachment").val()));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":$("#offerAttachment").val()},function (data,status) {
+            window.open(data);
+        });
+    })
+    $("#offer_upload").click(function(){
+        if($("#offerAttachment").val().indexOf($("#resDomain").val()) ==-1){
+            $("#upload_office").attr("href",$("#resDomain").val()+URLencode($("#offerAttachment").val()));
+        }else{
+            $("#upload_office").attr("href",URLencode($("#offerAttachment").val()));
+        }
+    })
+});
+    $(function(){
+        if(data_offer != ''){
+            $("#upload_offer").attr("style","height:270px");
+            $("#offer_attachment").show();
+    //        if($("#audit_stats").val() ==1){
+    //            $("#id-input-file-3").attr("disabled", "disabled");
+    //        }
+            upLoadImg()
+        }else{
+            upLoadImg();
+        }
+    })
+    //上传
+    function upLoadImg(){
+        $('#id-input-file-3').ace_file_input({
+            style:'well',
+            btn_choose:'Drop files here or click to choose',
+            btn_change:null,
+            no_icon:'icon-cloud-upload',
+            droppable:true,
+            thumbnail:'small',//large | fit
+            before_change:function(files, dropped) {
+                return true;
+            },
+            before_remove : function() {
+                $("#offerAttachment").val(data_offer);
+                $("#input_fileName").val(data_offer);
+                return true;
+            },
+            preview_error : function(filename, error_code) {
+                //name of the file that failed
+                //error_code values
+                //1 = 'FILE_LOAD_FAILED',
+                //2 = 'IMAGE_LOAD_FAILED',
+                //3 = 'THUMBNAIL_FAILED'
+                //alert(error_code);
+            }
+        }).on('change', function(){
+            console.log($(this).data('ace_input_files'));
+            console.log($(this).data('ace_input_method'));
+            uploadResult = false;
+            layer.msg('正在上传中...', {
+                icon: 16
+                ,shade: 0.01
+            });
+
+//            $("#form_file").append($("#id-input-file-3").parent().children(":first"));
+//            $("#form_file").hide();
+
+            $("#form_file").ajaxSubmit(function(message) {
+                uploadResult = true;
+                console.log(message);
+                var fileName = message.obj;
+                var code = message.code;
+                if(code == "1"){
+                    layer.msg("请上传正确的文件格式!")
+                }else if(message.success){
+                    $("#input_fileName").val(fileName);
+                    $("#offerAttachment").val(fileName);
+                    layer.msg("上传成功!");
+                }
+//                if (message) {
+//                    $(".alert-success").text("上传成功").show();
+//                    $('#alert').attr('class', 'alert alert-success').show();
+//                    setTimeout("$('#alert').hide()", 2000);
+//                    $("#myModal").modal("hide");
+//                } else {
+//                    $('#alertText').text('上传失败');
+//                    $('#alert').attr('class', 'alert alert-danger').show();
+//                    setTimeout("$('#alert').hide()", 2000);
+//                    $("#myModal").modal("hide");
+//                }
+            });
+        });
+    }
+
+    $("#returnPage").click(function(){
+        if(studentNo.indexOf('TY') == 0){
+            location.href = "/channelStudent/detail?studentNo=" + studentNo;
+        }
+        else{
+            location.href = "/student/detail?studentNo=" + studentNo;
+        }
+    });
+
+    $("#reason").change(function(){
+        // alert($("#expressCompanyCode").find("option:selected").text());
+        $("#reason_input").val($("#reason").find("option:selected").val());
+    });
+    $("#reason").val($("#reason_input").val());
+
+    $("#delayType").change(function(){
+        // alert($("#expressCompanyCode").find("option:selected").text());
+        $("#delayType_input").val($("#delayType").find("option:selected").val());
+    });
+    $("#delayType").val($("#delayType_input").val());
+
+
+    if (canSave == false) {
+        $("input").attr("disabled", "disabled");
+        $("textarea").attr("readonly", "readonly");
+        $("select").attr("disabled", "disabled");
+    }
+
+    if($("#checkPermission").val() == "true"){
+        $("#submits").hide();
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

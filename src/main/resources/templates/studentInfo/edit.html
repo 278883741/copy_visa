@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" th:href="@{/webuploader/webuploader.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+
+                </ul>
+            </div>
+            <div class="page-content">
+
+                <h3 class="header smaller lighter blue">修改学生信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"><span style="color: red;margin-left: 5px;">* </span>学号：</label>
+                                    <input class="col-sm-1" id="studentNo" name="studentNo" style="width: 150px" value=""/>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 姓名：</label>
+                                    <input class="col-sm-1" id="studentName" name="studentName" style="width: 150px" value=""/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 拼音：</label>
+                                    <input class="col-sm-1" id="pinyin" name="pinyin" style="width: 150px" value=""/>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 出生日期：</label>
+                                    <input class="col-sm-1" id="birthday" name="birthday" style="width: 150px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" value=""/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 留学国家：</label>
+                                    <select class="form-control input-sm" id="nation" name="nationId" style="width:150px;height:27px;margin:5px 0;">
+                                        <option></option>
+                                        <option th:each="country:${countryInfoList}" th:value="${country.id}"
+                                                th:text="${country.countryName}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+$(function () {
+
+    /*<![CDATA[*/
+    $("#submits").click(function () {
+        if($("#studentNo").val() == ''){
+            layer.alert("请填写学号！");
+            return false;
+        }
+        if($("#studentName").val() == '' && $("#pinyin").val() == ''
+                && $("#birthday").val() == '' && $("#nation").val() == ''){
+            layer.alert("请填写要修改的信息！");
+            return false;
+        }
+
+        $.ajax({
+            url: "/student/edit/save",
+            type: "post",
+            data: $("#edit").serialize(),
+            success: function (data) {
+                if (data) {
+                    layer.msg('操作成功！', {time: 1000});
+                } else {
+                    layer.msg('操作失败！', {time: 1000});
+                }
+            }
+        });
+
+    })
+
+    /*]]>*/
+    //监听modal关闭事件，清除整个页面的缓存数据
+    $("#myModal").on("hidden.bs.modal", function () {
+        $(this).removeData("bs.modal");
+    });
+});
+
+</script>
+</body>
+</html>

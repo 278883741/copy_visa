@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CoeAttachmentInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CoeAttachmentInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="business_id" jdbcType="INTEGER" property="businessId" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="attachment_type" jdbcType="INTEGER" property="attachmentType" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+  </resultMap>
+</mapper>

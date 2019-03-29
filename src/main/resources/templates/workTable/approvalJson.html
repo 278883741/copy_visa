@@ -1,0 +1,11 @@
+<div class="widget-main padding-4" id="approvalList" xmlns:th="http://www.w3.org/1999/xhtml">
+	<div class="content" >
+		<input id="approval_div" th:value="${approvalList}" type="text" name="approvalList" style="display: none"/>
+		<ul  th:each="item:${approvalList}">
+			<li  class="header smaller lighter pStyle LiYellow" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==false"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span style="color:#DAA520">[未读]</span>
+				<span th:text="${item.content}"></span></a></li>
+			<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==true"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span >[已读]</span>
+				<span th:text="${item.content}"></span></a></li>
+		</ul>
+	</div>
+</div>

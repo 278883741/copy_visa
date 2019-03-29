@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.ApplyResultInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.ApplyResultInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="reply_way" jdbcType="INTEGER" property="replyWay" />
+    <result column="result_type" jdbcType="INTEGER" property="resultType" />
+    <result column="result_date" jdbcType="TIMESTAMP" property="resultDate" />
+    <result column="student_reply_date" jdbcType="TIMESTAMP" property="studentReplyDate" />
+    <result column="school_reply_date" jdbcType="TIMESTAMP" property="schoolReplyDate" />
+    <result column="offer_type" jdbcType="INTEGER" property="offerType" />
+    <result column="offer_attachment" jdbcType="VARCHAR" property="offerAttachment" />
+    <result column="course_start_date" jdbcType="TIMESTAMP" property="courseStartDate" />
+    <result column="reply_deadline" jdbcType="TIMESTAMP" property="replyDeadline" />
+    <result column="reply_reason" jdbcType="VARCHAR" property="replyReason" />
+    <result column="result_comment" jdbcType="VARCHAR" property="resultComment" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="audit_status" jdbcType="VARCHAR" property="auditStatus" />
+  </resultMap>
+
+  <select id="getStatusByPlanId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select audit_status from
+    (select id from apply_info where delete_status = 0 and plan_id = #{planId}) ai left join
+    (select apply_id, audit_status from apply_result_info where delete_status = 0) ari
+    on ai.id = ari.apply_id
+  </select>
+    <select id="getAppResultById" resultType="com.aoji.model.ApplyResultInfo">
+      select id,apply_id applyId,reply_way replyWay,result_type resultType,result_date resultDate,student_reply_date studentReplyDate,school_reply_date schoolReplyDate,
+     offer_type offerType,offer_attachment offerAttachment,reply_deadline replyDeadline,reply_reason replyReasonm,result_comment resultComment,create_time createTime,
+     update_time updateTime,delete_status deleteStatus,operator_no operatorNo,operator_name operatorName,argue_date argueDate,audit_status auditStatus from apply_result_info where id = #{id}
+    </select>
+    <select id="getStudentInfoByApplyId" resultType="com.aoji.model.StudentInfo">
+      SELECT student.student_no AS studentNo,student.student_name AS studentName
+      FROM apply_result_info result,apply_info apply,student_info student
+      WHERE result.apply_id = apply.id AND apply.student_no = student.student_no AND result.apply_id = #{applyId} group by student.student_no
+
+    </select>
+    <select id="getApplyResultInfo" resultType="com.aoji.model.ApplyResultInfo">
+      SELECT applyResult.id id,applyResult.apply_id applyId,applyResult.reply_way replyWay,applyResult.result_type resultType,applyResult.result_date resultDate,applyResult.student_reply_date studentReplyDate,applyResult.school_reply_date schoolReplyDate,
+     applyResult.offer_type offerType,applyResult.offer_attachment offerAttachment,applyResult.reply_deadline replyDeadline,applyResult.reply_reason replyReasonm,applyResult.result_comment resultComment,applyResult.create_time createTime,
+     applyResult.update_time updateTime,applyResult.delete_status deleteStatus,applyResult.operator_no operatorNo,applyResult.operator_name operatorName,applyResult.argue_date argueDate,applyResult.audit_status auditStatus
+      FROM apply_result_info  applyResult,audit_apply_info audit
+      WHERE applyResult.operator_no = #{operatorNo} and applyResult.audit_status !=3 and applyResult.delete_status = 0 and audit.case_id = 3 and audit.business_id =applyResult.id and audit.delete_status = 0
+    </select>
+</mapper>

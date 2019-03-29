@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysPermissionMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysPermission">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="permission_name" jdbcType="VARCHAR" property="permissionName" />
+    <result column="permission_url" jdbcType="VARCHAR" property="permissionUrl" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="deleted" jdbcType="TIMESTAMP" property="deleted" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+  </resultMap>
+  
+  <select id="selectPermissionIdsByRoleId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT
+    sp.id
+    FROM sys_permission sp,
+    ( SELECT permission_id FROM sys_role_permission WHERE role_id = #{roleId} and delete_status = 0) pid
+    WHERE sp.id = pid.permission_id and sp.delete_status = 0
+  </select>
+    <select id="getPermissionByOaid" resultType="com.aoji.model.SysPermission">
+      SELECT sp.id,sp.permission_name AS permissionName
+      FROM sys_permission sp,
+       (
+      SELECT srp.permission_id
+      FROM sys_role_permission srp,
+              (
+      SELECT sr.id
+      FROM sys_role sr,sys_user_role sur
+      WHERE sr.id = sur.role_id AND sur.user_id=(
+      SELECT id
+      FROM sys_user
+      WHERE oaid = #{oaid} AND delete_status=0 and enable_status = 1) AND sr.delete_status=0 and sur.delete_status=0)t
+      WHERE t.id = srp.role_id AND srp.delete_status=0)p
+      WHERE p.permission_id = sp.id AND sp.delete_status=0
+    </select>
+</mapper>

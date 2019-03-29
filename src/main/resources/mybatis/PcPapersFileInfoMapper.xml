@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.PcPapersFileInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.PcPapersFileInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country_id" jdbcType="INTEGER" property="countryId" />
+    <result column="papers_id" jdbcType="INTEGER" property="papersId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="delete_time" jdbcType="DATE" property="deleteTime" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="papers_type" jdbcType="INTEGER" property="papersType" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+  </resultMap>
+
+  <resultMap id="materialListVoMap" type="com.aoji.vo.materialListVo" extends="BaseResultMap">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country_id" jdbcType="INTEGER" property="countryId" />
+    <result column="papers_id" jdbcType="INTEGER" property="papersId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="create_time" jdbcType="DATE" property="createTime" />
+    <result column="delete_time" jdbcType="DATE" property="deleteTime" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="papers_type" jdbcType="INTEGER" property="papersType" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+    <result column="papers_name" jdbcType="VARCHAR" property="papersName" />
+  </resultMap>
+
+  <!--查询材料清单-->
+  <select id="getList" resultMap="materialListVoMap" parameterType="com.aoji.model.PcPapersFileInfo">
+    select * from
+    (select ppfi.*, ppti.papers_name from
+    (select id, student_no, papers_id, papers_type, url, file_name, create_time ,country_id from pc_papers_file_info where delete_status = 0
+    <if test="pcPapersFileInfo.studentNo != null and pcPapersFileInfo.studentNo != ''">
+      and student_no = #{pcPapersFileInfo.studentNo}
+
+    </if>
+    <if test="pcPapersFileInfo.papersId != null and pcPapersFileInfo.papersId != '' and pcPapersFileInfo.papersId != -1">
+      and papers_id = #{pcPapersFileInfo.papersId}
+
+    </if>
+    <if test="pcPapersFileInfo.papersType != null and pcPapersFileInfo.papersType != '' and pcPapersFileInfo.papersType != -1">
+      and papers_type = #{pcPapersFileInfo.papersType}
+
+    </if>
+    <if test="pcPapersFileInfo.countryId != null and pcPapersFileInfo.countryId != ''">
+      and country_id = #{pcPapersFileInfo.countryId}
+
+    </if>
+    ) ppfi,
+    (SELECT id, country_id, papers_name FROM pc_papers_type_info
+    ) ppti
+    where ppfi.papers_id = ppti.id and ppfi.country_id = ppti.country_id ORDER BY ppfi.papers_type,ppfi.papers_id ASC ) a
+  </select>
+</mapper>

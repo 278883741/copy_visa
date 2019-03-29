@@ -1,0 +1,55 @@
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/zTreeStyle.css}"/>
+<link rel="stylesheet" th:href="@{/webuploader/webuploader.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+    .Wdate {
+        border: #999 1px solid;
+        height: 30px;
+        background: #fff url(datePicker.gif) no-repeat right;
+    }
+    .Style{
+        padding-left: 23px;
+        padding-right: 19px;
+        padding-top: 30px;
+    }
+</style>
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content Style">
+                <input id="id" th:value="${date}" type="text" name="id" style="display: none"/>
+                <label class="col-sm-3 control-label no-padding-right"> 学校确认时间：</label>
+                <input id="school_date" class="Wdate col-sm-3" style="width: 168px ;height:30px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                <div style="position:absolute;bottom:10px; right:20px;">
+                    <button type="button" class="btn btn-primary" id="school_submits">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--<div class="form-group offer_info" style="height:32px">-->
+<!--<label class="col-sm-3 control-label no-padding-right"> 学生确认时间：</label>-->
+<!--<input id="application_result_date" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>-->
+<!--<div class="modal-footer">-->
+<!--<button type="button" class="btn btn-primary" id="group_submits">保存</button>-->
+<!--</div>-->
+<!--</div>-->
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script></body>

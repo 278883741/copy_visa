@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+	.error {
+		color: #F00
+	}
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+	<div class="main-container-inner">
+		<div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+		<div class="main-content">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<ul class="breadcrumb">
+					<li>学生列表</li>
+					<li>院校申请列表</li>
+				</ul>
+			</div>
+			<!--<span th:text="${session.nation}"></span>-->
+			<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-12">
+								<div th:include="fragments/student_info::student_info" th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+								<h3 class="header smaller lighter blue">院校申请列表</h3>
+								<input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+								<shiro:hasPermission name="院校申请列表_查看">
+								<input type="hidden" name="checkPermission" id="checkPermission" th:value="true"/>
+								</shiro:hasPermission>
+								<shiro:hasPermission name="院校申请_修改">
+									<input type="hidden" name="editPermission" id="editPermission" th:value="true"/>
+								</shiro:hasPermission>
+
+								<shiro:hasAnyRoles name="外联经理,外联顾问,运营人员,运营人员-权限">
+									<input type="hidden" name="canBack" id="canBack" th:value="true"/>
+								</shiro:hasAnyRoles>
+								<shiro:hasRole name="同业经理">
+									<input type="hidden" name="channelLeader" id="channelLeader" th:value="true"/>
+								</shiro:hasRole>
+								<input type="hidden" id="input_hasPermission_visit_list" th:value="${hasPermission_visit_list!=null}?  ${hasPermission_visit_list}"/>
+								<input type="hidden" id="nationId" th:value="${nationId != null} ? ${nationId}"/>
+								<input type="hidden" id="nationStatus" th:value="${nationStatus != null} ? ${nationStatus}"/>
+								<input type="hidden" id="loginUser" th:value="${loginUser!=null}?  ${loginUser}"/>
+
+								<div class="table-header">
+									<form class="form-inline">
+										<div class="form-group">
+											<label for="audit_status">申请状态：</label>
+											<select type="" class="form-control input-sm" id="audit_status" style="width:100px;">
+												<option value="" >请选择</option>
+												<option value="11" >未补件</option>
+												<option value="10" >未提交院校申请</option>
+												<option value="20" >未收到院校结果</option>
+												<option value="30" >未确认录取院校</option>
+												<option value="40" >确认录取已完成</option>
+												<!--<option value="50" >确认拒绝已完成</option>-->
+											</select>
+										</div>
+										<button type="button" id="query" class="btn btn-success ">查询</button>
+										<button type="reset" class="btn btn-warning">清空</button>
+										<shiro:hasPermission name="院校申请_添加">
+										<a class="btn btn-info pull-right" id="add" onclick="addPage()">添加申请</a>
+										</shiro:hasPermission>
+										<a id="toStudent" th:href="@{/studentInfo}" class="btn btn-info pull-right">学生列表</a>
+										<a href="javascript:void(0);" id="firstCountryId" class="btn btn-info pull-right" onclick="queryFee()" target="_blank">查看其他费用</a>
+										<a href="javascript:void(0);" id="twoCountryId" class="btn btn-info pull-right" onclick="download1()">下载Invoice</a>
+									</form>
+								</div>
+
+								<div class="table-responsive">
+									<div id="alert" class="alert alert-success" style="display: none;" role="alert">
+										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										<span id="alertText"></span>
+									</div>
+									<table id="sample-table-2" class="table table-striped table-bordered table-hover" width="100%">
+										<thead>
+										<tr>
+											<th>方案编号</th>
+											<th>申请状态</th>
+											<th>申请类型</th>
+											<th>申请院校名称</th>
+											<th>专业名称</th>
+											<th>学位名称</th>
+											<th>学校学号</th>
+											<th>申请方式</th>
+											<th>申请提交日期</th>
+											<th>外联顾问</th>
+											<th>操作人</th>
+											<th>操作时间</th>
+											<th>offer审批时间</th>
+											<th>I-20审批时间</th>
+											<th class="hidden-480">操作</th>
+										</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /.col -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.page-content -->
+		</div>
+
+		<div th:include="fragments/bottom::bottom"></div>
+	</div>
+
+	<a href="#" id="btn-scroll-up"
+	   class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="icon-double-angle-up icon-only bigger-110"></i>
+	</a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	 aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content"></div>
+	</div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/apply/apply.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var nation = [[${nation}]];
+    $(function(){
+        if(nation ==1||nation == 2||nation == 58){
+            $("#twoCountryId").show();
+            $("#firstCountryId").show();
+        }else{
+            $("#twoCountryId").hide();
+            $("#firstCountryId").hide();
+        }
+    });
+
+    var planCourseStatus = [[${planCourseStatus}]];
+    $(function(){
+        if(planCourseStatus ==1){
+            $("#twoCountryId").show();
+
+        }else{
+            $("#twoCountryId").hide();
+
+        }
+    });
+    var oTable1;
+    jQuery(function($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter" : false,//是否使用搜索
+            "bProcessing" : true,
+            "bDeferRender" : true,//
+            "sPaginationType" : "bs_normal",//分页样式
+            "bRetrieve" : true,//是否调用后台
+            "bServerSide" : true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource" : "/apply/list/query",//请求路径
+            "fnServerData" : function(sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name":"applyStatusCode","value":$("#audit_status").children('option:selected').val()==""? null:$("#audit_status").children('option:selected').val()},
+					{"name":"studentNo","value":$("#studentNo").val()}
+                )
+                $.ajax({
+                    "dataType" : 'json',
+                    "type" : "GET",
+                    "url" : sSource,
+                    "data" : aoData,
+                    "success" : fnCallback
+                });
+            },
+            "aaSorting" : [ [ 0, "desc" ] ],
+			"bSort":true,
+            "aoColumns" : [
+                {"sClass": "center", "bSortable": false,"mData": "planId"},
+                {"sClass": "center", "bSortable": false, "mData":
+					function(data){
+                        if (data.applyStatusCode == 10) return "未提交院校申请";
+                        if (data.applyStatusCode == 11) return "未补件";
+                        if (data.applyStatusCode == 20) return "未收到院校结果";
+                        if (data.applyStatusCode == 30) return "未确认录取院校";
+                        if (data.applyStatusCode == 40) return "确认录取已完成";
+                        if (data.applyStatusCode == 50) return "确认拒绝已完成";
+                        return "";
+					}
+				},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.applyType == 1){
+                            return "主课";
+						}
+                        else if (data.applyType == 2){
+                            return "语言";
+						}
+                        else if (data.applyType == 3){
+                            return "预备";
+                        }
+                        else{
+                            return "";
+                        }
+
+                    }},
+                {"sClass": "center", "bSortable": false,"mData": "collegeName"},
+                {"sClass": "center", "bSortable": false, "mData": "majorName"},
+                {"sClass": "center", "bSortable": false, "mData": "courseName"},
+                {"sClass": "center", "bSortable": false, "mData": "schoolNo"},
+				{"sClass":"center","bSortable":false,"mData":
+					function (data) {
+						if(data.applyWay==1) {
+						    return "邮寄";
+						}else if(data.applyWay==2){
+						    return "网申";
+                        }else if(data.applyWay==3){
+						    return "邮件";
+                        }else {
+                            return "";
+                        }
+                    }
+				},
+				{"sClass":"center","bSortable":false,"mData":"sendDateString"},
+                {"sClass": "center", "bSortable": false, "mData":"connectorName"},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {"sClass": "center", "bSortable": false, "mData":
+					function (data) {
+						return getTimeString(new Date(data.updateTime))
+                    }
+				},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if(data.offerAuditTime == null || data.offerAuditTime == ""){
+                            return null
+                        }else {
+                            return getTimeString(new Date(data.offerAuditTime))
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                    	if(data.coeAuditTime == null || data.coeAuditTime == ""){
+                    	    return null
+						}else {
+                            return getTimeString(new Date(data.coeAuditTime))
+                        }
+                    }
+                },
+                {"sClass" : "center","sWidth":"20%",   "bSortable" : false, "mData" : function (data) {
+                	var assign = '&nbsp;&nbsp;<a href="javascript:void(0);" onclick="assign(' + data.id + ')" >分配</a>&nbsp;&nbsp;';
+
+                    var edit = '<a href="javascript:void(0);" onclick="toEditURL(' + data.id + ',\'' + data.studentNo + '\',' + $("#nationStatus").val() + ')" >修改</a>&nbsp;&nbsp;&nbsp;';
+                    var editOthers = '<a href="javascript:void(0);" onclick="toEditOthers(' + data.id + ',\'' + data.studentNo + '\')" >修改(其他)</a>&nbsp;&nbsp;&nbsp;';
+
+
+//                    //if(data.applyStatusCode>=30){
+//                       var detail= '<a href="javascript:void(0);" onclick="toDetailURL(' + data.id + ')" >查看</a>&nbsp;&nbsp;&nbsp;';
+//					//}
+
+
+					var check= '<a href="javascript:void(0);" onclick="toDetailURL(' + data.id + ')" >查看</a>&nbsp;&nbsp;&nbsp;';
+
+					var supplement = '<a href="javascript:void(0);" onclick="supplementPage(' + data.id + ')" >补件</a>&nbsp;&nbsp;&nbsp;';
+                    var visit ='';
+                    if($("#input_hasPermission_visit_list").val() != "" && $("#input_hasPermission_visit_list").val() =="true") {
+                        visit = '<a href="javascript:void(0);" onclick="visitPage(' + data.id + ')" >回访</a>&nbsp;&nbsp;&nbsp;'
+                    }
+
+                    var result = '<br><a href="javascript:void(0);" onclick="resultPage(' + data.id + ')" >申请结果</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+                    var agentResult = '&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="resultPage(' + data.id + ')" >申请结果</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+
+                    var coeApply = '<a href="javascript:void(0);" onclick="coeApply(' + data.id + ')" >COE</a>&nbsp;&nbsp;&nbsp;';
+                    var I20 = '<a href="javascript:void(0);" onclick="coeApply(' + data.id + ')" >I-20</a>&nbsp;&nbsp;&nbsp;';
+                    var CAS = '&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="coeApply(' + data.id + ')" >CAS</a>&nbsp;&nbsp;&nbsp;';
+                    var Receipt = '<a href="javascript:void(0);" onclick="coeApply(' + data.id + ')" >Receipt</a>&nbsp;&nbsp;&nbsp;';
+//                    var Full_Offer = "";
+//                    if(data.nationId == 5){
+//                        Full_Offer = '&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="coeApply(' + data.id + ')" >Full Offer</a>&nbsp;&nbsp;&nbsp;';
+//					}
+                    var confirm='<a href="javascript:void(0);" onclick="confirmCollege(' + data.id + ')" >录取</a>';
+                    //是否入读院校
+
+                    var ifplanCourseStatus = "";
+                    var editingFee = "";
+
+
+
+                    if (data.planCourseStatus == 0) {
+                        var ifplanCourseStatus = '<a class="blue" href="javascript:void(0);" onclick="toPlanCourseStatus(\'' + data.id + '\')">设置</a>';
+                    } else {
+                        var ifplanCourseStatus = "已设置";
+                        var editingFee = '&nbsp;&nbsp;&nbsp;<a class="blue" href="javascript:void(0);" onclick="toEditingFee('+ data.id +')">编辑基本费用</a>';
+                    }
+                    var sendback = "";
+					if($("#canBack").val() == "true"){
+                        sendback = '&nbsp;&nbsp;&nbsp;<a href="javascript:void(0);" onclick="toSendBack(' + data.id + ')">退回</a>';
+                    }
+                    var rt = "";
+
+					if($("#checkPermission").val() == "true"){
+					    rt = check+agentResult;
+                        if(data.nationId == 1){
+                            rt += coeApply;
+                        }else if(data.nationId == 4 || data.nationId == 40 || data.nationId == 41){
+                            rt += I20;
+                            rt += confirm;
+                        }else if(data.nationId == 2){
+                            rt += Receipt;
+                        }else if(data.nationId == 3){
+                            rt += CAS;
+                        }else{
+                            rt += coeApply;
+						}
+                        return rt;
+					}
+
+
+
+                    if(data.connector == null || data.connector == ''){
+                    	rt += assign;
+                    }
+
+					//rt += edit+detail + supplement + visit ;
+					if(data.applyStatusCode != null && data.applyStatusCode != 40) {
+    					if ($("#editPermission").val() == "true") {
+        					rt += edit;
+        					rt += editOthers;
+    					}
+					}
+
+					rt +=  check + supplement + visit ;
+
+					if(data.nationId == 1){
+						rt += coeApply;
+					}else if(data.nationId == 4 || data.nationId == 40 || data.nationId == 41){
+						rt += I20;
+                        rt += confirm;
+					}else if(data.nationId == 2){
+                        rt += Receipt;
+                    }else if(data.nationId == 3){
+						rt += CAS;
+					}else{
+                        rt += coeApply;
+						if(data.applyStatusCode <= 30){
+							rt += confirm;
+						}
+					}
+
+					return rt+result+ifplanCourseStatus+sendback+editingFee;
+                }},
+                /*{"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if(data.planCourseStatus==1) {
+                            $("#twoCountryId").show();
+                        }else {
+                            $("#twoCountryId").hide();
+						}
+
+                    }
+                },*/
+            ],
+            "oLanguage" : {
+                "sLengthMenu" : "每页 _MENU_条 ",
+                "sZeroRecords" : "对不起，查询不到任何相关数据",
+                "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty" : "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered" : "数据表中共为 _MAX_ 条记录)",
+                "sProcessing" : "正在加载中...",
+                "sSearch" : "搜索",
+                "sUrl" : "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate" : {
+                    "sFirst" : "第一页",
+                    "sPrevious" : " 上一页 ",
+                    "sNext" : " 下一页 ",
+                    "sLast" : " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+        $(function(){
+            if($("#checkPermission").val() == "true"){
+
+                oTable1.fnSetColumnVis(0, false, false);
+                oTable1.fnSetColumnVis(9, false, false);
+                oTable1.fnSetColumnVis(10, false, false);
+                oTable1.fnSetColumnVis(11, false, false);
+                oTable1.fnSetColumnVis(12, false, false);
+                oTable1.fnSetColumnVis(13, false, false);
+
+                $("#firstCountryId").hide();
+            }
+        });
+
+        $("#query").click(function() {
+            oTable1.fnDraw();
+        })
+
+    })
+
+
+    //设置是否为入读院校
+    function toPlanCourseStatus(id) {
+        parent.layer.confirm('是否设置为入读院校？', {
+            icon: 7,
+            btn: ['确认', '取消']
+            , btn1: function (index, layero) {
+                $.ajax({
+                    url: "/sale/PlanCourseStatus",
+                    type: "POST",
+                    data: {
+                        id: id,
+                    },
+                    success: function (data) {
+                        if (data) {
+                            layer.confirm('操作成功！', {
+                                icon: 1,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    location.href="/apply?studentNo="+$("#studentNo").val();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        } else {
+                            layer.confirm('操作失败，请联系管理员！', {
+                                icon: 2,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    location.href="/apply?studentNo="+$("#studentNo").val();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+
+
+    function changeTable() {
+        oTable1.fnDraw();
+    }
+
+    function download1() {
+
+        location.href="/exportpdf?studentNo="+ $("#studentNo").val();
+
+    }
+    function toSendBack(id){
+        parent.layer.confirm('确定要退回该条记录吗？', {
+            icon: 3,
+            btn: ['确认', '取消'],
+            btn1: function (index, layero) {
+                $.ajax({
+                    url: "applyInfo/remove",
+                    type: "post",
+                    data: {applyId : id},
+                    success: function (data) {
+                        if (data) {
+                            layer.msg('操作成功', {time: 1000});
+                            oTable1.fnDraw();
+                        } else {
+                            layer.msg('操作失败', {time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    $(function(){
+        if($("#checkPermission").val() == "true"){
+            $("#toStudent").hide();
+        }
+
+        if($("#channelLeader").val() == "true"){
+            $("#add").hide();
+		}
+    });
+
+    //跳转到编辑页面（注册费，押金，学费）
+    function toEditingFee(id){
+
+        location.href="/cost/basicCostPage?costId="+id+"&studentNo="+$("#studentNo").val();
+    }
+
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+
+    .contract_info {
+        float: left;
+        width: 560px;
+        min-height: 100px;
+        height: auto;
+        border: 1px solid #a09a9a;
+    }
+
+    .hidden_outInput {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+<body>
+<div class="navbar navbar-default" id="navbar" style="height:45px">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('navbar', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <div class="navbar-container" id="navbar-container">
+        <div class="navbar-header pull-left">
+            <a href="#" class="navbar-brand">
+                <small>
+                    <i class="icon-leaf"></i>
+                    欢迎：查看学生定校信息
+                </small>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <div class="page-content" style="margin-right: 100px">
+                <br/><br/>
+                <div class="tab-pane fade in active ">
+                    <div class="container">
+                        <div class="form-horizontal" >
+                            <h3 class="header smaller lighter blue">学生定校信息</h3>
+
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">所选院校：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 591px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.collegeName != null }? ${planCollegeInfo.collegeName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue"> 专业名称：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 591px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.majorName != null }? ${planCollegeInfo.majorName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">学位名称：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 591px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.courseName != null}? ${planCollegeInfo.courseName}"/>
+                            </div>
+
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">专业链接：</label>
+                                <input type="hidden" id="majorUrlId"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.majorUrl != null}? ${planCollegeInfo.majorUrl}"/>
+                                <input class="col-sm-1" id="majorUrl" readonly="readonly" style="width: 591px;color: #0b6cbc"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.majorUrl != null}? ${planCollegeInfo.majorUrl}"
+                                       onclick="showMajorUrl(this)"/>
+                                <input type="button" id="button" onClick="copyUrl2()" value="点击复制链接" />
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">专业类型：</label>
+                                <div th:switch="${planCollegeInfo != null and planCollegeInfo.collegeType != null}? ${planCollegeInfo.collegeType}">
+                                    <input class="col-sm-1" th:case="1" readonly="readonly"
+                                           style="width: 150px" value="主课"/>
+                                    <input class="col-sm-1" th:case="2" readonly="readonly"
+                                           style="width: 150px" value="语言"/>
+                                    <input class="col-sm-1" th:case="3" readonly="readonly"
+                                           style="width: 150px" value="预备"/>
+                                    <input class="col-sm-1" th:case="4" readonly="readonly"
+                                           style="width: 150px" value="快捷"/>
+                                    <input class="col-sm-1" th:case="5" readonly="readonly"
+                                           style="width: 150px" value="夏校"/>
+                                    <input class="col-sm-1" th:case="6" readonly="readonly"
+                                           style="width: 150px" value="桥梁"/>
+                                    <input class="col-sm-1" th:case="7" readonly="readonly"
+                                           style="width: 150px" value="top up"/>
+                                    <input class="col-sm-1" th:case="*" readonly="readonly"
+                                           style="width: 150px" value=""/>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue">教育学段：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.educationLevelName != null}? ${planCollegeInfo.educationLevelName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">学制：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.schoolLength != null}? ${planCollegeInfo.schoolLength}"/>
+
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">合作机构：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.agencyName != null}? ${planCollegeInfo.agencyName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+
+                                <label class="col-sm-3 control-label no-padding-right blue">申请类别：</label>
+                                <div th:switch="${planCollegeInfo != null and planCollegeInfo.collegeType != null}? ${planCollegeInfo.collegeType}">
+                                    <input class="col-sm-1" th:case="0" readonly="readonly"
+                                           style="width: 150px" value="直录"/>
+                                    <input class="col-sm-1" th:case="1" readonly="readonly"
+                                           style="width: 150px" value="双录"/>
+                                    <input class="col-sm-1" th:case="2" readonly="readonly"
+                                           style="width: 150px" value="纯语言"/>
+                                    <input class="col-sm-1" th:case="*" readonly="readonly"
+                                           style="width: 150px" value=""/>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue">课程备注：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.courseRemarkName != null}? ${planCollegeInfo.courseRemarkName}"/>
+
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">申请减免学分：</label>
+                                <div th:switch="${planCollegeInfo != null and planCollegeInfo.reduceCreditStatus != null}? ${planCollegeInfo.reduceCreditStatus}">
+                                    <input class="col-sm-1" th:case="true" readonly="readonly"
+                                           style="width: 150px" value="是"/>
+                                    <input class="col-sm-1" th:case="false" readonly="readonly"
+                                           style="width: 150px" value="否"/>
+                                    <input class="col-sm-1" th:case="*" readonly="readonly"
+                                           style="width: 150px" value=""/>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">小专业方向：</label>
+                                <div style="width:150px; float:left">
+                                        <span class="input-icon input-icon-right">
+                                            <input class="col-sm-1" readonly="readonly" id="email-account"
+                                                   style="width: 150px"
+                                                   th:value="${planCollegeInfo != null and planCollegeInfo.majorDetail != null}? ${planCollegeInfo.majorDetail}"/>
+                                        </span>
+                                </div>
+
+                            </div>
+                            <div class="form-group" style="height:29px">
+
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">意向校区：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.schoolArea != null}? ${planCollegeInfo.schoolArea}"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">申请截止日期：</label>
+                                <input class="col-sm-1" id="applyDeadlineId" style="width: 150px" type="hidden"
+                                       th:value="${ planCollegeInfo != null and planCollegeInfo.applyDeadline != null }?  ${#dates.format(planCollegeInfo.applyDeadline,'yyyy-MM-dd')}"/>
+                                <input class="col-sm-1" id="applyDeadlineRemarkId" style="width: 150px" type="hidden"
+                                       th:value="${ planCollegeInfo != null and planCollegeInfo.applyDeadlineRemark!=null}?  ${planCollegeInfo.applyDeadlineRemark}"/>
+                                <input class="col-sm-1" id="applyDead" readonly="readonly" style="width: 150px"/>
+                            </div>
+
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">开课时间：</label>
+                                <input class="col-sm-1" readonly="readonly" name="studentNo" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.courseStartTime != null}? ${#dates.format(planCollegeInfo.courseStartTime,'yyyy-MM-dd')}"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">定校国家：</label>
+                                <input class="col-sm-1" readonly="readonly" name="studentNo" style="width: 150px"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.collegeCountryName != null}? ${planCollegeInfo.collegeCountryName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">学生确认结果：</label>
+                                <a class="col-sm-1" id="confirmFile"
+                                   th:class="${planCollegeInfo != null and planCollegeInfo.confirmFile != null}? ${planCollegeInfo.confirmFile}"
+                                   onclick="showAttachment(this)">下载</a>
+
+                            </div>
+                            <div id="planCommentDiv" class="form-group" style="height:29px;">
+                                <label class="col-sm-3 control-label no-padding-right blue">定校备注：</label>
+                                <input type="hidden" id="planComment"
+                                       th:value="${planCollegeInfo != null and planCollegeInfo.planComment != null  }? ${planCollegeInfo.planComment}"/>
+                                <textarea id="planCommentText" readonly="readonly" style="width: 591px;height: 76px">
+
+                                </textarea>
+                            </div>
+                            <br/><br/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/js/upload/filePath.js}"></script>
+<script type="text/javascript" th:inline="JavaScript">
+
+    /*<![CDATA[*/
+    function showAttachment(obj) {
+        var showAttachment = obj.getAttribute('class');
+        if (showAttachment != null) {
+            window.open(showAttachment);
+        }
+    }
+
+    function showMajorUrl(obj) {
+        var showAttachment = obj.value;
+        if (showAttachment != null) {
+            window.open(showAttachment);
+        }
+    }
+    $(function () {
+        if ($("#planComment").val() != null) {
+            document.getElementById('planCommentText').innerText = $("#planComment").val();
+        }
+        if ($("#majorUrlId").val() != null) {
+            document.getElementById('majorUrl').innerText = $("#majorUrlId").val();
+
+        }
+
+
+        if ($("#applyDeadlineId").val() !=  ""  &&  $("#applyDeadlineId").val() !=null) {
+            $('#applyDead').val($("#applyDeadlineId").val());
+        } else if ($("#applyDeadlineRemarkId").val()  != "" &&  $("#applyDeadlineRemarkId").val() !=null) {
+            $('#applyDead').val($("#applyDeadlineRemarkId").val());
+        } else {
+            $('#applyDead').val("");
+        }
+    })
+
+    function copyUrl2()
+    {
+        var Url=document.getElementById("majorUrl");
+        Url.select(); // 选择对象
+        document.execCommand("Copy"); // 执行浏览器复制命令
+        alert("复制成功！");
+    }
+
+
+
+
+
+
+    /*]]>*/
+</script>
+
+</body>
+</html>

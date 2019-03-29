@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysUserRoleMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysUserRole">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="role_id" jdbcType="INTEGER" property="roleId" />
+    <result column="operator" jdbcType="VARCHAR" property="operator" />
+    <result column="created" jdbcType="TIMESTAMP" property="created" />
+    <result column="deleted" jdbcType="TIMESTAMP" property="deleted" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="oaid" jdbcType="VARCHAR" property="oaId" />
+  </resultMap>
+
+  <select id="getRoleIdsByUserId" parameterType="long" resultType="int">
+      select role_id from sys_user_role where user_id=#{userId} and delete_status=0
+  </select>
+
+  <update id="removeRoleByUserId" parameterType="java.lang.Integer">
+      update sys_user_role set deleted = now(), delete_status = 1 where user_id = #{userId}
+  </update>
+  <update id="insertList" parameterType="java.lang.Integer">
+  update sys_user_role set role_id = 41 where id = #{id}
+  </update>
+  <select id="getSysUsertest" resultType="com.aoji.model.SysUserRole">
+    select oaid,id from sys_user_role where oaid in (select sysUser.oaid from sys_user sysUser,sys_user_role userRole,sys_role role where sysUser.id = userRole.user_id and userRole.role_id = role.id and role.id != 23 and role.id != 24
+    ) and role_id = 25 and operator = '测试'
+  </select>
+
+  <select id="selectSysUserRole" resultType="com.aoji.vo.SysUserRoleVO" parameterType="com.aoji.vo.SysUserRoleVO">
+    select
+      su.id userId,
+      su.oaid,
+      su.username,
+      sr.id roleId,
+      sr.role_name roleName,
+      sur.id userRoleId,
+      sur.created
+    from
+    (select * from sys_user where delete_status = 0
+    <if test="oaid != null and oaid != ''">
+      and oaid = #{oaid}
+    </if>
+    <if test="username != null and username != ''">
+      and username like concat('%', #{username}, '%')
+    </if>
+    ) su,
+    (select * from sys_user_role where delete_status = 0) sur,
+    (select * from sys_role where delete_status = 0
+    <if test="roleName != null and roleName != ''">
+      and role_name like concat('%', #{roleName}, '%')
+    </if>
+    ) sr
+    where su.id = sur.user_id and sur.role_id = sr.id
+  </select>
+</mapper>

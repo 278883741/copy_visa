@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.ChannelStudentInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.ChannelStudentInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+    <result column="contract_type" jdbcType="INTEGER" property="contractType" />
+    <result column="branch_id" jdbcType="INTEGER" property="branchId" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
+    <result column="usa_status" jdbcType="INTEGER" property="usaStatus" />
+    <result column="gender" jdbcType="INTEGER" property="gender" />
+    <result column="agent_qq" jdbcType="VARCHAR" property="agentQq" />
+    <result column="agent_id" jdbcType="INTEGER" property="agentId" />
+    <result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="student_sort" jdbcType="VARCHAR" property="studentSort" />
+    <result column="channel_status" jdbcType="INTEGER" property="channelStatus" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="audit_status" jdbcType="INTEGER" property="auditStatus" />
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="transfer_remark" jdbcType="VARCHAR" property="transferRemark" />
+      <result column="agent_confirm" jdbcType="BIT" property="agentConfirm" />
+  </resultMap>
+
+  <select id="getList" resultMap="BaseResultMap" parameterType="object">
+
+    SELECT * FROM channel_student_info where delete_status = FALSE
+    <if test="channelStudentInfo.remark == 'TY'">
+      AND audit_status = 2
+    </if>
+    <if test="channelStudentInfo.remark == 'DL'">
+      AND audit_status IN (1,2)
+      AND operator_no = #{channelStudentInfo.operatorNo}
+    </if>
+    <if test="channelStudentInfo.agentName != null and channelStudentInfo.agentName !=''">
+      AND agent_name = #{channelStudentInfo.agentName}
+    </if>
+    <if test="channelStudentInfo.nationId != null and channelStudentInfo.nationId !=''">
+      AND nation_id = #{channelStudentInfo.nationId}
+    </if>
+    <if test="channelStudentInfo.studentName != null and channelStudentInfo.studentName !=''">
+      AND (student_name LIKE CONCAT('%',#{channelStudentInfo.studentName},'%' ) OR pinyin Like
+      CONCAT('%',#{channelStudentInfo.studentName},'%' ))
+    </if>
+    <if test="channelStudentInfo.auditStatus != null and channelStudentInfo.auditStatus !=''">
+      AND audit_status = #{channelStudentInfo.auditStatus}
+    </if>
+    ORDER BY create_time DESC
+  </select>
+
+    <select id="selectChannelStudentInfoByStudentNo" resultType="com.aoji.model.ChannelStudentInfo">
+      SELECT
+	id as id,
+	student_name as studentName,
+	student_no as studentNo,
+	contract_no as contractNo,
+	contract_type as contractType,
+	branch_id as branchId,
+	branch_name as branchName,
+	create_time as createTime,
+	operator_no as operatorNo,
+	nation_id as nationId,
+	nation_name as nationName,
+	birthday as birthday,
+	pinyin as pinyin,
+	usa_status as usaStatus,
+	gender as gender,
+	agent_qq as agentQq,
+	agent_id as agentId,
+	agent_name as agentName,
+	email as email,
+	student_sort as studentSort,
+	channel_status as channelStatus,
+	remark as remark,
+	audit_status as auditStatus,
+	sign_date as signDate,
+	transfer_remark as transferRemark
+FROM
+	channel_student_info
+WHERE
+	student_no = #{studentNo}
+AND delete_status = 0
+    </select>
+</mapper>

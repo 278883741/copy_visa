@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.StudentDelayInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.StudentDelayInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="contact_date" jdbcType="TIMESTAMP" property="contactDate" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="remark" jdbcType="VARCHAR" property="reason" />
+  </resultMap>
+    <select id="getStudentInfoVo" resultType="com.aoji.vo.StudentInfoVo">
+--       SELECT
+--           a.student_no studentNo,a.student_name studentName
+--       FROM
+--           (
+--               SELECT
+--                   student.*
+--               FROM
+--                   visa_result_info visaResult,
+--                   student_info student
+--               WHERE
+--                   visaResult.student_no = student.student_no
+--               AND student. STATUS = 90
+--               and student.delete_status = 0
+--               and visaResult.delete_status = 0
+--               AND visaResult.visa_result = 1
+--               AND visaResult.visa_status = 3 GROUP BY student.student_no
+--           ) a
+--       LEFT JOIN student_settle_info settle ON settle.student_no = a.student_no
+--       WHERE
+-- 	settle.id IS NULL group by a.student_no
+
+-- SELECT
+-- 	a.student_no studentNo,a.student_name studentName,a.createTIme
+-- FROM
+-- 	(
+-- 		SELECT
+-- 			student.*,auditResult.create_time createTime
+-- 		FROM
+-- 			visa_record_info record,
+-- 			audit_result_info auditResult,
+-- 			student_info student
+-- 		WHERE
+-- 			record.audit_status = 3
+-- 		AND record.id = auditResult.business_id
+--     and record.delete_status = 0
+-- 		AND auditResult.case_id = 7
+-- 		and auditResult.delete_status = 0
+-- 		AND auditResult.create_time >= '2018-05-01'
+-- 		AND record.student_no = student.student_no group by student.student_no
+-- 	) a
+-- LEFT JOIN student_settle_info settle ON a.student_no = settle.student_no
+-- WHERE
+-- 	settle.id IS NULL group by a.student_no
+    </select>
+</mapper>

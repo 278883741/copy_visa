@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li>控制台</li>
+                    <li>管理层查看</li>
+                    <li>签证结果列表</li>
+                </ul>
+            </div>
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div th:include="fragments/student_info::student_info" th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                                <h3 class="header smaller lighter blue">签证结果列表</h3>
+                                <input id="oaid" th:value="${session.user.oaid}" type="text" name="oaid" style="display: none"/>
+
+                                <input type="hidden" name="fromChannel" id="fromChannel" th:value="${#httpServletRequest.getParameter('fromChannel')}"/>
+                                <input id="input_canEdit" th:value="${canEdit}" type="hidden" />
+                                <input id="input_canAddVisaApply" th:value="${canAddVisaApply}" type="hidden" />
+                                <input id="input_hasVisaRecord" th:value="${has_visaRecord}" type="hidden" />
+                                <input type="text" id="input_nationStatus" th:value="${nationStatus}" style="display: none"/>
+                                <div class="table-header" style="height:42px">
+                                    <form class="form-inline">
+                                        <label>学号：</label>
+                                        <input type="text" id="input_studentNo" class="form-control input-sm"  style="width:70px;height: 25px;"/>
+                                        <label>姓名：</label>
+                                        <input type="text" id="input_studentName" class="form-control" style="width:70px;height: 25px;" />
+
+                                        <label>国家：</label>
+                                        <select id="select_nation" class="form-control input-sm" style="height: 25px;width:165px;">
+                                            <option value="-999">请选择</option>
+                                            <option th:each="item: ${countryList}" th:value="${item.id}" th:text="${item.countryName}"></option>
+                                        </select>
+
+                                        <label>是否审批：</label>
+                                        <select id="select_isAudited" class="form-control input-sm" style="height: 25px;width:80px;">
+                                            <option value="-999">请选择</option>
+                                            <option value="1">是</option>
+                                            <option value="0">否</option>
+                                        </select>
+
+                                        <label>签证结果：</label>
+                                        <select id="select_visaResult" class="form-control input-sm" style="height: 25px;width:105px;">
+                                            <option value="-999">请选择</option>
+                                            <option value="1">获签</option>
+                                            <option value="0">拒签</option>
+                                            <option value="2">撤签</option>
+                                        </select>
+
+                                        <div class="form-group">
+                                            <label>提交日期：</label>
+                                            <input type="text" id="input_createDateBegin" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd 00:00:00'})" style="width:130px; height:25px"/>
+                                            -
+                                            <input type="text" id="input_createDateEnd" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd 23:59:59'})" style="width:130px; height:25px"/>
+                                        </div>
+
+                                        <button type="button" id="query" class="btn btn-success pull-right">查询</button>
+                                        <button  class="btn btn-warning pull-right">清空</button>
+                                    </form>
+                                </div>
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th>学号</th>
+                                            <th>姓名</th>
+                                            <th>国家</th>
+                                            <th>签证结果</th>
+                                            <th>是否审批</th>
+                                            <th>提交日期</th>
+                                            <th>提交人</th>
+                                            <th>附件</th>
+                                            <th>详情</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/assets/js/date-time/moment.min.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function(){
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+
+                },
+                getQueryData:function(){
+                    this.oTable1;
+                },
+                handelQueryData:function(){
+
+                },
+                render:function(){
+                    var _self = this;
+                    _self.oTable1 = $('#sample-table-2').dataTable({
+                        "bFilter" : false,//是否使用搜索
+                        "bProcessing" : true,
+                        "bDeferRender" : true,//
+                        "sPaginationType" : "bs_normal",//分页样式
+                        "bRetrieve" : true,//是否调用后台
+                        "bServerSide" : true,//是否以后台分页
+                        "sAjaxSource" : "/visaResult/manageList/query",//请求路径
+                        "fnServerData" : function(sSource, aoData, fnCallback) {
+                            aoData.push(
+                                {"name": "searchStudentNo", "value": $("#input_studentNo").val()},
+                                {"name": "searchStudentName", "value": $("#input_studentName").val()},
+                                {"name": "searchNationId", "value": $("#select_nation").children("option:selected").val()},
+                                {"name": "searchVisaResult", "value": $("#select_visaResult").children("option:selected").val()},
+                                {"name": "searchCreateDateStart", "value": $("#input_createDateBegin").val()},
+                                {"name": "searchCreateDateEnd", "value": $("#input_createDateEnd").val()},
+                                {"name": "searchIsAudited", "value": $("#select_isAudited").children("option:selected").val()}
+                            )
+                            $.ajax({
+                                "dataType" : 'json',
+                                "type" : "GET",
+                                "url" : sSource,
+                                "data" : aoData,
+                                "success" : fnCallback
+                            });
+                        },
+                        "aaSorting" : [ [ 1, "desc" ] ],
+                        "aoColumns" : [
+                            {"sClass": "center", "bVisible": false, "mData": "id"},
+                            {"sClass": "center", "bSortable": false, "mData": "student_no",
+                                "mRender" : function(data, type, full, meta) {
+                                    if (data != null && data != '') {
+                                        return "<a href='/student/detail?studentNo=" + data + "' target='_blank'>" + data + "</a>";
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {"sClass": "center", "bSortable": false, "mData": "student_name"},
+                            {"sClass": "center", "bSortable": false, "mData": "nation_name"},
+                            {"sClass": "center", "bSortable": false, "mData": "visa_result",
+                                "mRender" : function(data, type, full, meta) {
+                                    if (data != null ) {
+                                        if(data == 1){
+                                            return "获签";
+                                        }else if(data == 0){
+                                            return "拒签";
+                                        }else if(data == 2){
+                                            return "撤签";
+                                        }
+                                    } else {
+                                        return "";
+                                    }
+                                }
+                            },
+                            {"sClass": "center", "bSortable": false, "mData": "visa_status",
+                                "mRender" : function(data, type, full, meta) {
+                                    if (data != null && data != '') {
+                                        if(data == "1" || data == "2"){
+                                            return "否";
+                                        }else{
+                                            return "是";
+                                        }
+                                    } else {
+                                        return "未知 - null";
+                                    }
+                                }
+                            },
+                            {"sClass": "center", "bSortable": false, "mData": "create_time",
+                                "mRender" : function(data, type, full, meta) {
+                                    if(data != null && data != ''){
+                                        return  moment(data).format("YYYY-MM-DD");
+                                    }
+                                    else
+                                        return "";
+                                }
+                            },
+                            {"sClass": "center", "bSortable": false, "mData": "operator_name"},
+                            {"sClass": "center", "bSortable": false, "mData": "attachment",
+                                "mRender" : function(data, type, full, meta) {
+                                    if (data != null && data != '') {
+                                        return "<a href='"+data+"' target='_blank'>查看</a>";
+                                    }else{
+                                        return '';
+                                    }
+                                }
+                            },
+                            {
+                                "sClass": "center", "bSortable": false, "mData": function (data) {
+                                    return "<a href='/visaApply/detailPage?id=" + data.visaApplyId + "&studentNo=" + data.student_no + "' target='_blank'>详情</a>";
+                                }
+                            }
+                        ],
+                        "oLanguage" : {
+                            "sLengthMenu" : "每页 _MENU_条 ",
+                            "sZeroRecords" : "对不起，查询不到任何相关数据",
+                            "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                            "sInfoEmpty" : "显示 0 到 0 条，共 0 条记录",
+                            "sInfoFiltered" : "数据表中共为 _MAX_ 条记录)",
+                            "sProcessing" : "正在加载中...",
+                            "sSearch" : "搜索",
+                            "sUrl" : "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                            "oPaginate" : {
+                                "sFirst" : "第一页",
+                                "sPrevious" : " 上一页 ",
+                                "sNext" : " 下一页 ",
+                                "sLast" : " 最后一页 "
+                            }
+                        }
+                        //多语言配置
+                    });
+                },
+                addEvent:function(){
+                    var _self = this;
+                    $("#query").click(function() {
+                        _self.oTable1.fnDraw();
+                    });
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+    -->
+</script>
+</body>
+</html>

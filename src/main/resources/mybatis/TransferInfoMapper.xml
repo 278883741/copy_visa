@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.TransferInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.TransferInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="transfer_type" jdbcType="INTEGER" property="transferType" />
+    <result column="country_group" jdbcType="INTEGER" property="countryGroup" />
+    <result column="user_group" jdbcType="INTEGER" property="userGroup" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="TransferListResultMap" type="com.aoji.vo.TransferListVO">
+    <result column="send_id" jdbcType="INTEGER" property="sendId" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="receive_no" jdbcType="VARCHAR" property="receiveNo" />
+    <result column="receive_name" jdbcType="VARCHAR" property="receiveName" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+    <result column="transfer_reason" jdbcType="VARCHAR" property="transferReason" />
+    <result column="confirm_status" jdbcType="BIT" property="confirmStatus" />
+    <result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo" />
+    <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant" />
+    <result column="copy_operator" jdbcType="VARCHAR" property="copyOperator" />
+    <result column="copy_operator_no" jdbcType="VARCHAR" property="copyOperatorNo" />
+    <result column="receive_time" jdbcType="TIMESTAMP" property="receiveTime" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+    <result column="contract_type" jdbcType="INTEGER" property="contractType" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="transfer_send_type" jdbcType="INTEGER" property="transferSendType" />
+    <result column="operator_type" jdbcType="INTEGER" property="operatorType" />
+    <result column="copy" jdbcType="VARCHAR" property="copy" />
+    <result column="visa_operator" jdbcType="VARCHAR" property="visaOperator" />
+  </resultMap>
+
+  <select id="transferList" resultMap="TransferListResultMap" parameterType="com.aoji.vo.TransferListVO">
+    SELECT y.*, receive.create_time as receive_time, receive.reason
+    <if test="transferType == 2">, apply.college_name</if>
+    FROM (SELECT x.*,
+    student.sales_consultant_no, student.sales_consultant, student.copy, student.visa_operator, student.copy_operator, student.copy_operator_no,
+    student.contract_no, student.contract_type, student.nation_name, student.birthday, student.branch_name
+    FROM (SELECT * FROM
+    (SELECT id, apply_id, student_no, student_name, `comment` FROM transfer_info WHERE delete_status = 0
+    <if test="studentNo != null and studentNo != ''">AND student_no = #{studentNo}</if>
+    <if test="studentName != null and studentName != ''">AND student_name LIKE concat('%', #{studentName}, '%')</if>
+    <if test="transferType != null">AND transfer_type = #{transferType}</if>
+    <if test="countryGroup != null">AND country_group = #{countryGroup}</if>
+    <if test="userGroup != null and canAssign">AND (user_group = #{userGroup} OR user_group is null)</if>
+    <if test="userGroup != null and !canAssign">AND user_group = #{userGroup}</if>
+    ) info,
+    (SELECT id AS send_id, transfer_id, operator_no, operator_name, receive_no, receive_name,
+    create_time as send_time, transfer_type as transfer_send_type, transfer_reason, operator_type,
+    confirm_status FROM transfer_send
+      <if test="transferType != 2">FORCE INDEX ( create_time )</if>
+      WHERE (delete_status = 0 AND enable_status = 1
+    <if test="transferSendType != null">AND transfer_type = #{transferSendType}</if>
+    <if test="operatorType != null">AND operator_type = #{operatorType}</if>
+    <if test="confirmStatus != null and confirmStatus != '-1'">AND confirm_status = #{confirmStatus}</if>
+    <if test="confirmStatus == '-1'">AND confirm_status is null</if>
+    <if test="receiveName != null and receiveName != ''">AND receive_name like concat('%', #{receiveName}, '%')</if>
+    <if test="operatorNo != null">AND operator_no = #{operatorNo}</if> )
+    <if test="receiveNo != null and canAssign">OR (receive_no = #{receiveNo} AND enable_status = 1
+        <if test="confirmStatus != null and confirmStatus != '-1'">AND confirm_status = #{confirmStatus}</if>
+        <if test="confirmStatus == '-1'">AND confirm_status is null</if>
+        <if test="transferSendType != null">AND transfer_type = #{transferSendType}</if>
+        <if test="operatorType != null">AND operator_type = #{operatorType}</if>
+        <if test="receiveName != null and receiveName != ''">AND receive_name like concat('%', #{receiveName}, '%')</if>
+      )
+    </if>
+    <if test="receiveNo != null and !canAssign">AND receive_no = #{receiveNo}</if>
+    ) send
+    WHERE info.id = send.transfer_id
+    <if test="transferType != 2">
+    union
+    select * from
+    (select id, apply_id, student_no, student_name, `comment` from transfer_info where delete_status = 0
+    <if test="studentNo != null and studentNo != ''">AND student_no = #{studentNo}</if>
+    <if test="studentName != null and studentName != ''">AND student_name LIKE concat('%', #{studentName}, '%')</if>
+    <if test="transferType != null">AND transfer_type = #{transferType}</if>
+    ) info2,
+    (select id AS send_id, transfer_id, operator_no, operator_name, receive_no, receive_name, create_time AS send_time,
+    transfer_type AS transfer_send_type, transfer_reason, operator_type, confirm_status from transfer_send
+    where enable_status = 1 and delete_status = 0 and transfer_type in (3, 4)
+    <if test="transferSendType != null">AND transfer_type = #{transferSendType}</if>
+    <if test="operatorType != null">AND operator_type = #{operatorType}</if>
+    <if test="confirmStatus != null and confirmStatus != '-1'">AND confirm_status = #{confirmStatus}</if>
+    <if test="confirmStatus == '-1'">AND confirm_status is null</if>
+    <if test="operatorNo != null">AND operator_no = #{operatorNo}</if>
+    <if test="receiveNo != null">AND receive_no = #{receiveNo}</if>
+    <if test="receiveName != null and receiveName != ''">AND receive_name like concat('%', #{receiveName}, '%')</if>
+    ) send2
+    where info2.id = send2.transfer_id
+    </if>
+    ) x,
+    ( SELECT student_no, sales_consultant, sales_consultant_no, contract_no, contract_type, nation_name,
+    birthday, branch_name, copy, visa_operator, copy_operator, copy_operator_no FROM student_info WHERE delete_status = 0
+    <if test="endCaseStatus == 0">
+      and status not in (90, 100)
+    </if>
+    <if test="endCaseStatus == 1">
+      and status in (90, 100)
+    </if>
+    ) student
+    WHERE x.student_no = student.student_no ) y
+    LEFT JOIN (SELECT send_id, create_time, reason FROM transfer_receive WHERE delete_status = 0) receive ON y.send_id = receive.send_id
+    <if test="transferType == 2">
+    LEFT JOIN (SELECT id, college_name FROM apply_info WHERE delete_status = 0) apply ON y.apply_id = apply.id
+    </if>
+    order by y.transfer_send_type ASC , y.send_time desc
+  </select>
+
+  <!-- 转案列表数据 优化中 -->
+  <select id="transferListBak" resultMap="TransferListResultMap" parameterType="com.aoji.vo.TransferListVO">
+    select x.*, receive.* <if test="transferType == 2">, apply.college_name</if> from
+    (
+    select info.*, send.*, student.sales_consultant_no, student.sales_consultant, student.copy,
+    student.visa_operator, student.copy_operator, student.copy_operator_no, student.contract_no,
+    student.contract_type, student.nation_name, student.birthday, student.branch_name from
+    (select id, apply_id, student_no, student_name, `comment` from transfer_info where delete_status = 0
+    <if test="transferType != null">AND transfer_type = #{transferType}</if>
+    <if test="countryGroup != null">AND country_group = #{countryGroup}</if>
+    <if test="userGroup != null and canAssign">AND (user_group = #{userGroup} OR user_group is null)</if>
+    <if test="userGroup != null and !canAssign">AND user_group = #{userGroup}</if>
+    ) info,
+    (select id AS send_id, transfer_id, operator_no, operator_name, receive_no, receive_name,
+    create_time as send_time, transfer_type as transfer_send_type, transfer_reason, operator_type,
+    confirm_status from transfer_send where (delete_status = 0 and enable_status = 1
+    <if test="transferSendType != null">AND transfer_type = #{transferSendType}</if>
+    <if test="operatorType != null">AND operator_type = #{operatorType}</if>
+    <if test="confirmStatus != null and confirmStatus != '-1'">AND confirm_status = #{confirmStatus}</if>
+    <if test="confirmStatus == '-1'">AND confirm_status is null</if>
+    <if test="receiveName != null and receiveName != ''">AND receive_name like concat('%', #{receiveName}, '%')</if>
+    <if test="operatorNo != null">AND operator_no = #{operatorNo}</if> )
+    <if test="receiveNo != null and canAssign">OR (receive_no = #{receiveNo} AND enable_status = 1
+      <!--接收人工号等于当前登录人 也要满足其他条件-->
+      <if test="confirmStatus != null and confirmStatus != '-1'">AND confirm_status = #{confirmStatus}</if>
+      <if test="confirmStatus == '-1'">AND confirm_status is null</if>
+      <if test="transferSendType != null">AND transfer_type = #{transferSendType}</if>
+      <if test="operatorType != null">AND operator_type = #{operatorType}</if>
+      <if test="receiveName != null and receiveName != ''">AND receive_name like concat('%', #{receiveName}, '%')</if>
+      )
+    </if>
+    <if test="receiveNo != null and !canAssign">AND receive_no = #{receiveNo}</if>
+    ) send,
+    (select student_no, sales_consultant, sales_consultant_no, contract_no, contract_type,
+    nation_name, birthday, branch_name, copy, visa_operator, copy_operator, copy_operator_no
+    from student_info  where delete_status = 0
+    <if test="studentNo != null and studentNo != ''">AND student_no = #{studentNo}</if>
+    <if test="studentName != null and studentName != ''">AND student_name LIKE concat('%', #{studentName}, '%')</if>
+    <if test="endCaseStatus == 0">
+      and status not in (90, 100)
+    </if>
+    <if test="endCaseStatus == 1">
+      and status in (90, 100)
+    </if>
+    ) student
+    where info.id = send.transfer_id and student.student_no = info.student_no
+    ) x left join
+    (select send_id, create_time, reason from transfer_receive where delete_status = 0) receive on x.send_id = receive.send_id
+    <if test="transferType == 2">
+      LEFT JOIN (SELECT id, college_name FROM apply_info WHERE delete_status = 0) apply ON x.apply_id = apply.id
+    </if>
+    ORDER BY x.transfer_send_type asc, x.send_time desc
+  </select>
+
+  <select id="getByStudentNoAndType" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select * from transfer_info where delete_status = 0 and student_no = #{studentNo} and transfer_type = #{transferType}
+  </select>
+
+  <select id="transferCaseListByVisaManagerOrDirector" resultType="java.util.Map">
+    SELECT
+    studentInfo.student_no,
+    studentInfo.student_name,
+    studentInfo.pinyin,
+    studentInfo.sales_consultant,
+    studentInfo.copy_operator,
+    studentInfo.branch_name,
+    studentInfo.sign_date,
+    studentInfo.id,
+    studentInfo.country_name,
+    studentInfo.contract_type,
+    transfer.confirm_status,
+    transfer.send_time,
+    transfer.`comment`
+
+    FROM
+    (
+    SELECT
+    info.student_no,
+    info.`comment`,
+    send.confirm_status,
+    send.send_time
+
+    FROM
+    (
+    SELECT
+    student_no,
+    id,
+    `comment`
+    FROM
+    transfer_info
+    WHERE
+    delete_status = 0
+    AND transfer_type = 1
+    ) info,
+    (
+    SELECT
+    student_no,
+    transfer_id,
+    confirm_status,
+    create_time as send_time
+    FROM
+    transfer_send
+    WHERE
+    delete_status = 0
+    AND enable_status = 1
+    AND operator_type = 1
+    ) send
+    WHERE
+    info.id = send.transfer_id
+    ) transfer,
+    (
+    SELECT
+    student.student_no,
+    student.student_name,
+    student.pinyin,
+    student.branch_name,
+    student.sales_consultant,
+    student.copy_operator,
+    student.contract_type,
+    student.sign_date,
+    cinfo.id,
+    cinfo.country_name
+    FROM
+    student_info student
+    LEFT JOIN (SELECT id,country_name FROM country_info) cinfo ON student.nation_id = cinfo.id
+    AND student.delete_status = 0
+    ) studentInfo
+    WHERE
+    transfer.student_no = studentInfo.student_no
+    <if test="arrayId !=null ">
+      and studentInfo.id in
+      <foreach collection="arrayId" item="dramaId" open="(" close=")" separator=",">
+        #{dramaId}
+      </foreach>
+    </if>
+    <if test="calibrationSchemeVo.studentNo != null and calibrationSchemeVo.studentNo!=''">
+      and studentInfo.student_no = #{calibrationSchemeVo.studentNo}
+    </if>
+    <if test="calibrationSchemeVo.studentName != null and calibrationSchemeVo.studentName!=''">
+      and studentInfo.student_name  LIKE CONCAT('%',#{calibrationSchemeVo.studentName},'%')
+    </if>
+    <if test="calibrationSchemeVo.pinyin != null and calibrationSchemeVo.pinyin!=''">
+      and studentInfo.pinyin LIKE CONCAT('%',#{calibrationSchemeVo.pinyin},'%')
+    </if>
+    <if test="calibrationSchemeVo.confirmStatus != null and calibrationSchemeVo.confirmStatus!=''">
+      and transfer.confirm_status =#{calibrationSchemeVo.confirmStatus}
+    </if>
+    <if test="calibrationSchemeVo.id != null and calibrationSchemeVo.id!=''">
+      and studentInfo.id =#{calibrationSchemeVo.id}
+    </if>
+    <if test="calibrationSchemeVo.copyOperator != null and calibrationSchemeVo.copyOperator!=''">
+      and studentInfo.copy_operator LIKE CONCAT('%',#{calibrationSchemeVo.copyOperator},'%')
+    </if>
+    ORDER BY transfer.send_time DESC
+  </select>
+</mapper>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/chosen.css}" />
+<head th:include="fragments/head::header" />
+<style>
+    .input-unit{
+        width: 65px;
+        height: 25px;
+        display: block;
+        float: left;
+        background-color: #abbac3;
+        line-height: 25px;
+        text-align: center;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">获签或入读信息</h3>
+                <br/>
+                <form method="post" id="edit">
+                    <input id="input_isAmerica" type="hidden" th:value="${isAmerica != null}?${isAmerica}" />
+                    <input type="hidden" id ="input_nation" th:value="${nation != null}?${nation}"/>
+                    <input type="hidden" id="input_nationStatus" th:value="${nationStatus != null}?${nationStatus}"/>
+
+                    <input id="input_stuNo" th:value="${stuNo}" type="text" name="visaRecordInfo.studentNo" style="display: none"/>
+                    <input type="hidden" id ="input_attachment" name="visaRecordInfo.evusAttachment"/>
+
+                    <input type="hidden" id ="input_contractType" th:value="${contractType != null}?${contractType}" />
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 获签日期：</label>
+                                    <input class="Wdate col-sm-3" style="width: 190px; height:25px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',maxDate:'%y-%M-%d'})" name="visaRecordInfo.resultTime"/>
+                                    <label class="col-sm-2 control-label no-padding-right blue"> 监护人费用：</label>
+                                    <input class="col-sm-3" style="width: 190px;height:25px;" disabled="disabled" th:value="${guardianFee!=null}? ${guardianFee}"/>
+                                </div>
+
+                                <div class="form-group" style="height:29px;display: none;" id="div_evus">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> EVUS登记完成日期：</label>
+                                    <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px; height:25px" name="visaRecordInfo.evusCompleteDate"/>
+                                </div>
+                                <div class="form-group" style="height:130px" id="div_comment">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> 备注：</label>
+                                    <textarea rows="10" cols="40"  name="visaRecordInfo.visaComment" class="col-sm-3" style="width:560px;height:100px;"></textarea>
+                                </div>
+
+                                <div id="div_addCourse">
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-1 control-label no-padding-right blue"> <i class="icon-edit green bigger-130"></i><a id="a_addCourse" class="smaller lighter blue" href="javascript:void(0);">添加课程</a></label>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="height:29px;margin-top: 20px;display: none;" id="div_studentNation">
+                                    <label class="col-sm-3 control-label no-padding-right blue">学生留学国家：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="visaRecordInfo.studentNation" style="width:190px;height:25px;" readonly="readonly">
+                                        <option th:each="item: ${doubleSignCountry}" th:attr="nationId=${item.nationId}" th:value="${item.id}" th:text="${item.nationName}"></option>
+                                    </select>
+                                </div>
+                                <div th:each="course : ${listOtherCourse}" flag="template">
+                                    <input type="hidden" th:name="list[+${course}+].collegeName"/>
+                                    <input type="hidden" th:name="list[+${course}+].majorName"/>
+                                    <input type="hidden" th:name="list[+${course}+].courseName"/>
+                                    <input type="hidden" th:name="list[+${course}+].cooperationName"/>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-1 control-label no-padding-right blue"></label>
+                                    </div>
+
+                                    <div class="form-group" style="height:29px;margin-top: 20px;">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 院校名称：</label>
+                                        <select class="col-sm-1 chosen-select" th:name="list[+${course}+].collegeId" data-placeholder="Choose a Country..." style="width:590px">
+                                            <option value="-1">请选择</option>
+                                            <option th:each="item: ${school}" th:value="${item.id}" th:text="${item.englishName}"></option>
+                                        </select>
+                                        <button type="button" businessId="" flag="btn_delete" class="btn btn-sm btn-danger" style="margin-left: 5px;" data-toggle="button">删除</button>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 专业类型：</label>
+                                        <select class="col-sm-2" th:name="list[+${course}+].courseType" style="">
+                                            <option value="-1">请选择</option>
+                                            <option value="1">语言</option>
+                                            <option value="2">预科</option>
+                                            <option value="3">主课</option>
+                                            <option value="4">快捷</option>
+                                            <option value="5">夏校</option>
+                                            <option value="6">桥梁</option>
+                                            <option value="7">top up</option>
+                                        </select>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 目标学历：</label>
+                                        <select class="col-sm-1" th:name="list[+${course}+].educationSection" data-placeholder="Choose a Country..." style="width:190px;">
+                                            <option value="-1">请选择</option>
+                                            <option value="2">中小学</option>
+                                            <option value="3">本科</option>
+                                            <option value="4">硕士</option>
+                                            <option value="5">博士</option>
+                                            <option value="9">专科</option>
+                                            <option value="10">非学历</option>
+                                            <option value="11">证书</option>
+                                            <option value="12">副学士</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 专业名称：</label>
+                                        <select class="col-sm-1 chosen-select" th:name="list[+${course}+].majorId" data-placeholder="Choose a Country..." style="width:190px;">
+                                            <option value="-1">请选择</option>
+                                        </select>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 学位名称：</label>
+                                        <select class="col-sm-1 chosen-select" th:name="list[+${course}+].courseId" data-placeholder="Choose a Country..." style="width:190px;">
+                                            <option value="-1">请选择</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 开课日期：</label>
+                                        <input class="Wdate col-sm-3" style="width: 190px; height:25px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" th:name="list[+${course}+].courseStartTime"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 学费金额：</label>
+                                        <input  class="col-sm-2" type="text" style="width:125px;height:25px;" th:name="list[+${course}+].tuition"/>
+                                        <select class="col-sm-1 form-control input-sm" style="height: 25px;width:65px;" th:name="list[+${course}+].currency">
+                                            <option th:each="item: ${list_currencyInfo}" th:value="${item.id}" th:text="${item.enName}"></option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 学制：</label>
+                                        <input class="col-sm-3" type="text" style="width:195px;height:25px;" th:name="list[+${course}+].schoolLength"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 上课周数：</label>
+                                        <input class=" col-sm-3" style="width: 125px;height:25px" type="number" th:name="list[+${course}+].courseLength"/>
+                                        <span class="input-unit">周</span>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 结课日期：</label>
+                                        <input th:name="list[+${course}+].courseEndTime" class="Wdate col-sm-3" style="width: 190px; height:25px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 所在校区：</label>
+                                        <input class=" col-sm-3" style="width: 190px; height:25px;" th:name="list[+${course}+].schoolArea"/>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 已付学费：</label>
+                                        <input  class="col-sm-2" type="number" style="height:25px;" th:name="list[+${course}+].prepaidTuition"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 院校学生号：</label>
+                                        <input th:name="list[+${course}+].studentNo" class=" col-sm-3" style="width: 190px; height:25px" />
+                                    </div>
+                                    <div class="form-group" style="height:29px;margin-top: 20px;">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 合作机构：</label>
+                                        <select class="col-sm-1 chosen-select" th:name="list[+${course}+].cooperationId" data-placeholder="Choose a Country..." style="width:190px;">
+                                            <option value="-999">请选择</option>
+                                        </select>
+                                    </div>
+                                    <hr/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="alert" class="alert alert-success" style="margin-top:50px" role="alert">
+                        <span>审批通过后：
+                            <br/>1.该学生的办理进程结束，自动结案。
+                            <br/>2.学生信息流入佣金系统，因此，一定不要漏填学校信息哈。</span>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" style="display: none;">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right blue">EVUS附件：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;" >
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-body">
+                                                <div class="widget-main">
+                                                    <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                    <label>
+                                                        <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                    </label>
+                                                    <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                    <input name="privateAccess" type="hidden" value="true"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                <button type="button" class="btn btn-primary" id="submits">保存</button>
+                <a class="blue" href="javascript:void(0);" onclick="tips()"><i class="icon-question-sign bigger-140"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/bottom::bottom"></div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script  th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function(){
+            this.studentNo;
+            this.uploadComplete;
+            this.postData = function(studentNo){
+                $("div[flag='template']:hidden").remove();
+                $.ajax({
+                    url: "/visaRecord/save",
+                    type: "post",
+                    data: $("#edit").serialize(),
+                    success: function (data) {
+                        if (data != null && data.code == "0") {
+                            layer.confirm('操作成功，是否跳转到列表页？', {
+                                btn: ['确定'] //按钮
+                            }, function () {
+                                location.href = '/visaApply?studentNo=' + studentNo;
+                            });
+                        }else {
+                            console.log(data);
+                            $("#submits").removeAttr("disabled");
+                            layer.alert('操作失败,请刷新后重新尝试!');
+                        }
+                    }
+                });
+            }
+            this.getMajor = function($this){
+                var schoolID = $this.children("option:selected").val();
+                var index = $("select[name $='collegeId']").index($this);
+                var select_major = $("select[name $='majorId']").eq(index);
+                var select_course = $("select[name $='courseId']").eq(index);
+                var select_cooperation = $("select[name $='cooperationId']").eq(index);
+                if(schoolID == "-1"){
+                    select_major.empty().append($("<option value='-1'>请选择</option>"));
+                    select_course.empty().append($("<option value='-1'>请选择</option>"));
+                    select_cooperation.empty().append($("<option value='-999'>请选择</option>"));
+                    select_major.trigger("chosen:updated");
+                    select_course.trigger("chosen:updated");
+                    select_cooperation.trigger("chosen:updated");
+                    return;
+                }
+                var input_collegeName = $("input[name $='collegeName']").eq(index);
+                input_collegeName.val($this.children("option:selected").text());
+                console.log("collegeId:" + $this.children("option:selected").val());
+                console.log("collegeName:" + $this.children("option:selected").text());
+
+                var educationSection = $("select[name $='educationSection']").eq(index).children("option:selected").val();
+                var courseType = $("select[name $='courseType']").eq(index).children("option:selected").val();
+                var majorType = courseType;
+                switch (courseType){
+                    case "1":majorType = 2;break;
+                    case "2":majorType = 3;break;
+                    case "3":majorType = 1;break;
+                }
+
+                $.post("/visaRecord/getMajor", { "schoolID": schoolID,"majorType":majorType,"educationSection":educationSection}, function (data, status) {
+                    select_major.empty();
+                    select_major.append($("<option value='-1'>请选择</option>"));
+                    $.each(data, function (index, item) {
+                        select_major.append($("<option value=" + item.id + ">" + item.englishName + "</option>"));
+                    });
+                    select_course.empty();
+                    select_course.append($("<option value='-1'>请选择</option>"));
+                    $(".chosen-select").trigger("chosen:updated");
+                });
+            }
+            this.getCooperation = function($this){
+                var schoolID = $this.children("option:selected").val();
+                if(schoolID != "-1"){
+                    var index = $("select[name $='collegeId']").index($this);
+                    var select_cooperation = $("select[name $='cooperationId']").eq(index);
+                    $.post("/visaRecord/getCooperation", { "schoolID": schoolID}, function (data, status) {
+                        select_cooperation.empty();
+                        select_cooperation.append($("<option value='-999'>请选择</option>"));
+                        $.each(data, function (index, item) {
+                            select_cooperation.append($("<option value=" + item.id + ">" + item.name + "</option>"));
+                        });
+                        $(".chosen-select").trigger("chosen:updated");
+                    });
+                }
+            }
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+                },
+                getQueryData:function(){
+                    this.studentNo = GetQueryString("studentNo");
+                    this.uploadComplete = true;
+                    this.studentNation;
+                    this.contractType = $("#input_contractType").val();
+                    this.nationId = $("#input_nation").val();
+                    this.nationStatus = $("#input_nationStatus").val();
+                },
+                handelQueryData:function(){
+
+                },
+                render:function(){
+                    var _self = this;
+                    $(".chosen-select").chosen();
+                    $("div[flag='template']").hide();
+                    if ($("#input_isAmerica").val() == "1") {
+                        /* 学生留学国家为美国时显示登记完成日期,EVUS附件 */
+                        $("#div_evus").show();
+                        $("#form_file").show();
+                    }
+                    if(_self.nationStatus == "1" || _self.nationStatus == "2" || _self.nationStatus == "3"){
+                        $("#div_studentNation").show();
+                    }
+                },
+                addEvent:function(){
+                    var _self = this;
+                    $("select[name $='collegeId']").change(function () {
+                        getMajor($(this));
+                        getCooperation($(this));
+                    });
+                    $("select[name $='courseType']").change(function () {
+                        if($(this).children("option:selected").val() != "-1"){
+                            var index = $("select[name $='courseType']").index($(this));
+                            getMajor($("select[name $='collegeId']").eq(index));
+                        }
+                    });
+                    $("select[name $='educationSection']").change(function () {
+                        if($(this).children("option:selected").val() != "-1") {
+                            var index = $("select[name $='educationSection']").index($(this));
+                            getMajor($("select[name $='collegeId']").eq(index));
+                        }
+                    });
+                    $("select[name $='cooperationId']").change(function () {
+                        var index = $("select[name $='cooperationId']").index($(this));
+                        var input_cooperationName = $("input[name $='cooperationName']").eq(index);
+                        input_cooperationName.val($(this).children("option:selected").text());
+                    });
+                    $("select[name $='majorId']").change(function () {
+                        var index = $("select[name $='majorId']").index($(this));
+                        var schoolID = $("select[name $='collegeId']").eq(index).children("option:selected").val();
+                        var majorID = $("select[name $='majorId']").eq(index).children("option:selected").val();
+                        var select_course = $("select[name $='courseId']").eq(index);
+                        if(majorID == "-1"){
+                            select_course.empty().append($("<option value='-1'>请选择</option>"));
+                            select_course.trigger("chosen:updated");
+                            return;
+                        }
+                        var input_majorName = $("input[name $='majorName']").eq(index);
+                        input_majorName.val($(this).children("option:selected").text());
+                        console.log("majorId:" + $(this).children("option:selected").val());
+                        console.log("majorName:" + $(this).children("option:selected").text());
+                        $.post("/visaRecord/getCourse", {"schoolID": schoolID,"majorId":majorID}, function (data, status) {
+                            select_course.empty();
+                            select_course.append($("<option value='-1'>请选择</option>"));
+                            $.each(data, function (index, item) {
+                                select_course.append($("<option value=" + item.id + ">" + item.englishName + "</option>"));
+                            });
+                            $(".chosen-select").trigger("chosen:updated");
+                        });
+                    });
+                    $("select[name $='courseId']").change(function () {
+                        var index = $("select[name $='courseId']").index($(this));
+                        var input_courseName = $("input[name $='courseName']").eq(index);
+                        input_courseName.val($(this).children("option:selected").text());
+                        console.log("courseId:" + $(this).children("option:selected").val());
+                        console.log("courseName:" + $(this).children("option:selected").text());
+                    });
+                    $('#id-input-file-3').ace_file_input({
+                        style: 'well',
+                        btn_choose: 'Drop files here or click to choose',
+                        btn_change: null,
+                        no_icon: 'icon-cloud-upload',
+                        droppable: true,
+                        thumbnail: 'small',//large | fit
+                        before_change: function (files, dropped) {
+                            return true;
+                        },
+                        before_remove: function () {
+                            $("#input_attachment").val("");
+                            return true;
+                        },
+                        preview_error: function (filename, error_code) {
+
+                        }
+                    }).on('change', function () {
+                        if (!checkUp(this)) {
+                            return false;
+                        }
+                        _self.uploadComplete = false;
+                        layer.msg('正在上传中...',{
+                            icon:16,
+                            shade:0.01
+                        });
+                        $("#form_file").ajaxSubmit(function (message) {
+                            _self.uploadComplete = true;
+                            if (message) {
+                                var fileName = message.obj;
+                                console.log(fileName);
+                                var code = message.code;
+                                if (code == "1") {
+                                    layer.msg("请上传正确的文件格式!")
+                                } else if (message.success) {
+                                    $("#input_attachment").val(fileName);
+                                    layer.msg("上传成功!");
+                                }
+                            } else {
+                                $('#alertText').text('上传失败');
+                                $('#alert').attr('class', 'alert alert-danger').show();
+                                setTimeout("$('#alert').hide()", 2000);
+                                $("#myModal").modal("hide");
+                            }
+                        });
+                    });
+                    $("#submits").click(function () {
+                        if(!_self.uploadComplete){
+                            layer.msg('正在上传中,请稍后保存!');
+                            return;
+                        }
+                        $(this).attr("disabled", "disabled");
+                        var success = true;
+
+                        if(_self.contractType == "1" || _self.contractType == "2"){
+                            if(_self.nationId == "1" || self.nationId == "2" || _self.nationStatus == "1"){
+                                $("select[name $='cooperationId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-999"){
+                                        layer.alert('合作机构为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='studentNo']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('院校学生号为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='prepaidTuition']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('已付学费为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='schoolArea']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('所在校区为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='tuition']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('学费金额为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='courseEndTime']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('结课日期为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='courseStartTime']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('开课日期为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='courseId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('学位为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='majorId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('专业为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='educationSection']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('目标学历为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='courseType']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('专业类型为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                            }
+                            else if(_self.nationId == "6" || self.nationId == "8"){
+                                $("input[name $='courseStartTime']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('开课日期为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='tuition']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('学费金额为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                            }
+                            else {
+                                $("select[name $='cooperationId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-999"){
+                                        layer.alert('合作机构为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='tuition']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('学费金额为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("input[name $='courseStartTime']:visible").each(function(){
+                                    if($(this).val() == ""){
+                                        layer.alert('开课日期为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='courseId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('学位为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='majorId']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('专业为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='educationSection']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('目标学历为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                                $("select[name $='courseType']:visible").each(function(){
+                                    if($(this).children("option:selected").val() == "-1"){
+                                        layer.alert('专业类型为必填项,请您填写！', {icon: 0});
+                                        $("#submits").removeAttr("disabled");
+                                        success = false;
+                                        return;
+                                    }
+                                });
+                            }
+                            $("select[name $='collegeId']:visible").each(function(){
+                                if($(this).children("option:selected").val() == "-1"){
+                                    layer.alert('院校为必填项,请您填写！', {icon: 0});
+                                    $("#submits").removeAttr("disabled");
+                                    success = false;
+                                    return;
+                                }
+                            });
+                            if ($("input[name='visaRecordInfo.resultTime']").val() == "") {
+                                layer.alert('获签日期为必填项,请您填写！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                success = false;
+                            }
+                        }
+                        if(success){
+                            postData(_self.studentNo);
+                        }
+                    });
+                    $("#returnPage").click(function () {
+                        location.href = '/visaApply?studentNo='+_self.studentNo;
+                    });
+                    $("input[name $= 'tuition']").each(function () {
+                        $(this).keyup(function () {
+                            var reg = $(this).val().match(/\d+\.?\d{0,2}/);
+                            var txt = '';
+                            if (reg != null) {
+                                txt = reg[0];
+                            }
+                            $(this).val(txt);
+                        }).change(function () {
+                            $(this).keyup();
+                        });
+                    });
+                    $("input[name $= 'prepaidTuition']").each(function () {
+                        $(this).keyup(function () {
+                            var reg = $(this).val().match(/\d+\.?\d{0,2}/);
+                            var txt = '';
+                            if (reg != null) {
+                                txt = reg[0];
+                            }
+                            $(this).val(txt);
+                        }).change(function () {
+                            $(this).keyup();
+                        });
+                    });
+                    $("#a_addCourse").click(function () {
+                        $("div[flag='template']:hidden").eq(0).show();
+                    });
+                    $("button[flag = 'btn_delete']").each(function () {
+                        var btn = $(this);
+                        btn.click(function () {
+                            btn.parent("div").parent("div").hide();
+                        });
+                    });
+
+                    /**
+                    $("select[name='visaRecordInfo.studentNation']").change(function () {
+                        _self.studentNation = $(this).children("option:selected").val();
+                        $.post("/visaRecord/getSchool", { "nationId": _self.studentNation}, function (data, status) {
+                            $("select[name $='collegeId']").each(function () {
+                                var select_college = $(this);
+                                select_college.empty();
+                                select_college.append($("<option value='-1'>请选择</option>"));
+                                $.each(data, function (index, item) {
+                                    select_college.append($("<option value=" + item.id + ">" + item.englishName + "</option>"));
+                                });
+                                select_college.children("option:eq(0)").trigger("change");
+                            });
+                            $(".chosen-select").trigger("chosen:updated");
+                        });
+                    });
+                    **/
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+
+
+    $("#alert").css("visibility","hidden");
+    function tips(){
+        if($("#alert").css("visibility")=="hidden"){
+            $("#alert").css("visibility","visible");
+        }else{
+            $("#alert").css("visibility","hidden");
+        }
+    }
+
+    -->
+</script>
+</body>
+</html>

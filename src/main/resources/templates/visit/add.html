@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">回访记录信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="text" style="display: none;" id ="input_studentNo" name="studentNo"/>
+                    <input type="text" style="display: none;" id ="input_businessId" name="businessId"/>
+                    <input type="text" style="display: none;" id ="input_visitCase" name="visitCase"/>
+                    <input type="hidden" id ="input_attachment" name="attachment"/>
+                    <input type="hidden" name="isPublic" value="1"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" id="div_senderType" style="height:29px">
+                                    <label class="col-sm-1 control-label no-padding-right blue">发送方：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="senderType" style="width:190px;height:25px;">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">公司</option>
+                                        <option value="2">学校</option>
+                                    </select>
+                                    <label class="col-sm-5 control-label no-padding-right blue">回访途径：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="visitWay" style="width:190px;height:25px;">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">传真</option>
+                                        <option value="2">邮件</option>
+                                        <option value="3">电话</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="div_visitType" style="height:29px">
+                                    <label class="col-sm-1 control-label no-padding-right blue">回访类型：</label>
+                                    <select type=""  class="col-sm-3 form-control input-sm" name="visitType" style="width:190px;height:25px;">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">收材料</option>
+                                        <option value="2">要求补件</option>
+                                        <option value="3">确认补件</option>
+                                        <option value="4">跟催</option>
+                                        <option value="5">其他</option>
+                                    </select>
+                                    <div id="div_deadline" style="display: none;">
+                                        <label class="col-sm-5 control-label no-padding-right blue">补件截止日：</label>
+                                        <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px" name="deadline" required="required"/>
+                                    </div>
+
+                                </div>
+                                <div class="form-group" id="div_isPublic" style="display: none;">
+                                    <label class="col-sm-1 control-label no-padding-right blue">是否公开：</label>
+                                    <input type="checkbox" checked="checked" id="check_isPublic" />
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label no-padding-right no-padding-left blue"> 回访内容：</label>
+                                    <!--ueditor-->
+                                    <div class="col-sm-9 table-responsive" style="padding-left:0px;">
+                                        <!-- 加载编辑器的容器 -->
+                                        <script id="content" name="content" type="text/plain"></script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" style="display: none;">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label no-padding-right no-padding-left blue">上传附件：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;" >
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="alert" class="alert alert-success" style="margin-top:50px" role="alert">
+                    <span>1.9月之后文签回访都要展示给学生的。
+                        <br/>2.所有的外联回访记录默认都要展示给学生看的，若有特殊情况，一定报备经理或总监哦，然后选择不公开展示就可以了。</span>
+                    <span id="alertText"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                    <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    <a class="blue" href="javascript:void(0);" onclick="tips()"><i class="icon-question-sign bigger-140"></i></a>
+                </div>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function(){
+            this.visitCase;
+            this.studentNo;
+            this.businessId;
+            this.ueEditor;
+            this.uploadComplete;
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+                },
+                getQueryData:function(){
+                    this.visitCase = GetQueryString("visitCase");
+                    this.studentNo = GetQueryString("studentNo");
+                    this.businessId = GetQueryString("businessId");
+                    this.uploadComplete = true;
+                },
+                handelQueryData:function(){
+                    if(this.visitCase == null){
+                        alert("参数非法!");
+                        window.history.go(-1);
+                    }
+                },
+                render:function(){
+                    var _self = this;
+                    $("#input_visitCase").val(_self.visitCase);
+                    $("#input_studentNo").val(_self.studentNo);
+
+                    if(_self.visitCase == "1" || _self.visitCase == "3"){
+                        $("#div_senderType").hide();
+                        $("#div_visitType").hide();
+                        if(_self.visitCase == "3"){
+                            $("#input_businessId").val(_self.businessId);
+                        }
+                    }
+                    else if(_self.visitCase == "2"){
+                        $("#input_businessId").val(_self.businessId);
+                        $("#form_file").show();
+                        $("#div_isPublic").show();
+                    }
+
+                    var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                    _self.ueEditor = UE.getEditor('content', {
+                        toolbars: [
+                            [//'anchor', //锚点
+                                //'undo', //撤销
+                                //'redo', //重做
+                                'bold', //加粗
+                                'indent', //首行缩进
+                                //'snapscreen', //截图
+                                'italic', //斜体
+                                'underline', //下划线
+                                'strikethrough', //删除线
+                                'subscript', //下标
+                                'fontborder', //字符边框
+                                'superscript', //上标
+                                'formatmatch', //格式刷
+                                'source', //源代码
+                                //'blockquote', //引用
+                                'pasteplain', //纯文本粘贴模式
+                                //'selectall', //全选
+                                //'print', //打印
+                                'preview', //预览
+                                'horizontal', //分隔线
+                                //'removeformat', //清除格式
+                                'time', //时间
+                                'date', //日期
+                                //'unlink', //取消链接
+                                'insertrow', //前插入行
+                                'insertcol', //前插入列
+                                //'mergeright', //右合并单元格
+                                //'mergedown', //下合并单元格
+                                'deleterow', //删除行
+                                'deletecol', //删除列
+                                //'splittorows', //拆分成行
+                                //'splittocols', //拆分成列
+                                //'splittocells', //完全拆分单元格
+                                //'deletecaption', //删除表格标题
+                                //'inserttitle', //插入标题
+                                //'mergecells', //合并多个单元格
+                                //'deletetable', //删除表格
+                                'cleardoc', //清空文档
+                                //'insertparagraphbeforetable', //"表格前插入行"
+                                //'insertcode', //代码语言
+                                'fontfamily', //字体
+                                'fontsize', //字号
+                                'paragraph', //段落格式
+                                'simpleupload', //单图上传
+                                //'insertimage', //多图上传
+                                //'edittable', //表格属性
+                                //'edittd', //单元格属性
+                                'link', //超链接
+                                'emotion', //表情
+                                'spechars', //特殊字符
+                                'searchreplace', //查询替换
+                                //'map', //Baidu地图
+                                //'gmap', //Google地图
+                                //'insertvideo', //视频
+                                //'help', //帮助
+                                'justifyleft', //居左对齐
+                                'justifyright', //居右对齐
+                                'justifycenter', //居中对齐
+                                'justifyjustify', //两端对齐
+                                'forecolor', //字体颜色
+                                'backcolor', //背景色
+                                //'insertorderedlist', //有序列表
+                                //'insertunorderedlist', //无序列表
+                                //'fullscreen', //全屏
+                                //'directionalityltr', //从左向右输入
+                                //'directionalityrtl', //从右向左输入
+                                'rowspacingtop', //段前距
+                                'rowspacingbottom', //段后距
+                                //'pagebreak', //分页
+                                //'insertframe', //插入Iframe
+                                'imagenone', //默认
+                                'imageleft', //左浮动
+                                'imageright', //右浮动
+                                //'attachment', //附件
+                                'imagecenter', //居中
+                                'wordimage', //图片转存
+                                'lineheight', //行间距
+                                //'edittip ', //编辑提示
+                                //'customstyle', //自定义标题
+                                'autotypeset', //自动排版
+                                //'webapp', //百度应用
+                                'touppercase', //字母大写
+                                'tolowercase', //字母小写
+                                //'background', //背景
+                                //'template', //模板
+                                //'scrawl', //涂鸦
+                                //'music', //音乐
+                                //'inserttable', //插入表格
+                                //'drafts', // 从草稿箱加载
+                                //'charts' // 图表
+                            ]
+                        ],
+                        'enterTag': 'p',
+                        elementPathEnabled: false,//删除元素路径
+                        initialFrameHeight: 200,
+                        wordCount: false
+                    });
+                    _self.ueEditor.ready(function() {
+                        _self.ueEditor.setContent($("#span_content").text());
+                        $(".edui-editor-bottomContainer").remove();
+                        layer.close(loadIndex);
+                    });
+                },
+                addEvent:function(){
+                    var _self = this;
+                    $("#submits").click(function () {
+                        if(!_self.uploadComplete){
+                            layer.msg('正在上传中,请稍后保存!');
+                            return;
+                        }
+                        $(this).attr("disabled","disabled");
+                        if(_self.ueEditor.getContent($("#content").text()) == ""){
+                            layer.alert('请添加回访内容！', {icon: 0});
+                            $("#submits").removeAttr("disabled");
+                            return;
+                        }
+                        if(_self.visitCase == "2") {
+                            if ($("select[name='senderType']").children("option:selected").val() == "-1") {
+                                layer.alert('请选择发送方！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                return;
+                            }
+                            if ($("select[name='visitWay']").children("option:selected").val() == "-1") {
+                                layer.alert('请选择回访途径！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                return;
+                            }
+                            if ($("select[name='visitType']").children("option:selected").val() == "-1") {
+                                layer.alert('请选择回访类型！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                return;
+                            }
+                        }
+                        $.ajax({
+                            url: "/visit/add",
+                            type: "post",
+                            data: $("#edit").serialize(),
+                            success: function (data) {
+                                if (data) {
+                                    if(_self.visitCase == "1" ){
+                                        layer.confirm('操作成功，是否跳转到列表页？', {btn: ['确定','取消']}, function(){
+                                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase;
+                                        },function(){
+                                            $("#submits").removeAttr("disabled");
+                                            location.reload(true);
+                                        });
+                                    }
+                                    else if(_self.visitCase == "2" || _self.visitCase == "3"){
+                                        layer.confirm('操作成功，是否跳转到列表页？', {btn: ['确定','取消']}, function(){
+                                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase + "&businessId=" + _self.businessId;
+                                        },function(){
+                                            $("#submits").removeAttr("disabled");
+                                            location.reload(true);
+                                        });
+                                    }
+                                }
+                                else {
+                                    $("#submits").removeAttr("disabled");
+                                    $('#alertText').text('操作失败');
+                                    $('#alert').attr('class', 'alert alert-danger').show();
+                                    setTimeout("$('#alert').hide()", 2000);
+                                    $("#myModal").modal("hide");
+                                }
+                            }
+                        });
+                    });
+                    $('#id-input-file-3').ace_file_input({
+                        style:'well',
+                        btn_choose:'Drop files here or click to choose',
+                        btn_change:null,
+                        no_icon:'icon-cloud-upload',
+                        droppable:true,
+                        thumbnail:'small',//large | fit
+                        before_change:function(files, dropped) {
+                            return true;
+                        },
+                        before_remove : function() {
+                            $("#input_attachment").val("");
+                            return true;
+                        },
+                        preview_error : function(filename, error_code) {
+
+                        }
+                    }).on('change', function(){
+                        if (!checkUp(this)) {
+                            return false;
+                        }
+                        _self.uploadComplete = false;
+                        layer.msg('正在上传中...',{
+                            icon:16,
+                            shade:0.01
+                        });
+                        $("#form_file").ajaxSubmit(function(message) {
+                            _self.uploadComplete = true;
+                            if (message) {
+                                var fileName = message.obj;
+                                var code = message.code;
+                                if(code == "1"){
+                                    layer.msg("请上传正确的文件格式!")
+                                }else if(message.success){
+                                    $("#input_attachment").val(fileName);
+                                    layer.msg("上传成功!");
+                                }
+                            } else {
+                                $('#alertText').text('上传失败');
+                                $('#alert').attr('class', 'alert alert-danger').show();
+                                setTimeout("$('#alert').hide()", 2000);
+                                $("#myModal").modal("hide");
+                            }
+                        });
+                    });
+                    $("select[name='visitType']").change(function(){
+                        var value = $(this).children("option:selected").val();
+                        if(value == "2")
+                            $("#div_deadline").show();
+                        else
+                            $("#div_deadline").hide();
+                    });
+                    $("#returnPage").click(function(){
+                        if(_self.visitCase == "1" ){
+                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase;
+                        }
+                        else if(_self.visitCase == "2" || _self.visitCase == "3"){
+                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase + "&businessId=" + _self.businessId;
+                        }
+                    });
+                    $("#check_isPublic").click(function () {
+                        if ($(this).is(":checked")) {
+                            $("input[name=isPublic]").val(1);
+                        } else {
+                            $("input[name=isPublic]").val(0);
+                        }
+                    });
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+
+
+    $("#alert").css("visibility","hidden");
+    function tips(){
+        if($("#alert").css("visibility")=="hidden"){
+            $("#alert").css("visibility","visible");
+        }else{
+            $("#alert").css("visibility","hidden");
+        }
+    }
+    -->
+</script>
+</body>
+</html>

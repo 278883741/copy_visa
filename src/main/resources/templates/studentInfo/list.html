@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="fragments/head::head"/>
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+    /*固定列宽度及长度调整，避免固定列出现滚动条*/
+    .DTFC_LeftBodyLiner {
+       /* height: 941px ! important;*/
+        width: 219px ! important;
+        .DTFC_LeftHeadWrapper;
+    }
+
+    #sample-table-2_paginate span {
+        background-color: #FFFFFF;
+    }
+</style>
+<body style='overflow:visible ! important;'>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+            <!--<ul class="breadcrumb">-->
+            <!--<li>首页</li>-->
+            <!--<li>学生管理</li>-->
+            <!--<li>学生列表</li>-->
+            <!--&lt;!&ndash;<li class="active">内容列表</li>&ndash;&gt;-->
+            <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">学生信息列表</h3>
+                                <input type="hidden" name="applyId" id="applyId"
+                                       th:value="${#httpServletRequest.getParameter('applyId')}"/>
+                                <input type="hidden" name="studentNo" id="studentNo"
+                                       th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+
+                                <input type="hidden" name="isAuditor" id="isAuditor" th:value="1"/>
+                                <input type="hidden" name="oaid" id="oaid" th:value="${oaid}"/>
+                                <input type="hidden" name="status" id="status" th:value="${status}"/>
+                                <input type="hidden" name="roleName" id="roleName" th:value="${roleName}"/>
+
+                                <shiro:hasPermission name="visit:list">
+                                    <input type="hidden" id="input_hasPermission_visit_list" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="visaApply:list">
+                                    <input type="hidden" id="input_hasPermission_visaApply_list" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="两次寄出绩效审核">
+                                    <input type="hidden" id="doubleSendingConfirm" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="院校申请列表_查看">
+                                    <input type="hidden" name="checkPermission" id="checkPermission" th:value="true"/>
+                                </shiro:hasPermission>
+
+                                <shiro:hasRole name="文案经理">
+                                    <input type="hidden" id="role_copyManager" value="1"/>
+                                </shiro:hasRole>
+                                <shiro:hasRole name="签证经理">
+                                    <input type="hidden" id="role_visaManager" value="1"/>
+                                </shiro:hasRole>
+                                <shiro:hasRole name="文签总监">
+                                    <input type="hidden" id="role_director" value="1"/>
+                                </shiro:hasRole>
+
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+
+                                            <label for="sNo">学号：</label>
+                                            <input type="text" id="sNo" class="form-control input-sm"
+                                                   th:value="${#httpServletRequest.getParameter('studentNo')}"
+                                                   placeholder="" style="width:60px;" onkeyup="changeTable()"/>
+                                            <label for="sName">姓名/拼音：</label>
+                                            <input type="text" id="sName" class="form-control input-sm" placeholder=""
+                                                   style="width:60px;" onkeyup="changeTable()"/>
+
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sStatus">服务进程：</label>
+                                            <select type="" class="form-control input-sm" id="sStatus"
+                                                    style="width:100px;" onchange="changeTable()">
+                                                <option value="">请选择</option>
+                                                <option value="10">未上传文书材料</option>
+                                                <option value="20">未递交申请材料</option>
+                                                <option value="30">未收到申请结果</option>
+                                                <option value="40">未确认录取院校</option>
+                                                <!--<option value="50">未进行签证辅导</option>-->
+                                                <option value="60">未递交签证申请</option>
+                                                <option value="70">未收到签证结果</option>
+                                                <option value="80">未填写获签信息</option>
+                                                <option value="90">已结案</option>
+                                                <option value="100">已退费</option>
+                                                <option value="85">待结案</option>
+                                            </select>
+                                            <label for="sStatus">学生状态：</label>
+                                            <select type="" class="form-control input-sm" id="sStudentStatus"
+                                                    style="width:60px;" onchange="changeTable()">
+                                                <option value="">请选择</option>
+                                                <option value="1" selected="selected">正常</option>
+                                                <option value="2">停办</option>
+                                                <!--原服务进程-->
+                                                <!--<option value="3">已退费</option>-->
+                                            </select>
+
+                                            <label for="sStatus">筛选条件：</label>
+                                            <select type="" class="form-control input-sm" id="order"
+                                                    style="width:110px;" onchange="changeTable()">
+                                                <option value="1">按签约日期倒序</option>
+                                                <option value="2">按签约日期正序</option>
+                                                <option value="3">按回访日期倒序</option>
+                                                <option value="4">按回访日期正序</option>
+                                                <!--原服务进程-->
+                                                <!--<option value="3">已退费</option>-->
+                                            </select>
+
+                                            <label for="sStatus">只看美高：</label>
+                                            <select type="" class="form-control input-sm" id="usaStatus"
+                                                    style="width:110px;" onchange="changeTable()">
+                                                <option value="">请选择</option>
+                                                <option value="1">是</option>
+                                                <option value="0">否</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="hidden" name="branchId" id="selectBranch"/>
+                                            <input type="hidden" name="nationId" id="selectNation"/>
+                                            <input type="hidden" name="dateStartString" id="dateStart"/>
+                                            <input type="hidden" name="dateEndString" id="dateEnd"/>
+
+                                            <input type="hidden" name="copy" id="copy"/>
+                                            <input type="hidden" name="visaOperator" id="visaOperator"/>
+                                            <input type="hidden" name="copier" id="copier"/>
+
+                                            <input type="hidden" name="copyOperator" id="copyOperator"/>
+                                            <input type="hidden" name="copyMaker" id="copyMaker"/>
+
+                                            <input type="hidden" id="visaSendDate_Start" name="visaSendDateStart"/>
+                                            <input type="hidden" id="visaSendDate_End" name="visaSendDateEnd"/>
+
+                                            <input type="hidden" id="visaOperatorDate_Start" name="visaOperatorDateStart"/>
+                                            <input type="hidden" id="visaOperatorDate_End" name="visaOperatorDateEnd"/>
+
+                                            <input type="hidden" id="salesConsultant" name="salesConsultant"/>
+
+                                            <input type="hidden" name="birthdayStart" id="birthdayStart"/>
+                                            <input type="hidden" name="birthdayEnd" id="birthdayEnd"/>
+                                            <input type="hidden" name="agencyName" id="agencyName"/>
+
+                                            <input type="hidden" name="registerStatus" id="registerStatus"/>
+                                        </div>
+                                        <button type="button" id="query" class="btn btn-success"
+                                                onclick="changeTable()">查询
+                                        </button>
+                                        <button  class="btn btn-warning">清空</button>
+                                        <a onclick="toSearchPage()" class="btn btn-success pull-right">高级查询</a>
+                                        <a href="/student/excel" id="export" class="btn btn-success pull-right">导出</a>
+                                    </form>
+
+
+                                </div>
+
+
+                                <!--<div id="search" class="form-group" style="height:29px;display:none">-->
+                                <!--<label class="col-sm-1 control-label no-padding-right blue">分支机构：</label>-->
+                                <!--<select class="col-sm-2 input-sm" id="selectBranch"-->
+                                <!--style="width:150px;height:30px;margin:5px 0;"-->
+                                <!--data-placeholder="&#45;&#45;请选择分支机构&#45;&#45;">-->
+                                <!--<option></option>-->
+                                <!--<option th:each="branch:${branchInfoList}" th:value="${branch.branchId}"-->
+                                <!--th:text="${branch.branchName}"></option>-->
+                                <!--</select>-->
+                                <!--<label class="col-sm-1 control-label no-padding-right blue">留学国家：</label>-->
+                                <!--<select class="col-sm-2 input-sm" id="selectNation"-->
+                                <!--style="width:150px;height:30px;margin:5px 0;"-->
+                                <!--data-placeholder="&#45;&#45;请选择留学国家&#45;&#45;">-->
+                                <!--<option></option>-->
+                                <!--<option th:each="country:${countryInfoList}" th:value="${country.id}"-->
+                                <!--th:text="${country.countryName}"></option>-->
+                                <!--</select>-->
+                                <!--<label class="col-sm-1 control-label no-padding-right blue">签约日期：</label>-->
+                                <!--<input id="dateStart" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"-->
+                                <!--style="width: 160px;margin:5px 0;"-->
+                                <!--name="birthday_string" required="required"/>-->
+                                <!--&#45;&#45;-->
+                                <!--<input id="dateEnd" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"-->
+                                <!--style="width: 160px;margin:5px 0;"-->
+                                <!--name="birthday_string" required="required"/>-->
+                                <!--</div>-->
+
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th>学号</th>
+                                            <th>姓名</th>
+                                            <th>拼音</th>
+                                            <th>出生日期</th>
+                                            <th>服务进程</th>
+                                            <th>国家</th>
+                                            <th>咨询顾问</th>
+                                            <!--<th>文签顾问</th>-->
+                                            <th>合同名称</th>
+                                            <th>材料清单</th>
+                                            <th>费用条码</th>
+                                            <th>费用</th>
+                                            <th>分支机构</th>
+                                            <th>签约日期</th>
+                                            <th>联系</th>
+                                            <th>回访</th>
+                                            <th>文书</th>
+                                            <th>定校</th>
+                                            <th>申请</th>
+                                            <th>文签顾问</th>
+                                            <th>制作文案</th>
+                                            <th>最新回访</th>
+                                            <th>首次寄出</th>
+                                            <th>最终寄出</th>
+                                            <th>签证</th>
+                                            <th>后续</th>
+                                            <th>文书员</th>
+                                            <th>文案员</th>
+                                            <th>业务员</th>
+                                            <th>规划顾问</th>
+                                            <th>注册小希</th>
+                                            <!-- <th class="hidden-480">操作</th>-->
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                    <!--</div>-->
+                                    <!--</div>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script charset="UTF-8" th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/pagination.input.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/temp.js}"></script>
+<!--图片查看器-->
+<script charset="UTF-8" th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script charset="UTF-8" th:src="@{/layer/layer.js}"></script>
+<script charset="UTF-8" th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/date-time/bootstrap-datepicker.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/date-time/bootstrap-timepicker.min.js}"></script>
+<script charset="UTF-8" th:src="@{/business/student/studentList.js}"></script>
+</body>
+<!--<script th:src="@{/assets/js/date-time/moment.min.js}"></script>-->
+<script type="text/javascript">
+    <!--
+    var oTable1;
+    $("#sStatus").val($("#status").val());
+    $('#selectNation').addClass('tag-input-style');
+    $('#selectBranch').addClass('tag-input-style');
+
+    jQuery(function ($) {
+
+        oTable1 = $('#sample-table-2').dataTable({
+
+            "ordering": false, // 禁止排序
+
+            "aLengthMenu": [10, 20],  //用户可自选每页展示数量 5条或10条
+
+            // "sScrollY": "450px",
+
+            "scrollX": true,
+            "scrollCollapse": true,
+            "bProcessing": true,//显示搜索样式
+            "bDeferRender": true,//延迟加载表格
+
+            "fixedColumns": { //固定列的配置项
+                "leftColumns": 3, //固定左边第一列
+            },
+            "buttons": [
+                {"extend": 'create', "editor": "myEditor"},
+                {"extend": 'edit', "editor": "myEditor"},
+                {"extend": 'remove', "editor": "myEditor"}
+            ],
+            "bInfo": true,
+            "bFilter": false,//是否使用搜索
+            "sPaginationType": "bs_normal",//分页样式
+            'pagingType': 'input',
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/studentInfo/list",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {name: 'studentNo', value: $("#sNo").val() == "" ? null : $.trim($("#sNo").val())},
+                    {name: 'studentName', value: $("#sName").val() == "" ? null : $.trim($("#sName").val())},
+                    {
+                        name: 'status',
+                        value: $("#sStatus").find("option:selected").val() == "" ? null : $("#sStatus").find("option:selected").val()
+                    },
+                    {
+                        name: 'studentStatus',
+                        value: $("#sStudentStatus").find("option:selected").val() == "" ? null : $("#sStudentStatus").find("option:selected").val()
+                    },
+                    {
+                        name: 'nationId',
+                        value: $("#selectNation").val() == "" ? null : $.trim($("#selectNation").val())
+                    },
+                    {
+                        name: 'branchId',
+                        value: $("#selectBranch").val() == "" ? null : $.trim($("#selectBranch").val())
+                    },
+                    {name: 'dateStart', value: $("#dateStart").val() == "" ? null : $.trim($("#dateStart").val())},
+                    {name: 'dateEnd', value: $("#dateEnd").val() == "" ? null : $.trim($("#dateEnd").val())},
+                    {name: 'status', value: $("#status").val() == "" ? null : $("#status").val()},
+                    {name: 'usaStatus', value: $("#usaStatus").val() == "" ? null : $("#usaStatus").val()},
+                    {name: 'copyOperator', value: $("#copyOperator").val() == "" ? null : $("#copyOperator").val()},
+                    {name: 'copyMaker', value: $("#copyMaker").val() == "" ? null : $.trim($("#copyMaker").val())},
+                    {name: 'copy', value: $("#copy").val() == "" ? null : $.trim($("#copy").val())},
+                    {
+                        name: 'visaOperator',
+                        value: $("#visaOperator").val() == "" ? null : $.trim($("#visaOperator").val())
+                    },
+                    {name: 'copier', value: $("#copier").val() == "" ? null : $.trim($("#copier").val())},
+
+                    {name: 'visaSendDateStart', value: $("#visaSendDate_Start").val() == "" ? null : $.trim($("#visaSendDate_Start").val())},
+                    {name: 'visaSendDateEnd', value: $("#visaSendDate_End").val() == "" ? null : $.trim($("#visaSendDate_End").val())},
+                    {name: 'visaOperatorDateStart', value: $("#visaOperatorDate_Start").val() == "" ? null : $.trim($("#visaOperatorDate_Start").val())},
+                    {name: 'visaOperatorDateEnd', value: $("#visaOperatorDate_End").val() == "" ? null : $.trim($("#visaOperatorDate_End").val())},
+
+                    {name: 'salesConsultant', value: $("#salesConsultant").val() == "" ? null : $.trim($("#salesConsultant").val())},
+
+                    {name: 'birthdayStart', value: $("#birthdayStart").val() == "" ? null : $.trim($("#birthdayStart").val())},
+                    {name: 'birthdayEnd', value: $("#birthdayEnd").val() == "" ? null : $.trim($("#birthdayEnd").val())},
+                    {name: 'agencyName', value: $("#agencyName").val() == "" ? null : $.trim($("#agencyName").val())},
+                    {
+                        name: 'registerStatus',
+                        value: $("#registerStatus").val() == "" ? null : $("#registerStatus").val()
+                    },
+
+                    //人工排序
+                    {
+                        name: 'iSortCol_0',
+                        value: $("#order").val() == "" ? null : $("#order").val() == 1 ? "0" : $("#order").val() == 2 ? "0" : $("#order").val() == 3 ? "1" : $("#order").val() == 4 ? "1" : ""
+                    }, {
+                        name: 'sSortDir_0',
+                        value: $("#order").val() == "" ? null : $("#order").val() == 1 ? "desc" : $("#order").val() == 2 ? "asc" : $("#order").val() == 3 ? "desc" : $("#order").val() == 4 ? "asc" : ""
+                    }
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            // "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+
+                {
+                    "sClass": "center", "bSortable": false, sWidth: "20%", "mData": function (data) {
+                        var studentDetail = "";
+                        if(data.studentNo.indexOf('TY') == 0){
+                            studentDetail = '<a class="blue" href="javascript:void(0);" onclick="toChannelStudentDetail(\'' + data.studentNo + '\')">' + data.studentNo + '</a>';
+                        }else{
+                            studentDetail = '<a class="blue" href="javascript:void(0);" onclick="toStudentDetail(\'' + data.studentNo + '\')">' + data.studentNo + '</a>';
+                        }
+
+                        return studentDetail;
+                    }
+                },
+                {"sClass": "center", "bSortable": false, sWidth: "20%" ,"mData": "studentName"},
+                {"sClass": "center", "bSortable": false, "mData": "pinyin"},
+                {"sClass": "center", "bSortable": false, "mData": "birthdayString"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.status == 10) {
+                                return "未上传文书材料";
+                            } else if (data.status == 20) {
+                                return "未递交申请材料";
+                            } else if (data.status == 30) {
+                                return "未收到申请结果";
+                            } else if (data.status == 40) {
+                                return "未确认录取院校";
+                            } else if (data.status == 50) {
+                                return "未进行签证辅导";
+                            } else if (data.status == 60) {
+                                return "未递交签证申请";
+                            } else if (data.status == 70) {
+                                return "未收到签证结果";
+                            } else if (data.status == 80) {
+                                return "未填写获签信息";
+                            } else if (data.status == 90) {
+                                return "已结案";
+                            } else if (data.status == 100) {
+                                return "已退费";
+                            } else if (data.status == 85) {
+                                return "待结案";
+                            } else {
+                                return "";
+                            }
+
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.nationName == "美高") return "美国";
+                            if (data.nationName == "美普") return "美国";
+                            else return data.nationName;
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": function (data) {
+                    var checkSalesConsultant = '<a href="javascript:void(0);" onclick="checkSalesConsultant(\'' + data.salesConsultantNo + '\')">' + data.salesConsultant + '</a>';
+                    return checkSalesConsultant;
+                }},
+//                {"sClass": "center", "bSortable": false, "mData": "copyOperator"},
+                {"sClass": "center", "bSortable": false, "mData": "contractNo"},
+                {"sClass": "center", "bSortable": false, "mData": function (data)
+                    {
+                        var material = '<a class="blue" href="javascript:void(0);" onclick="toMaterialList(\'' + data.studentNo + '\')">查看</a>';
+                        return material;
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData":function (data) {
+                        if(data.confeeid == null){
+                            data.confeeid="";
+                        }
+                        var confeeid = '<input value="'+data.confeeid+'" readonly="readonly" style="width: 65%;"/>';
+                        var edit ="";
+                        if($("#role_copyManager").val() == "1" || $("#role_visaManager").val() == "1"|| $("#role_director").val() == "1" )
+                            edit = '<a href="javacsript:void(0);" onclick="editConfee(this);">修改</a>';
+                        var confirm = '<a href="javacsript:void(0);" style="display: none;" onclick="confirmConfee(this,\''+data.studentNo+'\');">确定</a>';
+                        return confeeid + edit + confirm;
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var fee = '<a href="javascript:void(0);" onclick="toFee(\'' + data.studentNo + '\')">查看</a>';
+                        return fee;
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "branchName"},
+                {"sClass": "center", "bSortable": false, "mData": "signDateString"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                    if($("#checkPermission").val() == "true"){
+                        return "";
+                    }
+                    var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                    var phoneOperation = '<a class="blue" href="javascript:void(0);" onclick="toPhone(\'' + data.studentNo + '\', \'' + data.studentName + '\')">\n' +
+                        '<i class="icon-mobile-phone bigger-210"></i></a>\n' +
+                        '</div>';
+                    return styleDiv + phoneOperation;
+                }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var visitOperation = '';
+                        if ($("#input_hasPermission_visit_list").val() == "1") {
+                            visitOperation = '<a class="blue"  href="javascript:void(0);" onclick="toVisitURL(\'' + data.studentNo + '\')"><i class="icon-pencil bigger-130"></i></a>';
+                        }
+                        return styleDiv + visitOperation + '</div>';
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if($("#checkPermission").val() == "true"){
+                            return "";
+                        }
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var visitOperation = '<a class="blue" href="javascript:void(0);" onclick="toCopyURL(\'' + data.studentNo + '\',' + data.status + ')">\n' +
+                            '<i class="icon-edit bigger-130"></i></a>\n' +
+                            '</div>';
+                        return styleDiv + visitOperation;
+                    }
+                },
+                //定校
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                    var planCollegeListOperation = '<a class="blue" href="javascript:void(0);" onclick="toPlanCollegeList(\'' + data.studentNo + '\')">\n' +
+                        '<i class="icon-tasks bigger-130"></i></a>\n' +
+                        '</div>';
+                    return planCollegeListOperation;
+                }
+                },
+                //院校申请
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var applyListOperation = '<a class="blue" href="javascript:void(0);" onclick="toApplyCollegeList(\'' + data.studentNo + '\',' + data.status + ')">\n' +
+                            '<i class="icon-globe bigger-130"></i></a>\n' +
+                            '</div>';
+                        return applyListOperation;
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.copyOperator != null) {
+                            return '<a class="blue" href="javascript:void(0);" onclick="transferRecord_new(\'' + data.studentNo + '\', ' + 1 + ')">' + data.copyOperator + '</a>';
+                        }
+                        return "";
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.copyMaker != null) {
+                            return '<a class="blue" href="javascript:void(0);" onclick="transferRecord_new(\'' + data.studentNo + '\', ' + 0 + ')">' + data.copyMaker + '</a>';
+                        }
+                        return "";
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.lastVisitTime != null) {
+                                return getTimeString_day(new Date(data.lastVisitTime))
+                            } else {
+                                return "";
+                            }
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if ($("#doubleSendingConfirm").val() == "1" && data.status >= 30) {
+                            var auditFirstOperation = '<a class="blue" href="javascript:void(0);" onclick="toFirstConfirm(\'' + data.id + '\')">未审核</a>';
+                            var firstAuditInfo = '<a class="blue" href="javascript:void(0);" onclick="sendAuditInfo(\'' + data.studentNo + '\', ' + 1 + ')">已审核</a>';
+                            if (data.firstBonusStatus == 1) return auditFirstOperation;
+                            if (data.firstBonusStatus == 2) return firstAuditInfo;
+                            if (data.firstBonusStatus == 0) return "";
+                        }
+                        else {
+                            var firstAuditInfo = '<a class="blue" href="javascript:void(0);" onclick="sendAuditInfo(\'' + data.studentNo + '\', ' + 1 + ')">已审核</a>';
+                            if (data.firstBonusStatus == 1) return "未审核";
+                            if (data.firstBonusStatus == 2) return firstAuditInfo;
+                            if (data.firstBonusStatus == 0) return "";
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if ($("#doubleSendingConfirm").val() == "1" && data.status >= 30) {
+                            var auditFinallyOperation = '<a class="blue" href="javascript:void(0);" onclick="toLastConfirm(\'' + data.id + '\')">未审核</a>';
+                            var lastAuditInfo = '<a class="blue" href="javascript:void(0);" onclick="sendAuditInfo(\'' + data.studentNo + '\', ' + 2 + ')">已审核</a>';
+                            if (data.finallyBonusStatus == 1) return auditFinallyOperation;
+                            if (data.finallyBonusStatus == 2) return lastAuditInfo;
+                            if (data.finallyBonusStatus == 0) return "";
+                        } else {
+                            var lastAuditInfo = '<a class="blue" href="javascript:void(0);" onclick="sendAuditInfo(\'' + data.studentNo + '\', ' + 2 + ')">已审核</a>';
+                            if (data.finallyBonusStatus == 1) return "未审核";
+                            if (data.finallyBonusStatus == 2) return lastAuditInfo;
+                            if (data.finallyBonusStatus == 0) return "";
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var visitOperation = '';
+                        if ($("#input_hasPermission_visaApply_list").val() == "1") {
+                            visitOperation = '<a class="blue" href="javascript:void(0);" onclick="toVisaURL(\'' + data.studentNo + '\',' + data.status + ')"><i class="icon-credit-card bigger-130"></i></a>';
+                        }
+                        return styleDiv + visitOperation + '</div>';
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if($("#checkPermission").val() == "true"){
+                            return "";
+                        }
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var visitOperation = '<a class="blue" href="javascript:void(0);" onclick="toServiceURL(\'' + data.studentNo + '\',' + data.status + ')">\n' +
+                            '<i class="icon-home bigger-130"></i></a>\n' +
+                            '</div>';
+                        return styleDiv + visitOperation;
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.copier != null) {
+                            return '<a class="blue" href="javascript:void(0);" onclick="transferRecord_old(\'' + data.studentNo + '\', ' + 2 + ')">' + data.copier + '</a>';
+                        }
+                        return "";
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.copy != null) {
+                            return '<a class="blue" href="javascript:void(0);" onclick="transferRecord_old(\'' + data.studentNo + '\', ' + 1 + ')">' + data.copy + '</a>';
+                        }
+                        return "";
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.visaOperator != null) {
+                            return '<a class="blue" href="javascript:void(0);" onclick="transferRecord_old(\'' + data.studentNo + '\', ' + 3 + ')">' + data.visaOperator + '</a>';
+                        }
+                        return "";
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "planningConsultant"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.registerStatus == 1) return "已注册";
+                        else return "未注册";
+                    }}
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        //页面响应回车事件
+        $(document).keyup(function (e) {//捕获文档对象的按键弹起事件
+            if (e.keyCode == 13) {//按键信息对象以参数的形式传递进来了
+                $("#query").click();
+            }
+        });
+
+        // 外联
+        if ($("#roleName").val() == "true") {
+            oTable1.fnSetColumnVis(21, false, false);
+            oTable1.fnSetColumnVis(22, false, false);
+            oTable1.fnSetColumnVis(23, false, false);
+        }
+        //海外办公室
+        if($("#checkPermission").val() == "true"){
+            oTable1.fnSetColumnVis(15, false, false);
+            oTable1.fnSetColumnVis(16, false, false);
+            oTable1.fnSetColumnVis(24, false, false);
+            oTable1.fnSetColumnVis(25, false, false);
+            $("#export").hide();
+        }
+
+        $("#empty").click(function () {
+            $("#selectNation").empty();
+            $("#selectBranch").empty();
+            $("#dateStart").val("");
+            $("#dateEnd").val("");
+            $("#visaSendDate_Start").val("");
+            $("#visaSendDate_End").val("");
+            $("#visaOperatorDate_Start").val("");
+            $("#visaOperatorDate_End").val("");
+            $("#birthdayStart").val("");
+            $("#birthdayEnd").val("");
+            $("#agencyName").val("");
+            location.href = '/studentInfo';
+        })
+
+        function getTimeString_day(date) {
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m >= 10 ? m : '0' + m;
+            var d = date.getDate();
+            d = d >= 10 ? d : '0' + d;
+            return y + '-' + m + '-' + d;
+        }
+
+    })
+
+    function changeTable() {
+        oTable1.fnDraw()
+    }
+    function editConfee(ele){
+        $(ele).prev("input").removeAttrs("readonly");
+        $(ele).next("a").show();
+        $(ele).hide();
+    }
+    function confirmConfee(ele,studentNo) {
+        var confee = $(ele).prev("a").prev("input").val();
+        $.post("/student/updateConfee",{"studentNo":studentNo,"confee":confee},function(data,status){
+            if(data == true){
+                $(ele).prev("a").prev("input").attr("readonly","readonly");
+                $(ele).prev("a").show();
+                $(ele).hide();
+            }
+        });
+    }
+    //查看咨询顾问联系方式
+    function checkSalesConsultant(salesConsultantNo){
+
+        var studentNo = $("#studentNo").val();
+        $.post("/student/checkSalesConsultant", { "salesConsultantNo": salesConsultantNo ,"studentNo":studentNo}, function (data, status) {
+            layer.confirm('该学生的咨询顾问 电话号码/邮箱 分别为:</br>'+data, {
+            });
+        });
+
+
+    }
+    -->
+
+</script>
+
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+    .input-unit{
+        width: 65px;
+        height: 25px;
+        display: block;
+        float: left;
+        background-color: #abbac3;
+        line-height: 25px;
+        text-align: center;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li><i class="icon-home home-icon"></i>首页</li>-->
+                    <!--<li>学生列表</li>-->
+                    <!--<li>后续管理</li>-->
+                    <!--<li>添加后续申请</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">添加后续申请</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+
+                <form method="post" id="edit">
+                    <input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">服务类型：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="visitType" name="visitType" style="width:190px;height:25px;" required="required">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">接机</option>
+                                        <option value="2">保险</option>
+                                        <option value="3">监护</option>
+                                        <option value="4">主课住宿</option>
+                                        <option value="5">语言住宿</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">购买途径：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="applyWay" name="applyWay" style="width:190px;height:25px;" required="required">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">学校</option>
+                                        <option value="2">合作机构</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >是否已付后续费用：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="paymentStatus" name="paymentStatus" style="width:190px;height:25px;" required="required">
+                                        <option value="">请选择</option>
+                                        <option value="1">是</option>
+                                        <option value="0">否</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue" >费用：</label>
+                                    <input class="col-sm-1 capital" id="fee" name="fee" type="number" min="0" style="width:125px;height:25px" value=""/>
+                                    <span>
+                                        <select class="input-unit" name="feeUnit">
+                                            <option th:each="currency : ${currencyInfos}" th:value="${currency.id}" th:text="${currency.enName}"></option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <div class="form-group insurance-control" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险类型：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="insuranceType" name="insuranceType" style="width:190px;height:25px;" required="required">
+                                        <option value="-1">请选择</option>
+                                        <option value="1">OSHC</option>
+                                        <option value="2">OVHC</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险开始时间：</label>
+                                    <input id="safeStartTime" class="Wdate col-sm-3" style="width: 190px" name="safeStartTime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                                </div>
+                                <div class="form-group insurance-control" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险结束时间：</label>
+                                    <input id="safeEndTime" class="Wdate col-sm-3" style="width: 190px" name="safeEndTime" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                                    <!--<label class="col-sm-3 control-label no-padding-right blue" >保险长度：</label>-->
+                                    <!--<input class="col-sm-1" id="insuranceLength" name="insuranceLength" style="width:125px;height:25px" value=""-->
+                                           <!--onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"-->
+                                           <!--onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"/>-->
+                                    <!--<span class="input-unit">月</span>-->
+                                </div>
+                                <div class="form-group agency-control" style="height:29px">
+                                    <div>
+                                        <label class="col-sm-3 control-label no-padding-right blue" >合作机构：</label>
+                                        <select class="col-sm-3 form-control input-sm" id="agency" name="agency" style="width:190px;height:25px;" required="required">
+                                            <option value="-1">请选择</option>
+                                            <option th:each="agency : ${agencyInfos}" th:class="${agency.agencyType + ' agency'}" th:value="${agency.id}" th:text="${agency.agencyName}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group " style="height:210px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">申请表附件：</label>
+                                    <input type="hidden" name="attachment" id="input_fileName"/>
+                                    <div class="col-sm-6" style="padding-left: 0px;">
+                                        <div class="widget-header" style="width:546px">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body" style="width:560px;">
+                                            <div class="widget-main">
+                                                <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf，&nbsp;.eml</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="height:100px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">备注：</label>
+                                    <textarea class="col-sm-2" name="applyContent" style="width:560px;height:100px;" required="required"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="submits_callback">返回</button>
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+                <!-- 文件上传 -->
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                </form>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/followService/add.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

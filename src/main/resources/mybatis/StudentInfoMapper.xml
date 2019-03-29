@@ -1,0 +1,977 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.StudentInfoMapper">
+    <resultMap id="BaseResultMap" type="com.aoji.model.StudentInfo">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="student_no" jdbcType="VARCHAR" property="studentNo"/>
+        <result column="student_name" jdbcType="VARCHAR" property="studentName"/>
+        <result column="contract_no" jdbcType="VARCHAR" property="contractNo"/>
+        <result column="contract_type" jdbcType="INTEGER" property="contractType"/>
+        <result column="branch_id" jdbcType="INTEGER" property="branchId"/>
+        <result column="branch_name" jdbcType="VARCHAR" property="branchName"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_status" jdbcType="BIT" property="deleteStatus"/>
+        <result column="operator_no" jdbcType="VARCHAR" property="operatorNo"/>
+        <result column="nation_id" jdbcType="INTEGER" property="nationId"/>
+        <result column="nation_name" jdbcType="VARCHAR" property="nationName"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="sign_date" jdbcType="TIMESTAMP" property="signDate"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="first_bonus_status" jdbcType="INTEGER" property="firstBonusStatus"/>
+        <result column="finally_bonus_status" jdbcType="INTEGER" property="finallyBonusStatus"/>
+        <result column="copy_operator" jdbcType="VARCHAR" property="copyOperator"/>
+        <result column="copy_maker" jdbcType="VARCHAR" property="copyMaker"/>
+        <result column="student_status" jdbcType="INTEGER" property="studentStatus"/>
+        <result column="usa_status" jdbcType="INTEGER" property="usaStatus"/>
+        <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant"/>
+        <result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo"/>
+        <result column="channel_status" jdbcType="INTEGER" property="channelStatus"/>
+        <result column="channel_transfer_status" jdbcType="INTEGER" property="channelTransferStatus"/>
+        <result column="copy_no" jdbcType="VARCHAR" property="copyNo"/>
+        <result column="copy" jdbcType="VARCHAR" property="copy"/>
+        <result column="visa_operator_no" jdbcType="VARCHAR" property="visaOperatorNo"/>
+        <result column="visa_operator" jdbcType="VARCHAR" property="visaOperator"/>
+        <result column="copier_no" jdbcType="VARCHAR" property="copierNo"/>
+        <result column="copier" jdbcType="VARCHAR" property="copier"/>
+        <result column="last_visit_time" jdbcType="TIMESTAMP" property="lastVisitTime"/>
+        <result column="confeeid" jdbcType="VARCHAR" property="confeeid"/>
+        <result column="planning_consultant_no" jdbcType="VARCHAR" property="planningConsultantNo"/>
+        <result column="planning_consultant" jdbcType="VARCHAR" property="planningConsultant"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="agent_id" jdbcType="INTEGER" property="agentId"/>
+        <result column="agent_name" jdbcType="VARCHAR" property="agentName"/>
+        <result column="register_status" jdbcType="BIT" property="registerStatus"/>
+        <result column="nation_status" jdbcType="INTEGER" property="nationStatus"/>
+    </resultMap>
+    <resultMap id="StudentServiceResult" type="com.aoji.model.dto.StudentInfoDTO" extends="BaseResultMap">
+        <result column="service_code" jdbcType="TIMESTAMP" property="serviceCode"/>
+        <result column="service_name" jdbcType="INTEGER" property="serviceName"/>
+    </resultMap>
+    <resultMap id="StudentInfoBOResult" type="com.aoji.model.bo.StudentInfoBO">
+        <result column="student_no" jdbcType="VARCHAR" property="studentNo"/>
+        <result column="student_name" jdbcType="VARCHAR" property="studentName"/>
+        <result column="contract_no" jdbcType="VARCHAR" property="contractNo"/>
+        <result column="contractType" jdbcType="VARCHAR" property="contractType"/>
+        <result column="branch_name" jdbcType="VARCHAR" property="branchName"/>
+        <result column="nation_name" jdbcType="VARCHAR" property="nationName"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="sign_date" jdbcType="TIMESTAMP" property="signDate"/>
+        <result column="statusName" jdbcType="VARCHAR" property="statusName"/>
+        <result column="firstBonusStatus" jdbcType="VARCHAR" property="firstBonusStatus"/>
+        <result column="finallyBonusStatus" jdbcType="VARCHAR" property="finallyBonusStatus"/>
+        <result column="copy_operator" jdbcType="VARCHAR" property="copyOperator"/>
+        <result column="copy_maker" jdbcType="VARCHAR" property="copyMaker"/>
+        <result column="studentStatus" jdbcType="VARCHAR" property="studentStatus"/>
+        <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant"/>
+        <result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo"/>
+        <result column="copy_no" jdbcType="VARCHAR" property="copyNo"/>
+        <result column="copy" jdbcType="VARCHAR" property="copy"/>
+        <result column="visa_operator_no" jdbcType="VARCHAR" property="visaOperatorNo"/>
+        <result column="visa_operator" jdbcType="VARCHAR" property="visaOperator"/>
+        <result column="copier_no" jdbcType="VARCHAR" property="copierNo"/>
+        <result column="copier" jdbcType="VARCHAR" property="copier"/>
+        <result column="last_visit_time" jdbcType="TIMESTAMP" property="lastVisitTime"/>
+        <result column="studentInfoURL" jdbcType="VARCHAR" property="studentInfoURL"/>
+        <result column="settleApplyURL" jdbcType="VARCHAR" property="settleApplyURL"/>
+    </resultMap>
+    <select id="getUserMap" parameterType="com.aoji.model.StudentInfo" resultType="map">
+        select student_no as studentNo,student_name as studentName,nation_name as nationName
+        ,contract_no  as contractNo ,confeeid as confeeid,contract_type as contractType,branch_id as branchId,branch_name as branchName,
+        sales_consultant as salesConsultant, sales_consultant_no as salesConsultantNo,create_time as createTime,channel_status as channelStatus,
+        remark as remark,channel_transfer_status as channelTransferStatus
+
+        from student_info where delete_status=0
+        <if test="nationId != null">
+            and nation_id=#{nationId}
+        </if>
+    </select>
+    <update id="updateByStudentNo" parameterType="com.aoji.model.StudentInfo">
+        update student_info
+        <set>
+            <if test="studentName != null and studentName != ''">
+                student_name = #{studentName},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="pinyin != null and pinyin != ''">
+                pinyin = #{pinyin},
+            </if>
+            <if test="nationId != null">
+                nation_id = #{nationId},
+            </if>
+            <if test="nationName != null and nationName != ''">
+                nation_name = #{nationName},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="usaStatus != null">
+                usa_status = #{usaStatus},
+            </if>
+            <if test="emailAccount != null and emailAccount != ''">
+                email_account = #{emailAccount},
+            </if>
+            <if test="emailPassword != null and emailPassword != ''">
+                email_password = #{emailPassword},
+            </if>
+            <if test="studentStatus != null">
+                student_status = #{studentStatus},
+            </if>
+            <if test="copyOperator != null and copyOperator != ''">
+                copy_operator = #{copyOperator},
+            </if>
+            <if test="copyOperatorNo != null and copyOperatorNo != ''">
+                copy_operator_no = #{copyOperatorNo},
+            </if>
+            <if test="copyMaker != null and copyMaker != ''">
+                copy_maker = #{copyMaker},
+            </if>
+            <if test="copyMakerNo != null and copyMakerNo != ''">
+                copy_maker_no = #{copyMakerNo},
+            </if>
+            <if test="salesConsultant != null and salesConsultant != ''">
+                sales_consultant = #{salesConsultant},
+            </if>
+            <if test="salesConsultantNo != null and salesConsultantNo != ''">
+                sales_consultant_no = #{salesConsultantNo},
+            </if>
+            <if test="channelTransferStatus != null">
+                channel_transfer_status = if(channel_status = 1, #{channelTransferStatus}, 0),
+            </if>
+            <if test="planningConsultantNo != null and planningConsultantNo != ''">
+                planning_consultant_no = #{planningConsultantNo},
+            </if>
+            <if test="planningConsultant != null and planningConsultant != ''">
+                planning_consultant = #{planningConsultant},
+            </if>
+            <if test="registerStatus != null">
+                register_status = #{registerStatus},
+            </if>
+        </set>
+        where student_no = #{studentNo}
+    </update>
+
+    <select id="selectStudentAndServiceByStudentNo" resultMap="StudentServiceResult" parameterType="java.lang.String">
+        SELECT
+            student.STATUS,
+            student.student_no,
+            service.service_code,
+            service.service_name
+        FROM student_info student, student_service_info ssi, service_info service
+        WHERE student.student_no = ssi.student_no AND ssi.service_id = service.id
+              AND student.delete_status = 0 AND ssi.delete_status = 0 AND service.delete_status = 0
+              AND student.student_no = #{studentNo}
+    </select>
+
+    <select id="selectServiceCodeByStudentNo" resultType="java.lang.String" parameterType="java.lang.String">
+        SELECT service.service_code
+        FROM student_info student, student_service_info ssi, service_info service
+        WHERE student.student_no = ssi.student_no AND ssi.service_id = service.id
+              AND student.delete_status = 0 AND ssi.delete_status = 0 AND service.delete_status = 0
+              AND student.student_no = #{studentNo}
+    </select>
+
+    <select id="selectStudentInfoByMoreConditionCount" resultType="java.lang.Integer" parameterType="object">
+        SELECT count(*)
+        FROM student_info
+        WHERE delete_status = 0
+
+        <if test="isChannelStatus==true and roleName != '总经理' and roleName != '渠道文案员_学生列表查看' and roleName != '渠道同业_文签顾问'">
+            and channel_transfer_status = 0 and channel_status = 1
+        </if>
+        <if test="isChannelStatus==false and (roleName == '文案顾问' or roleName == '文案经理') and roleName != '总经理' and roleName != '渠道文案员_学生列表查看' and roleName != '渠道同业_文签顾问'">
+            and (channel_status != 1 or (channel_status = 1 and (channel_transfer_status = 1 or channel_transfer_status is null)))
+        </if>
+        <if test="studentInfo.studentNo != null and studentInfo.studentNo !=''">AND student_no =
+            #{studentInfo.studentNo}
+        </if>
+        <if test="studentInfo.copyOperator != null and studentInfo.copyOperator !=''">AND copy_operator =
+            #{studentInfo.copyOperator}
+        </if>
+        <if test="studentInfo.copyMaker != null and studentInfo.copyMaker !=''">AND copy_maker =
+            #{studentInfo.copyMaker}
+        </if>
+        <if test="studentInfo.visaOperator != null and studentInfo.visaOperator !=''">AND visa_operator =
+            #{studentInfo.visaOperator}
+        </if>
+        <if test="studentInfo.copier != null and studentInfo.copier !=''">AND copier = #{studentInfo.copier}</if>
+        <if test="studentInfo.copy != null and studentInfo.copy !=''">AND copy = #{studentInfo.copy}</if>
+        <if test="studentInfo.status != null and studentInfo.status !=''">AND status = #{studentInfo.status}</if>
+        <if test="studentInfo.usaStatus != null and studentInfo.usaStatus !=''">AND usa_status = #{studentInfo.usaStatus}</if>
+        <if test="studentInfo.studentStatus != null and studentInfo.studentStatus !=''">AND student_status =
+            #{studentInfo.studentStatus}
+        </if>
+        <if test="studentInfo.branchId != null and studentInfo.branchId !=''">AND branch_id = #{studentInfo.branchId}
+        </if>
+        <if test="studentInfo.nationId != null and studentInfo.nationId !=''">AND nation_id = #{studentInfo.nationId}
+        </if>
+        <if test="studentInfo.dateStart != null and studentInfo.dateStart !=''">AND sign_date &gt;=
+            DATE_FORMAT(#{studentInfo.dateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.dateEnd != null and studentInfo.dateEnd !=''">AND sign_date &lt;=
+            DATE_FORMAT(#{studentInfo.dateEnd}, '%Y-%m-%d %T')
+        </if>
+
+        <if test="studentInfo.visaSendDateStart != null and studentInfo.visaSendDateStart !=''">
+            AND visa_send_date &gt;= DATE_FORMAT(#{studentInfo.visaSendDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaSendDateEnd != null and studentInfo.visaSendDateEnd !=''">
+            AND visa_send_date &lt;= DATE_FORMAT(#{studentInfo.visaSendDateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaOperatorDateStart != null and studentInfo.visaOperatorDateStart !=''">
+            AND visa_operator_date &gt;= DATE_FORMAT(#{studentInfo.visaOperatorDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaOperatorDateEnd != null and studentInfo.visaOperatorDateEnd !=''">
+            AND visa_operator_date &lt;= DATE_FORMAT(#{studentInfo.visaOperatorDateEnd}, '%Y-%m-%d %T')
+        </if>
+
+        <if test="studentInfo.studentName != null and studentInfo.studentName !=''">AND (student_name LIKE
+            CONCAT('%',#{studentInfo.studentName},'%' ) OR pinyin Like CONCAT('%',#{studentInfo.studentName},'%' ))
+        </if>
+        and ( id > 0
+        <if test="roleName == '文签总监' ">
+            and nation_id in(select if(id = 41 or id = 40, 4, id) as id from country_info where country_group in (
+            SELECT nation
+            FROM user_group
+            WHERE id IN(
+            SELECT group_id
+            FROM user_group_relation
+            WHERE oaid = #{studentInfo.copyOperatorNo} and delete_status = 0) group by nation))
+        </if>
+        <if test="roleName == '文签副总监' ">
+            and nation_id in(select if(id = 41 or id = 40, 4, id) as id from country_info where country_group in (
+            SELECT nation
+            FROM user_group
+            WHERE id IN(
+            SELECT group_id
+            FROM user_group_relation
+            WHERE oaid = #{studentInfo.copyOperatorNo} and delete_status = 0) group by nation))
+        </if>
+        <if test="roleName == '文案经理' or roleName == '签证经理'">
+            AND copy_operator_no in(select oaid from user_group_relation where group_id in(select group_id from
+            user_group_relation where oaid = #{studentInfo.copyOperatorNo} and leader_status =1 and delete_status=0) and
+            delete_status = 0)
+            AND nation_id IN(select country.id from user_group ugroup,user_group_relation relation,country_info country
+            where ugroup.id = relation.group_id and ugroup.nation = country.country_group and relation.oaid=
+            #{studentInfo.copyOperatorNo} )
+        </if>
+        <if test="roleName == '文案顾问' or roleName == '签证顾问'">
+            AND (copy_operator_no = #{studentInfo.copyOperatorNo} or copy_maker_no = #{studentInfo.copyOperatorNo})
+        </if>
+        <if test="roleName == '渠道同业_文签顾问'">
+            AND ((copy_operator_no = #{studentInfo.copyOperatorNo} or copy_maker_no = #{studentInfo.copyOperatorNo}) or channel_status = 1)
+        </if>
+        <if test="roleName == '外联经理'">
+            AND student_no in (
+            select student_no from apply_info where connector != '' and delete_status=0)
+        </if>
+        <if test="roleName == '外联顾问'">
+            AND student_no in (
+            select student_no from apply_info where connector = #{studentInfo.copyOperatorNo})
+        </if>
+        <if test="roleName == '渠道文案员' or roleName == '渠道文案员_学生列表查看'">
+            AND channel_status = 1
+        </if>
+
+        <if test="studentInfo.copyNo != null and studentInfo.copyNo !=''">
+            or copy_no = #{studentInfo.copyNo}
+        </if>
+        <if test="studentInfo.visaOperatorNo != null and studentInfo.visaOperatorNo !=''">
+            or visa_operator_no = #{studentInfo.visaOperatorNo}
+        </if>
+        <if test="studentInfo.copierNo != null and studentInfo.copierNo !=''">
+            or copier_no = #{studentInfo.copierNo}
+        </if>
+        <if test="roleName == '文案经理' or roleName == '签证经理' or roleName == '文签副总监'">
+            or copy_operator_no = #{studentInfo.copyOperatorNo}
+        </if>
+        )
+    </select>
+
+    <!--学生列表数据-->
+    <select id="selectStudentInfoByMoreCondition" resultMap="BaseResultMap" parameterType="object">
+        SELECT
+        *,
+        CASE status
+        WHEN 10 THEN "未上传文书材料"
+        WHEN 20 THEN "未递交申请材料"
+        WHEN 30 THEN "未收到申请结果"
+        WHEN 40 THEN "未确认录取院校"
+        WHEN 50 THEN "未进行签证辅导"
+        WHEN 60 THEN "未递交签证申请"
+        WHEN 70 THEN "未收到签证结果"
+        WHEN 80 THEN "未填写获签信息"
+        WHEN 90 THEN "已结案"
+        WHEN 100 THEN "已退费"
+        WHEN 85 THEN "待结案"
+        END as statusName,
+        DATE_FORMAT(birthday, '%Y-%m-%d') as birthdayString,
+        DATE_FORMAT(sign_date, '%Y-%m-%d') as signDateString
+        FROM student_info
+        WHERE delete_status = 0
+        <if test="isChannelStatus==true and roleName != '总经理' and roleName != '渠道文案员_学生列表查看' and roleName != '渠道同业_文签顾问'">
+            and channel_transfer_status = 0 and channel_status = 1
+        </if>
+        <if test="isChannelStatus==false and (roleName == '文案顾问' or roleName == '文案经理') and roleName != '总经理'  and roleName != '渠道文案员_学生列表查看'and roleName != '渠道同业_文签顾问'">
+            and (channel_status != 1 or (channel_status = 1 and (channel_transfer_status = 1 or channel_transfer_status is null)))
+        </if>
+        <if test="studentInfo.studentNo != null and studentInfo.studentNo !=''">AND student_no =
+            #{studentInfo.studentNo}
+        </if>
+        <if test="studentInfo.copyOperator != null and studentInfo.copyOperator !=''">AND copy_operator =
+            #{studentInfo.copyOperator}
+        </if>
+        <if test="studentInfo.copyMaker != null and studentInfo.copyMaker !=''">AND copy_maker =
+            #{studentInfo.copyMaker}
+        </if>
+        <if test="studentInfo.visaOperator != null and studentInfo.visaOperator !=''">AND visa_operator =
+            #{studentInfo.visaOperator}
+        </if>
+        <if test="studentInfo.salesConsultant != null and studentInfo.salesConsultant !=''">AND sales_consultant =
+            #{studentInfo.salesConsultant}
+        </if>
+        <if test="studentInfo.copier != null and studentInfo.copier !=''">AND copier = #{studentInfo.copier}</if>
+        <if test="studentInfo.copy != null and studentInfo.copy !=''">AND copy = #{studentInfo.copy}</if>
+        <if test="studentInfo.status != null and studentInfo.status !=''">AND status = #{studentInfo.status}</if>
+        <if test="studentInfo.usaStatus != null and studentInfo.usaStatus !=''">AND usa_status = #{studentInfo.usaStatus}</if>
+        <if test="studentInfo.studentStatus != null and studentInfo.studentStatus !=''">AND student_status =
+            #{studentInfo.studentStatus}
+        </if>
+        <if test="studentInfo.registerStatus == true or studentInfo.registerStatus == false">AND register_status =
+            #{studentInfo.registerStatus}
+        </if>
+        <if test="studentInfo.branchId != null and studentInfo.branchId !=''">AND branch_id = #{studentInfo.branchId}
+        </if>
+        <if test="studentInfo.nationId != null and studentInfo.nationId !=''">AND nation_id = #{studentInfo.nationId}
+        </if>
+        <if test="studentInfo.dateStart != null and studentInfo.dateStart !=''">AND sign_date &gt;=
+            DATE_FORMAT(#{studentInfo.dateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.dateEnd != null and studentInfo.dateEnd !=''">AND sign_date &lt;=
+            DATE_FORMAT(#{studentInfo.dateEnd}, '%Y-%m-%d %T')
+        </if>
+
+        <if test="studentInfo.visaSendDateStart != null and studentInfo.visaSendDateStart !=''">
+            AND visa_send_date &gt;= DATE_FORMAT(#{studentInfo.visaSendDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaSendDateEnd != null and studentInfo.visaSendDateEnd !=''">
+            AND visa_send_date &lt;= DATE_FORMAT(#{studentInfo.visaSendDateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaOperatorDateStart != null and studentInfo.visaOperatorDateStart !=''">
+            AND visa_operator_date &gt;= DATE_FORMAT(#{studentInfo.visaOperatorDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaOperatorDateEnd != null and studentInfo.visaOperatorDateEnd !=''">
+            AND visa_operator_date &lt;= DATE_FORMAT(#{studentInfo.visaOperatorDateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.birthdayStart != null and studentInfo.birthdayStart !=''">
+            AND birthday &gt;= DATE_FORMAT(#{studentInfo.birthdayStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.birthdayEnd != null and studentInfo.birthdayEnd !=''">
+            AND birthday &lt;= DATE_FORMAT(#{studentInfo.birthdayEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.agencyName != null and studentInfo.agencyName !=''">
+            AND agent_name = #{studentInfo.agencyName}
+        </if>
+        <if test="studentInfo.studentName != null and studentInfo.studentName !=''">AND (student_name LIKE
+            CONCAT('%',#{studentInfo.studentName},'%' ) OR pinyin Like CONCAT('%',#{studentInfo.studentName},'%' ))
+        </if>
+        and ( id > 0
+        <if test="roleName == '文签总监' ">
+            and nation_id in(select if(id = 41 or id = 40, 4, id) as id from country_info where country_group in (
+            SELECT nation
+            FROM user_group
+            WHERE id IN(
+            SELECT group_id
+            FROM user_group_relation
+            WHERE oaid = #{studentInfo.copyOperatorNo} and delete_status = 0) group by nation))
+        </if>
+        <if test="roleName == '文签副总监' ">
+            and nation_id in(select if(id = 41 or id = 40, 4, id) as id from country_info where country_group in (
+            SELECT nation
+            FROM user_group
+            WHERE id IN(
+            SELECT group_id
+            FROM user_group_relation
+            WHERE oaid = #{studentInfo.copyOperatorNo} and delete_status = 0) group by nation))
+        </if>
+        <if test="roleName == '文案经理' or roleName == '签证经理'">
+            AND copy_operator_no in(select oaid from user_group_relation where group_id in(select group_id from
+            user_group_relation where oaid = #{studentInfo.copyOperatorNo} and leader_status =1 and delete_status=0) and
+            delete_status = 0)
+            AND nation_id IN(select if(country.id = 41 or country.id = 40, 4, country.id) from user_group
+            ugroup,user_group_relation relation,country_info country where ugroup.id = relation.group_id and
+            ugroup.nation = country.country_group and relation.oaid= #{studentInfo.copyOperatorNo} )
+        </if>
+        <if test="roleName == '文案顾问' or roleName == '签证顾问'">
+            AND (copy_operator_no = #{studentInfo.copyOperatorNo} or copy_maker_no = #{studentInfo.copyOperatorNo})
+        </if>
+        <if test="roleName == '渠道同业_文签顾问'">
+            AND ((copy_operator_no = #{studentInfo.copyOperatorNo} or copy_maker_no = #{studentInfo.copyOperatorNo}) or channel_status = 1)
+        </if>
+        <if test="roleName == '外联经理'">
+            AND student_no in (
+            select student_no from apply_info where connector != '' and delete_status=0)
+        </if>
+        <if test="roleName == '外联顾问'">
+            AND student_no in (
+            select student_no from apply_info where connector = #{studentInfo.copyOperatorNo})
+        </if>
+        <if test="roleName == '渠道文案员'  or roleName == '渠道文案员_学生列表查看'">
+            AND channel_status = 1
+        </if>
+        <if test="roleName == '海外办公室'">
+            AND nation_id = 1 AND channel_status = 0
+        </if>
+
+        <if test="studentInfo.copyNo != null and studentInfo.copyNo !=''">
+            or copy_no = #{studentInfo.copyNo}
+        </if>
+        <if test="studentInfo.visaOperatorNo != null and studentInfo.visaOperatorNo !=''">
+            or visa_operator_no = #{studentInfo.visaOperatorNo}
+        </if>
+        <if test="studentInfo.copierNo != null and studentInfo.copierNo !=''">
+            or copier_no = #{studentInfo.copierNo}
+        </if>
+        <if test="roleName == '文案经理' or roleName == '签证经理' or roleName == '文签副总监'">
+            or copy_operator_no = #{studentInfo.copyOperatorNo}
+        </if>
+        <if test="isPlannManager == true">
+            or planning_consultant_no in (
+            select oaid from user_group_relation where group_id in (
+            select group_id from user_group_relation where group_id = '142' and leader_status =1 and delete_status=0 and oaid = #{studentInfo.planningConsultantNo}
+
+            ) and delete_status = 0
+            )
+        </if>
+        <if test="isPlannManager == false">
+            or planning_consultant_no = #{studentInfo.planningConsultantNo}
+        </if>
+        )
+        <if test="sortPro != null ">
+            ORDER BY ${sortPro}
+            <if test="sSortDir_0 !=null">
+                ${sSortDir_0}
+            </if>
+        </if>
+        <if test="pageStart != null and pageEnd != null">
+            limit #{pageStart}, #{pageEnd}
+        </if>
+    </select>
+
+
+    <select id="getStudentMaterial" resultType="com.aoji.model.StudentInfo">
+        SELECT
+            student_no       studentNo,
+            student_material studentMaterrial
+        FROM student_info
+        WHERE student_no = (SELECT student_no
+                            FROM apply_info
+                            WHERE id = #{id})
+    </select>
+    <select id="getStudentInfoByStudentNo" resultMap="BaseResultMap">
+        SELECT
+            id                   id,
+            student_no           studentNo,
+            student_name         studentName,
+            contract_no          contractNo,
+            contract_type        contractType,
+            branch_id            branchId,
+            branch_name          branchName,
+            create_time          createTime,
+            update_time          updateTime,
+            delete_status        deleteStatus,
+            operator_no          operatorNo,
+            nation_id            nationId,
+            nation_name          nationName,
+            birthday             birthday,
+            sign_date            signDate,
+            status               status,
+            email_account        emailAccount,
+            first_bonus_status   firstBonusStatus,
+            finally_bonus_status finallyBonusStatus,
+            copy_operator        copyOperator,
+            copy_operator_no     copyOperatorNo,
+            copy_maker_no        copyMakerNo,
+            copy_maker           copyMaker,
+            student_status       studentStatus,
+            usa_status           usaStatus,
+            sales_consultant     salesConsultant,
+            sales_consultant_no  salesConsultantNo,
+            channel_status       channelStatus,
+            pinyin               pinyin,
+            birthday             birthday,
+            agent_id             agentId,
+            agent_name           agentName,
+            register_status      registerStatus,
+            nation_status        nationStatus
+        FROM student_info
+        WHERE student_no = #{studentNo} AND delete_status = 0
+    </select>
+
+    <!--查询学生信息-->
+    <select id="getStudentInfoByCondition" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT * FROM student_info WHERE delete_status = 0
+        <if test="studentInfo.studentNo != null and studentInfo.studentNo !=''">
+            AND student_no = #{studentInfo.studentNo}
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !=''">
+            AND status = #{studentInfo.status}
+        </if>
+        <if test="studentInfo.studentStatus != null and studentInfo.studentStatus !=''">
+            AND student_status = #{studentInfo.studentStatus}
+        </if>
+        <if test="studentInfo.branchName != null and studentInfo.branchName !=''">
+            AND branch_name = #{studentInfo.branchName}
+        </if>
+        <if test="studentInfo.nationName != null and studentInfo.nationName !=''">
+            AND nation_name = #{studentInfo.nationName}
+        </if>
+        <if test="studentInfo.dateStart != null and studentInfo.dateStart !=''">
+            AND sign_date &gt;= DATE_FORMAT(#{studentInfo.dateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.dateEnd != null and studentInfo.dateEnd !=''">
+            AND sign_date &lt;= DATE_FORMAT(#{studentInfo.dateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.studentName != null and studentInfo.studentName !=''">
+            AND (student_name LIKE CONCAT('%',#{studentInfo.studentName},'%' ) OR pinyin Like
+            CONCAT('%',#{studentInfo.studentName},'%' ))
+        </if>
+        AND (copy_operator_no in (
+        select oaid from user_group_relation where group_id in(select group_id from user_group_relation where oaid =
+        #{oaid} and leader_status =1))
+        OR copy_operator_no = #{oaid}
+        OR copy_maker_no in (
+        select oaid from user_group_relation where group_id in(select group_id from user_group_relation where oaid =
+        #{oaid} and leader_status =1))
+        OR copy_maker_no = #{oaid}
+        ) AND student_no in (
+        select student_no from
+        (select student_no, count(student_no) as count from
+        (select id, student_no from transfer_send_info where delete_status = 0 and enable_status = 1 and apply_id is
+        null) tsi,
+        (select send_id, confirm_status from transfer_receive_info where delete_status = 0 and confirm_status = 1) tri
+        where tsi.id = tri.send_id group by student_no) x
+        where x.count >= (select count(1) from transfer_send_info where delete_status = 0 and enable_status = 1 and
+        apply_id is null and student_no = x.student_no) )
+    </select>
+
+    <select id="getVisaUnAudit" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select visa.id,visa.student_no,student.student_name,student.nation_name from
+        audit_apply_info audit,visa_apply_info visa,student_info student where audit.case_id = 5 AND audit.delete_status = 0 AND audit.oaid = 7796 and audit.business_id = visa.id and visa.student_no = student.student_no
+        <if test="studentNo != null and studentNo !=''">
+            AND visa.student_no = #{studentNo}
+        </if>
+        <if test="nationName != null and nationName !=''">
+            AND student.nation_name = #{nationName}
+        </if>
+        order by visa.student_no desc
+    </select>
+
+    <select id="getVisaResultUnAudit" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select visa.id as businessId,visa.visa_id as id,visa.student_no,student.student_name,student.nation_name from
+        audit_apply_info audit,visa_result_info visa,student_info student where audit.case_id = 6 AND audit.delete_status = 0 AND audit.oaid = 7796 and audit.business_id = visa.id and visa.student_no = student.student_no
+        <if test="studentNo != null and studentNo !=''">
+            AND visa.student_no = #{studentNo}
+        </if>
+        <if test="nationName != null and nationName !=''">
+            AND student.nation_name = #{nationName}
+        </if>
+        order by visa.student_no desc
+    </select>
+
+    <select id="getSettleUnAudit" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select settle.id,settle.student_no,student.student_name,student.nation_name from
+        audit_apply_info audit,student_settle_info settle,student_info student where audit.case_id = 11 AND audit.delete_status = 0 AND audit.oaid = 7796 and audit.business_id = settle.id and settle.student_no = student.student_no
+        <if test="studentNo != null and studentNo !=''">
+            AND settle.student_no = #{studentNo}
+        </if>
+        <if test="nationName != null and nationName !=''">
+            AND student.nation_name = #{nationName}
+        </if>
+        order by settle.student_no desc
+    </select>
+    <select id="getStudentListByOaId" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select student_no,student_name,pinyin,birthday,contract_no,sales_consultant,copy_operator,copy_maker,copier,copy,visa_operator,branch_name,sign_date,status ,channel_status,last_visit_time
+        from student_info where sign_date > DATE_SUB(now(), interval 2 YEAR ) and sign_date <![CDATA[ < ]]> now() and channel_status !=1 and status not in ('90', '100') and contract_no not like '%单项目%'
+        and nation_name not in('昆省预科（unilearn)','NCUK IFY课程','NCUK PMP课程','美国AUP预科','加拿大预科','昆省IFY(AU)','IFY昆省(UK)','NCC IFY','NCC PMP','UNSW预科','美国USPP项目')
+        and (DATE_FORMAT(now( ), '%Y-%m' ) != DATE_FORMAT(last_visit_time, '%Y-%m' )  or last_visit_time is null) and delete_status = 0 and student_status != 2
+        <if test="roleName == '文案顾问'">
+            and (copy_operator_no = #{operator} OR copy_maker_no = #{operator} OR copy_no = #{operator} OR visa_operator_no = #{operator} OR copier_no = #{operator})
+        </if>
+        <if test="roleName == '文案经理'">
+            and
+            (
+                copy_operator_no in
+                (
+                  SELECT oaid from user_group_relation where group_id in
+                  (
+                    SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+                  ) and delete_status = 0 and oaid != #{operator}
+                )
+                or
+                copy_maker_no in
+                (
+                  SELECT oaid from user_group_relation where group_id in
+                  (
+                    SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+                  ) and delete_status = 0 and oaid != #{operator}
+                )
+                or
+                copy_no in
+                (
+                  SELECT oaid from user_group_relation where group_id in
+                  (
+                    SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+                  ) and delete_status = 0 and oaid != #{operator}
+                )
+                or
+                visa_operator_no in
+                (
+                    SELECT oaid from user_group_relation where group_id in
+                    (
+                      SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+                    ) and delete_status = 0 and oaid != #{operator}
+                )
+                or
+                copier_no in
+                (
+                    SELECT oaid from user_group_relation where group_id in
+                    (
+                      SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+                    ) and delete_status = 0 and oaid != #{operator}
+                )
+            )
+        </if>
+        <if test="roleName == '文签总监'">
+            and nation_id in
+            (
+                SELECT id from country_info where country_group in
+                (
+                  SELECT nation from user_group where id in
+                  (
+                    SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0
+                  ) and delete_status = 0
+                )
+            )
+        </if>
+        <if test="roleName == '总经理'">
+        </if>
+        <if test="studentInfo.studentNo != null and studentInfo.studentNo != ''">
+            AND student_no = #{studentInfo.studentNo}
+        </if>
+        <if test="studentInfo.studentName != null and studentInfo.studentName != ''">
+            AND student_name LIKE CONCAT('%',#{studentInfo.studentName},'%' )
+        </if>
+        <if test="studentInfo.copyOperator !=null and studentInfo.copyOperator !=''">
+            and (copy_operator = #{studentInfo.copyOperator} OR copy_maker = #{studentInfo.copyOperator} OR copy = #{studentInfo.copyOperator} OR visa_operator = #{studentInfo.copyOperator} OR copier = #{studentInfo.copyOperator})
+        </if>
+        <if test = "studentInfo.startTime!=null and studentInfo.startTime!='' ">
+            and sign_date <![CDATA[>=]]> #{studentInfo.startTime}
+        </if>
+        <if test = "studentInfo.endTime!=null and studentInfo.endTime!='' ">
+            and sign_date <![CDATA[<=]]> #{studentInfo.endTime}
+        </if>
+        order by last_visit_time desc
+    </select>
+
+    <!--咨询顾问学生列表-->
+    <select id="getStudentByBranchAndCountry" resultMap="StudentInfoBOResult" parameterType="java.util.Map">
+        select *,
+        #{studentInfoURL} as studentInfoURL,
+        CASE status
+        WHEN 10 THEN "未上传文书材料"
+        WHEN 20 THEN "未递交申请材料"
+        WHEN 30 THEN "未收到申请结果"
+        WHEN 40 THEN "未确认录取院校 "
+        WHEN 50 THEN "未进行签证辅导"
+        WHEN 60 THEN "未递交签证申请"
+        WHEN 70 THEN "未收到签证结果"
+        WHEN 80 THEN "未填写获签信息"
+        WHEN 90 THEN "已结案"
+        WHEN 100 THEN "已退费"
+
+        WHEN 85 THEN "待结案"
+        END as statusName,
+        CASE contract_type
+        WHEN 1 THEN "全程"
+        WHEN 2 THEN "单申请"
+        WHEN 3 THEN "单文书"
+        WHEN 4 THEN "单签证"
+        END as contractType,
+        CASE student_status
+        WHEN 1 THEN "正常"
+        WHEN 2 THEN "停办"
+        END as studentStatus,
+        CASE first_bonus_status
+        WHEN 1 THEN "未审核"
+        WHEN 2 THEN "已审核"
+        END as firstBonusStatus,
+        CASE finally_bonus_status
+        WHEN 1 THEN "未审核"
+        WHEN 2 THEN "已审核"
+        END as finallyBonusStatus
+        from student_info where delete_status = 0
+        <if test="studentInfoReq.studentNo != null and studentInfoReq.studentNo != ''">
+            and student_no = #{studentInfoReq.studentNo}
+        </if>
+        <if test="studentInfoReq.studentName != null and studentInfoReq.studentName != ''">
+            and student_name LIKE CONCAT('%',#{studentInfoReq.studentName},'%' )
+        </if>
+        <if test="studentInfoReq.signDateStart != null and studentInfoReq.signDateStart != ''">
+            and sign_date &gt; #{studentInfoReq.signDateStart}
+        </if>
+        <if test="studentInfoReq.signDateEnd != null and studentInfoReq.signDateEnd != ''">
+            and sign_date &lt;= #{studentInfoReq.signDateEnd}
+        </if>
+        <if test="studentInfoReq.studentStatus != null">
+            and student_status = #{studentInfoReq.studentStatus}
+        </if>
+        <if test="studentInfoReq.processStatus != null">
+            and status = #{studentInfoReq.processStatus}
+        </if>
+        <if test="studentInfoReq.managerFlag">
+            and (branch_id in ( select seriaNo from branch_info where branch_id in
+            <foreach collection="studentInfoReq.branchIds" item="branchId" open="(" close=")" separator=",">
+                #{branchId}
+            </foreach>
+            )
+            and nation_id in ( select id from country_info where country_bussid in
+            <foreach collection="studentInfoReq.countryIds" item="countryId" open="(" close=")" separator=",">
+                #{countryId}
+            </foreach>
+            ) or sales_consultant_no = #{studentInfoReq.consultorNo})
+        </if>
+        <if test="!studentInfoReq.managerFlag">
+            and sales_consultant_no = #{studentInfoReq.consultorNo}
+        </if>
+        order by sign_date desc
+        <if test="studentInfoReq.page != null and studentInfoReq.pageSize != null">
+            limit #{begin}, #{end}
+        </if>
+    </select>
+
+    <!--咨询顾问学生列表-->
+    <select id="getStudentByBranchAndCountryCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(*)
+        from student_info where delete_status = 0
+        <if test="studentInfoReq.studentNo != null and studentInfoReq.studentNo != ''">
+            and student_no = #{studentInfoReq.studentNo}
+        </if>
+        <if test="studentInfoReq.studentName != null and studentInfoReq.studentName != ''">
+            and student_name LIKE CONCAT('%',#{studentInfoReq.studentName},'%' )
+        </if>
+        <if test="studentInfoReq.signDateStart != null and studentInfoReq.signDateStart != ''">
+            and sign_date &gt; #{studentInfoReq.signDateStart}
+        </if>
+        <if test="studentInfoReq.signDateEnd != null and studentInfoReq.signDateEnd != ''">
+            and sign_date &lt; #{studentInfoReq.signDateEnd}
+        </if>
+        <if test="studentInfoReq.studentStatus != null">
+            and student_status = #{studentInfoReq.studentStatus}
+        </if>
+        <if test="studentInfoReq.processStatus != null">
+            and status = #{studentInfoReq.processStatus}
+        </if>
+        <if test="studentInfoReq.managerFlag">
+            and (branch_id in ( select seriaNo from branch_info where branch_id in
+            <foreach collection="studentInfoReq.branchIds" item="branchId" open="(" close=")" separator=",">
+                #{branchId}
+            </foreach>
+            )
+            and nation_id in ( select id from country_info where country_bussid in
+            <foreach collection="studentInfoReq.countryIds" item="countryId" open="(" close=")" separator=",">
+                #{countryId}
+            </foreach>
+            ) or sales_consultant_no = #{studentInfoReq.consultorNo})
+        </if>
+        <if test="!studentInfoReq.managerFlag">
+            and sales_consultant_no = #{studentInfoReq.consultorNo}
+        </if>
+    </select>
+    <select id="getIsSettleStudents" resultType="com.aoji.vo.StudentVO">
+        select student_no AS studentNo, student_name as studentName,branch_name as branchName  from student_info where delete_status = 0 and status != 90 and( copy_operator_no = #{oaid} or  copy_maker_no = #{oaid}) order by sign_date
+    </select>
+
+    <select id="getStudentInfoByOaid" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select id,student_no,student_name,status,nation_id,nation_name,sign_date,
+        CASE status
+        WHEN 10 THEN "未上传文书材料"
+        WHEN 20 THEN "未递交申请材料"
+        WHEN 30 THEN "未收到申请结果"
+        WHEN 40 THEN "未确认录取院校"
+        WHEN 50 THEN "未进行签证辅导"
+        WHEN 60 THEN "未递交签证申请"
+        WHEN 70 THEN "未收到签证结果"
+        WHEN 80 THEN "未填写获签信息"
+        WHEN 90 THEN "已结案"
+        WHEN 100 THEN "已退费"
+        WHEN 85 THEN "待结案"
+        END as statusName
+        from student_info where 1 = 1
+        <if test="oaid != null and oaid != ''">
+            and (copy_operator_no = #{oaid} OR copy_maker_no = #{oaid} OR copy_no = #{oaid} OR
+            visa_operator_no = #{oaid} OR copier_no = #{oaid} )
+        </if>
+        <if test="type != null and type != ''">
+            <if test="type == 1">
+                and status IN (10)
+
+            </if>
+            <if test="type == 2">
+                and status IN (20,30,40)
+
+            </if>
+            <if test="type == 3">
+                and status IN (50,60,70,80,85)
+
+            </if>
+            <if test="type == 4">
+                and status IN (90)
+
+            </if>
+        </if>
+        order by sign_date desc
+        <if test="startIndex != null and pageSize != null">
+            limit #{startIndex}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getDisabledList" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select id,student_no,student_name,pinyin,birthday,status,nation_name,contract_no,sales_consultant,visa_operator,remark
+        from student_info where delete_status = 1
+        <if test="studentNo != null and studentNo != ''">
+            and student_no LIKE CONCAT('%',#{studentNo},'%' )
+        </if>
+        <if test="studentName != null and studentName != ''">
+            and (student_name LIKE CONCAT('%',#{studentName},'%' ) or pinyin LIKE CONCAT('%',#{studentName},'%' ))
+        </if>
+    </select>
+    <select id="getDisabledListCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(1)
+        from student_info where delete_status = 1
+        <if test="studentNo != null and studentNo != ''">
+            and student_no LIKE CONCAT('%',#{studentNo},'%' )
+        </if>
+        <if test="studentName != null and studentName != ''">
+            and (student_name LIKE CONCAT('%',#{studentName},'%' ) or pinyin LIKE CONCAT('%',#{studentName},'%' ))
+        </if>
+    </select>
+    <select id="getStudentNoList" resultType="java.lang.String">
+        select student_no from student_info where delete_status = 0 and status = 90 and student_no in
+        <foreach collection="studentNoList" item="studentNo" open="(" close=")" separator=",">
+            #{studentNo}
+        </foreach>
+    </select>
+    <select id="getAuditStudentByAgentId" resultType="com.aoji.model.StudentInfo">
+        SELECT
+        id AS id,
+        student_no AS studentNo,
+        student_name AS studentName,
+        contract_no AS contractNo,
+        contract_type AS contractType,
+        branch_id AS branchId,
+        branch_name AS branchName,
+        nation_id AS nationId,
+        nation_name AS nationName,
+        birthday AS birthday,
+        pinyin as pinyin,
+        sign_date as signDate,
+        `status` as status,
+        agent_id as agentId,
+        agent_name as agentName,
+        copy_operator_no as copyOperatorNo,
+        copy_operator as copyOperator,
+        sales_consultant as salesConsultant,
+        sales_consultant_no as salesConsultantNo
+
+        FROM
+        student_info
+        WHERE
+        agent_id IS NOT NULL
+        AND delete_status = 0
+        <if test="studentInfo.studentNo != null and studentInfo.studentNo !=''">
+            AND student_no = #{studentInfo.studentNo}
+        </if>
+        <if test="studentInfo.studentName != null and studentInfo.studentName !=''">
+            AND (student_name LIKE CONCAT('%',#{studentInfo.studentName},'%' ) OR pinyin Like
+            CONCAT('%',#{studentInfo.studentName},'%' ))
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '20'">
+            AND status IN (10,20)
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '30'">
+            AND status IN (30)
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '60'">
+            AND status IN (40,50,60)
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '70'">
+            AND status IN (70,80)
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '85'">
+            AND status = 85
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '90'">
+            AND status = 90
+        </if>
+        <if test="studentInfo.status != null and studentInfo.status !='' and studentInfo.status == '100'">
+            AND status =100
+        </if>
+        <if test="studentInfo.nationId != null and studentInfo.nationId !=''">
+            AND nation_id = #{studentInfo.nationId}
+        </if>
+        <if test="studentInfo.copyOperator != null and studentInfo.copyOperator !=''">
+            AND copy_operator = #{studentInfo.copyOperator}
+        </if>
+        <if test="studentInfo.visaSendDateStart != null and studentInfo.visaSendDateStart !=''">
+            AND sign_date &gt;= DATE_FORMAT(#{studentInfo.visaSendDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.visaSendDateEnd != null and studentInfo.visaSendDateEnd !=''">
+            AND sign_date &lt;= DATE_FORMAT(#{studentInfo.visaSendDateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="studentInfo.agentName != null and studentInfo.agentName !=''">
+            AND  agent_name LIKE CONCAT('%',#{studentInfo.agentName},'%' )
+        </if>
+        <if test="channelStatus == true">
+            and agent_id = #{agentId}
+        </if>
+        order by sign_date desc
+    </select>
+
+    <select id="getFirstBonusList" resultMap="BaseResultMap" parameterType="java.lang.String">
+        SELECT si.student_no,si.student_name,si.copy_operator,(select ssr.update_time from student_status_record ssr where si.student_no = ssr.student_no and ssr.status_code = 30 and ssr.delete_status = 0)  AS update_time FROM
+        student_info si
+        where si.contract_type IN (1,2) AND si.status >= 30 and si.first_bonus_status != 2 AND si.create_time>='2018-05-07' AND si.delete_status = 0 AND si.copy_operator_no = #{oaid}
+    </select>
+
+    <select id="getToAuditFirstBonusList" resultMap="BaseResultMap" parameterType="java.lang.String">
+SELECT si.id,si.student_no,si.student_name,si.copy_operator,(select ssr.update_time from student_status_record ssr where si.student_no = ssr.student_no and ssr.status_code = 30 and ssr.delete_status = 0)  AS update_time FROM
+        student_info si
+        where si.contract_type IN (1,2) AND si.status >= 30 and si.first_bonus_status != 2 AND si.create_time>='2018-05-07' AND si.delete_status = 0
+        <if test="studentInfo.copyOperator != null and studentInfo.copyOperator !=''">
+            AND copy_operator = #{studentInfo.copyOperator}
+        </if>
+    AND si.nation_id IN
+(
+SELECT id FROM country_info WHERE country_group IN
+(
+SELECT nation FROM user_group WHERE id IN
+(
+SELECT group_id FROM user_group_relation WHERE oaid = #{oaid} AND delete_status = 0
+) AND delete_status = 0
+)
+)
+    </select>
+
+    <select id="getIMStudentSearchData" parameterType="java.util.List" resultType="com.aoji.model.StudentInfo">
+        select student_no as studentNo, student_name as studentName from student_info where delete_status = 0 and student_no in
+        <foreach collection="imStudentSearchVOS" item="student" separator="," open="(" close=")">
+            #{student.student_no}
+        </foreach>
+    </select>
+</mapper>

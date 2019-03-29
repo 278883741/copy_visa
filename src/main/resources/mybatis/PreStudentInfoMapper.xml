@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.PreStudentInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.PreStudentInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+    <result column="contract_type" jdbcType="INTEGER" property="contractType" />
+    <result column="branch_id" jdbcType="INTEGER" property="branchId" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="old_nation_id" jdbcType="INTEGER" property="oldNationId" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate" />
+    <result column="headmaster_name" jdbcType="VARCHAR" property="headmasterName" />
+    <result column="headmaster_no" jdbcType="VARCHAR" property="headmasterNo" />
+    <result column="usa_status" jdbcType="BIT" property="usaStatus" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="channel_status" jdbcType="INTEGER" property="channelStatus" />
+    <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant" />
+    <result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo" />
+    <result column="confeeid" jdbcType="VARCHAR" property="confeeid" />
+  </resultMap>
+  <update id="updatePreStudentInfoByStudentNo">
+    update pre_student_info set headmaster_name = #{preStudentInfo.headmasterName},headmaster_no = #{preStudentInfo.headmasterNo},operator_no=#{preStudentInfo.operatorNo},operator_name = #{preStudentInfo.operatorName},is_allot = 1 where student_no = #{preStudentInfo.studentNo}
+
+  </update>
+  <update id="updateIsTransferByStudentNo">
+    update pre_student_info set is_transfer = 1 where student_no = #{studentNo}
+  </update>
+  <select id="selectPreStudentInfo" resultType="com.aoji.model.PreStudentInfo">
+      select student_no as studentNo,student_name as studentName, contract_no as contractNo,contract_type as contractType,branch_id as branchId,branch_name as branchName,create_time as createTime,update_time as updateTIme,delete_status as deleteStatus,operator_no as operatorNo,
+      nation_id as nationId,old_nation_id as oldNationId,nation_name as nationName,birthday,pinyin,sign_date as signDate,headmaster_name as headmasterName,headmaster_no as headmasterNo,
+      usa_status as usaStatus,status,channel_status as channelStatus,sales_consultant as salesConsultant,sales_consultant_no as salesConsultantNo,confeeid,is_transfer as isTransfer, is_allot as isAllot,content from pre_student_info where 1=1
+      <if test="preStudentInfo.studentNo != null and preStudentInfo.studentNo !=''">AND student_no =
+        #{preStudentInfo.studentNo}
+      </if>
+      <if test="preStudentInfo.studentName != null and preStudentInfo.studentName !=''">AND (student_name LIKE
+        CONCAT('%',#{preStudentInfo.studentName},'%' ) OR pinyin Like CONCAT('%',#{preStudentInfo.studentName},'%' ))
+      </if>
+      <if test="preStudentInfo.isAllot ==1">
+          and is_allot = 1
+      </if>
+      <if test="preStudentInfo.isAllot ==2">
+          and is_allot = 0
+      </if>
+      <if test="preStudentInfo.isTransfer == 1">
+          and is_transfer = 1
+      </if>
+      <if test="preStudentInfo.isTransfer == 2">
+          and is_transfer = 0
+      </if>
+      and delete_status = 0
+    <choose>
+      <when test="roleName != null and roleName !=''">
+
+      </when>
+      <otherwise>
+        and headmaster_no = #{preStudentInfo.headmasterNo}
+      </otherwise>
+    </choose>
+      order by sign_date desc
+    </select>
+  <select id="getAllotTeacher" resultType="com.aoji.model.SysUser">
+    select sysUser.oaid as oaid,sysUser.username as username from sys_user sysUser,sys_user_role sysUserRole where sysUser.oaid = sysUserRole.oaid and sysUserRole.role_id = '43' and sysUserRole.delete_status = 0
+  </select>
+  <select id="getStudentInfo" resultType="com.aoji.vo.StudentInfoVo">
+      select
+      id                   id,
+      student_no           studentNo,
+      student_name         studentName,
+      contract_no          contractNo,
+      branch_id            branchId,
+      branch_name          branchName,
+      create_time          createTime,
+      update_time          updateTime,
+      delete_status        deleteStatus,
+      operator_no          operatorNo,
+      nation_id            nationId,
+      nation_name          nationName,
+      birthday             birthday,
+      sign_date            signDate,
+      status               status,
+      first_bonus_status   firstBonusStatus,
+      finally_bonus_status finallyBonusStatus,
+      copy_operator        copyOperator,
+      copy_operator_no     copyOperatorNo,
+      copy_maker_no        copyMakerNo,
+      copy_maker           copyMaker,
+      student_status       studentStatus,
+      usa_status           usaStatus,
+      sales_consultant     salesConsultant,
+      sales_consultant_no  salesConsultantNo,
+      channel_status       channelStatus,
+      pinyin               pinyin,
+      birthday             birthday,
+      confeeid            confeeid
+      from student_info  where student_no in (152552,152554)
+  </select>
+  <select id="getOldNationId" resultType="java.lang.Integer">
+    select country_bussid from country_info where country_name = #{nationName}
+  </select>
+</mapper>

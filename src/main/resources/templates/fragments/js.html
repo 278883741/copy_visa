@@ -1,0 +1,74 @@
+<div th:fragment="js">
+	<!-- basic scripts -->
+
+	<!--[if !IE]> -->
+
+	<script type="text/javascript" th:src="@{/assets/js/jquery-2.0.3.min.js}"></script>
+
+	<!-- <![endif]-->
+
+	<!--[if IE]>
+	<script type="text/javascript" th:src="@{/assets/js/jquery-1.10.2.min.js}"></script>
+	<![endif]-->
+
+	<!--[if !IE]> -->
+
+	<!--<script type="text/javascript">-->
+	<!--window.jQuery || document.write("<script src='assets/js/jquery-2.0.3.min.js'>"+"<"+"/script>");-->
+	<!--</script>-->
+
+	<!-- <![endif]-->
+
+	<!--[if IE]><![endif]-->
+	<script type="text/javascript" th:src="@{/assets/js/jquery-1.10.2.min.js}"></script>
+
+
+	<script type="text/javascript" th:src="@{/assets/js/jquery.mobile.custom.min.js}"></script>
+	<script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+	<script type="text/javascript" th:src="@{/assets/js/typeahead-bs2.min.js}"></script>
+
+	<!-- ace scripts -->
+
+	<script type="text/javascript" th:src="@{/assets/js/ace-elements.min.js}"></script>
+	<script type="text/javascript" th:src="@{/assets/js/ace.min.js}"></script>
+
+	<script type="text/javascript">
+        <!--
+        try {
+            ace.settings.check('main-container', 'fixed')
+        } catch (e) {
+        }
+		//左侧菜单箭头样式
+		$(function() {
+			$("li a").each(function() {
+				var href = $(this).attr("href");
+				if (window.location.pathname.indexOf(href.replace(/\?.*/,'')) != -1) {
+					$(this).parents("ul").parent("li").addClass("active");
+					$(this).parent("li").addClass("active");
+				}
+			});
+
+
+
+
+            $('[data-rel="tooltip"]').tooltip({
+                placement : tooltip_placement
+            });
+            function tooltip_placement(context, source) {
+                var $source = $(source);
+                var $parent = $source.closest('table')
+                var off1 = $parent.offset();
+                var w1 = $parent.width();
+
+                var off2 = $source.offset();
+                var w2 = $source.width();
+
+                if (parseInt(off2.left) < parseInt(off1.left)
+                    + parseInt(w1 / 2))
+                    return 'right';
+                return 'left';
+            }
+		});
+      -->
+	</script>
+</div>

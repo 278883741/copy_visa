@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.PlanCollegeInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.PlanCollegeInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="college_no" jdbcType="INTEGER" property="collegeNo" />
+    <result column="educationLevel" jdbcType="INTEGER" property="educationLevel" />
+    <result column="college_type" jdbcType="INTEGER" property="collegeType" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="major_id" jdbcType="INTEGER" property="majorId" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="school_area" jdbcType="VARCHAR" property="schoolArea" />
+    <result column="school_length" jdbcType="VARCHAR" property="schoolLength" />
+    <result column="major_detail" jdbcType="VARCHAR" property="majorDetail" />
+    <result column="major_url" jdbcType="VARCHAR" property="majorUrl" />
+    <result column="apply_deadline" jdbcType="TIMESTAMP" property="applyDeadline" />
+    <result column="apply_deadline_remark" jdbcType="VARCHAR" property="applyDeadlineRemark" />
+    <result column="course_start_time" jdbcType="TIMESTAMP" property="courseStartTime" />
+    <result column="plan_comment" jdbcType="VARCHAR" property="planComment" />
+    <result column="reduce_credit_status" jdbcType="BIT" property="reduceCreditStatus" />
+    <result column="audit_status" jdbcType="INTEGER" property="auditStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="plan_id" jdbcType="INTEGER" property="planId" />
+    <result column="plan_no" jdbcType="VARCHAR" property="planNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="agency_no" jdbcType="INTEGER" property="agencyNo" />
+    <result column="agency_name" jdbcType="VARCHAR" property="agencyName" />
+    <result column="college_country_id" jdbcType="INTEGER" property="collegeCountryId" />
+    <result column="course_remark" jdbcType="INTEGER" property="courseRemark" />
+    <result column="confirm_file" jdbcType="VARCHAR" property="confirmFile" />
+    <result column="xx_type" jdbcType="INTEGER" property="xxType" />
+  </resultMap>
+  <resultMap id="PlanCollegeInfoVOMap" type="com.aoji.vo.PlanCollegeInfoVO" extends="BaseResultMap">
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="nation" jdbcType="INTEGER" property="nation" />
+    <result column="apply_type" jdbcType="INTEGER" property="applyType" />
+    <result column="agency" jdbcType="VARCHAR" property="agency" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant" />
+    <result column="connector" jdbcType="VARCHAR" property="connector" />
+    <result column="connector_name" jdbcType="VARCHAR" property="connectorName" />
+    <result column="add_status" jdbcType="BIT" property="addStatus" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="usa_status" jdbcType="INTEGER" property="usaStatus" />
+    <result column="student_confirm_status" jdbcType="INTEGER" property="studentConfirmStatus" />
+    <result column="copy_operator_no" jdbcType="VARCHAR" property="copyOperatorNo" />
+    <result column="nationName" jdbcType="VARCHAR" property="nationName" />
+    <result column="collegeCountryName" jdbcType="VARCHAR" property="collegeCountryName" />
+    <!--<result column="sales_consultant_no" jdbcType="VARCHAR" property="salesConsultantNo" />-->
+    <!--<result column="planning_consultant_no" jdbcType="VARCHAR" property="planningConsultantNo" />-->
+    <!--<result column="plan_operator_no" jdbcType="VARCHAR" property="planOperatorNo" />-->
+  </resultMap>
+
+  <resultMap id="PlanCollegeInfoMap" type="com.aoji.model.res.PlanCollege" extends="BaseResultMap">
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="nation" jdbcType="INTEGER" property="nation" />
+    <result column="apply_type" jdbcType="INTEGER" property="applyType" />
+    <!--<result column="agency" jdbcType="VARCHAR" property="agency" />-->
+    <result column="add_status" jdbcType="BIT" property="addStatus" />
+    <result column="planId" jdbcType="INTEGER" property="planId" />
+    <result column="collegeCountryId" jdbcType="INTEGER" property="collegeCountryId" />
+  </resultMap>
+
+  <!--作废定校方案-->
+  <update id="toVoidPlanCollageByPlanCollageId">
+    <!--文签接受该定校方案-->
+    <if test="auditStatus==3" >
+    UPDATE plan_college_info pci, apply_info ai  SET ai.delete_status =1 ,pci.delete_status =1 where pci.id = #{planCollageId} and ai.plan_college_id=pci.id and pci.audit_status =3
+    </if>
+    <!--审核状态不包括(文签接受该定校方案)之外的状态-->
+    <if test="auditStatus !=3">
+      UPDATE plan_college_info SET delete_status =1 where id = #{planCollageId}
+    </if>
+  </update>
+  <!--查询定校方案信息-->
+  <select id="getPlanCollegeInfo" resultMap="PlanCollegeInfoVOMap" parameterType="com.aoji.vo.PlanCollegeInfoVO">
+    select * from
+    (
+      select pi.student_no, pi.nation, pi.agency, pi.apply_type, pci.*, si.student_name, si.copy_operator_no, si.branch_name, si.sales_consultant,si.nation_id,si.usa_status
+      from
+      (
+        select student_no, student_name, branch_name, copy_operator_no, sales_consultant,sales_consultant_no,planning_consultant_no,nation_id,usa_status from student_info where delete_status = 0
+        <if test="studentName != null">
+          and student_name = #{studentName}
+        </if>
+
+        <if test="planRole == '规划顾问' or planRole == '规划经理'">
+          and nation_id = 4  and usa_status = 1
+        </if>
+
+        <if test="planRole == '规划顾问'">
+          and planning_consultant_no = #{currUserNo}
+        </if>
+
+        <if test="planRole == ''">
+        and (copy_operator_no = #{copyOperatorNo} or copier_no = #{copyOperatorNo})
+        </if>
+      ) si,
+      (
+        select id, student_no, nation, agency, apply_type from plan_info where delete_status = 0
+        <if test="studentNo != null">
+          and student_no = #{studentNo}
+        </if>
+      ) pi,
+      (
+        select id, plan_id, college_no, college_name, college_type, major_name, major_id, course_name, course_id,
+        course_remark, school_area, school_length, major_detail, major_url, apply_deadline, course_start_time,
+        plan_comment, plan_no, reduce_credit_status, confirm_file, operator_no, operator_name, create_time, audit_status, student_confirm_status,
+        agency_no, agency_name, educationLevel, college_country_id, update_time, apply_deadline_remark
+        from plan_college_info where delete_status = 0 and audit_status not in (0, 2)
+
+        <!--<if test="planRole == '规划经理'">-->
+          <!--and operator_no in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)-->
+        <!--</if>-->
+        <if test="planRole == '规划顾问'">
+          and operator_no not in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)
+        </if>
+
+    <if test="auditStatus != null">
+          and audit_status = #{auditStatus}
+        </if>
+        <if test="id != null">
+          and id = #{id}
+        </if>
+      ) pci
+      where pi.id = pci.plan_id and si.student_no = pi.student_no) x
+      <if test="hasConnector == '-1'">
+      left join
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null) ai on x.id = ai.plan_college_id
+      </if>
+      <if test="hasConnector == 1">
+        ,
+        (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and connector is not null and connector != '') ai where x.id = ai.plan_college_id
+      </if>
+      <if test="hasConnector == 0">
+        ,
+        (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and (connector is null or connector = '')) ai where x.id = ai.plan_college_id
+      </if>
+    ORDER BY x.update_time DESC
+  </select>
+
+  <select id="getPlanCollegeInfoCount" resultType="java.lang.Integer" parameterType="com.aoji.vo.PlanCollegeInfoVO">
+    select count(*) from
+    (
+      select pi.student_no, pi.nation, pi.agency, pi.apply_type, pci.*, si.student_name, si.branch_name, si.sales_consultant
+      from
+      (
+        select student_no, student_name, branch_name, sales_consultant,sales_consultant_no,planning_consultant_no from student_info where delete_status = 0
+        <if test="studentName != null">
+          and student_name = #{studentName}
+        </if>
+
+        <if test="planRole == '规划顾问' or planRole == '规划经理'">
+          and nation_id = 4  and usa_status = 1
+        </if>
+
+        <if test="planRole == '规划顾问'">
+          and planning_consultant_no = #{currUserNo}
+        </if>
+
+        <if test="planRole == ''">
+          and (copy_operator_no = #{copyOperatorNo} or copier_no = #{copyOperatorNo})
+        </if>
+      ) si,
+      (
+        select id, student_no, nation, agency, apply_type from plan_info where delete_status = 0
+        <if test="studentNo != null">
+          and student_no = #{studentNo}
+        </if>
+      ) pi,
+      (
+        select id, plan_id, college_no, college_name, college_type, major_name, course_name, course_id,
+        course_remark, school_area, school_length, major_detail, major_url, apply_deadline, course_start_time,
+        plan_comment, plan_no, reduce_credit_status, confirm_file, operator_no, operator_name, create_time, audit_status
+        from plan_college_info where delete_status = 0 and audit_status not in (0, 2)
+
+        <!--<if test="planRole == '规划经理'">-->
+          <!--and operator_no in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)-->
+        <!--</if>-->
+        <if test="planRole == '规划顾问'">
+          and operator_no not in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)
+        </if>
+
+    <if test="auditStatus != null">
+          and audit_status = #{auditStatus}
+        </if>
+        <if test="id != null">
+          and id = #{id}
+        </if>
+      ) pci
+    where pi.id = pci.plan_id and si.student_no = pi.student_no) x
+    <if test="hasConnector == '-1'">
+      left join
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null) ai on x.id = ai.plan_college_id
+    </if>
+    <if test="hasConnector == 1">
+      ,
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and connector is not null and connector != '') ai where x.id = ai.plan_college_id
+    </if>
+    <if test="hasConnector == 0">
+      ,
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and (connector is null or connector = '')) ai where x.id = ai.plan_college_id
+    </if>
+  </select>
+
+  <select id="getPlanCollegeCountByWorktable" resultType="java.lang.Integer" parameterType="com.aoji.vo.PlanCollegeInfoVO">
+    select count(*) from
+    (
+    select pi.student_no, pi.nation, pi.agency, pi.apply_type, pci.*, si.student_name, si.branch_name, si.sales_consultant
+    from
+    (
+    select student_no, student_name, status, branch_name, sales_consultant,sales_consultant_no,planning_consultant_no from student_info where delete_status = 0 AND status != 90
+    <if test="studentName != null">
+      and student_name = #{studentName}
+    </if>
+
+    <if test="planRole == '规划顾问' or planRole == '规划经理'">
+      and nation_id = 4  and usa_status = 1
+    </if>
+
+    <if test="planRole == '规划顾问'">
+      and planning_consultant_no = #{currUserNo}
+    </if>
+
+    <if test="planRole == ''">
+      and (copy_operator_no = #{copyOperatorNo} or copier_no = #{copyOperatorNo})
+    </if>
+    ) si,
+    (
+    select id, student_no, nation, agency, apply_type from plan_info where delete_status = 0
+    <if test="studentNo != null">
+      and student_no = #{studentNo}
+    </if>
+    ) pi,
+    (
+    select id, plan_id, college_no, college_name, college_type, major_name, course_name, course_id,
+    course_remark, school_area, school_length, major_detail, major_url, apply_deadline, course_start_time,
+    plan_comment, plan_no, reduce_credit_status, confirm_file, operator_no, operator_name, create_time, audit_status
+    from plan_college_info where delete_status = 0 and audit_status not in (0, 2)
+
+    <!--<if test="planRole == '规划经理'">-->
+    <!--and operator_no in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)-->
+    <!--</if>-->
+    <if test="planRole == '规划顾问'">
+      and operator_no not in (SELECT oaid from sys_user_role where role_id = (SELECT id from sys_role where role_name = '规划顾问' and delete_status = 0) and delete_status = 0)
+    </if>
+
+    <if test="auditStatus != null">
+      and audit_status = #{auditStatus}
+    </if>
+    <if test="id != null">
+      and id = #{id}
+    </if>
+    ) pci
+    where pi.id = pci.plan_id and si.student_no = pi.student_no) x
+    <if test="hasConnector == '-1'">
+      left join
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null) ai on x.id = ai.plan_college_id
+    </if>
+    <if test="hasConnector == 1">
+      ,
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and connector is not null and connector != '') ai where x.id = ai.plan_college_id
+    </if>
+    <if test="hasConnector == 0">
+      ,
+      (select plan_college_id, connector, connector_name from apply_info where delete_status = 0 and plan_college_id is not null and (connector is null or connector = '')) ai where x.id = ai.plan_college_id
+    </if>
+  </select>
+
+  <select id="calibrationSchemeList" resultType="map">
+    SELECT
+    pci.id,
+    pci.plan_id as planId,
+    pci.student_confirm_status,
+    si.student_no,
+    si.student_name,
+    si.nation_id,
+    ci.country_name,
+    si.branch_name,
+    pci.college_name,
+    pci.major_name,
+    si.sales_consultant,
+    si.copy_operator,
+    pci.audit_status,
+    si.pinyin,
+    si.contract_type,
+    si.sign_date,
+    pci.course_start_time,
+    pci.apply_deadline,
+    if(pci.apply_deadline_remark is null, '', pci.apply_deadline_remark) apply_deadline_remark,
+    pcr.create_time,
+    pi.apply_type,
+    si.usa_status,
+    pci.student_confirm_status as studentConfirmStatus
+    FROM
+    plan_info pi
+    LEFT JOIN plan_college_info pci ON pi.id = pci.plan_id
+    LEFT JOIN student_info si ON pi.student_no = si.student_no
+    LEFT JOIN  (
+    SELECT
+    max(create_time) AS create_time,
+    plan_college_id
+    FROM
+    plan_college_record
+    WHERE
+    delete_status = 0
+    AND type = 5
+    AND result = 1
+    AND create_time IS NOT NULL
+    GROUP BY
+    plan_college_id
+    ) pcr ON pci.id = pcr.plan_college_id,
+    country_info ci
+    WHERE
+    ci.id = si.nation_id and pci.delete_status=FALSE
+    <if test="arrayId !=null ">
+    and si.nation_id in
+    <foreach collection="arrayId" item="dramaId" open="(" close=")" separator=",">
+      #{dramaId}
+    </foreach>
+    </if>
+    <if test="calibrationSchemeVo.studentNo != null and calibrationSchemeVo.studentNo!=''">
+      and si.student_no = #{calibrationSchemeVo.studentNo}
+    </if>
+    <if test="calibrationSchemeVo.studentName != null and calibrationSchemeVo.studentName!=''">
+      and si.student_name  LIKE CONCAT('%',#{calibrationSchemeVo.studentName},'%')
+    </if>
+    <if test="calibrationSchemeVo.pinyin != null and calibrationSchemeVo.pinyin!=''">
+      and si.pinyin LIKE CONCAT('%',#{calibrationSchemeVo.pinyin},'%')
+    </if>
+    <if test="calibrationSchemeVo.auditStatus != null and calibrationSchemeVo.auditStatus!=''">
+      and pci.audit_status =#{calibrationSchemeVo.auditStatus}
+    </if>
+    <if test="calibrationSchemeVo.cid != null and calibrationSchemeVo.cid!=''">
+      and si.nation_id =#{calibrationSchemeVo.cid}
+    </if>
+    <if test="calibrationSchemeVo.copyOperator != null and calibrationSchemeVo.copyOperator!=''">
+      and si.copy_operator LIKE CONCAT('%',#{calibrationSchemeVo.copyOperator},'%')
+    </if>
+    ORDER BY
+    pcr.create_time DESC
+  </select>
+
+  <!--文签查看定校信息-->
+  <select id="queryPlanCollegeForVisa" resultMap="PlanCollegeInfoVOMap" parameterType="com.aoji.model.req.PlanCollegeCondition">
+    select *, (select country_name from country_info where id = college.college_country_id) as collegeCountryName from
+    (select id as planId, student_no,
+    (select country_name from country_info where id = nation) as nationName,
+    apply_type, agency, add_status from plan_info where delete_status = 0
+    <if test="studentNo != null">
+      and student_no = #{studentNo}
+    </if>
+    <if test="planId != null">
+      and id = #{planId}
+    </if>
+    ) plan,
+    (select * from plan_college_info where delete_status = 0
+    <if test="collegeId != null">
+      and id = #{collegeId}
+    </if>
+    ) college
+    where plan.planId = college.plan_id
+  </select>
+
+
+  <select id="queryPlanCollege" resultMap="PlanCollegeInfoMap" parameterType="com.aoji.model.req.PlanCollegeCondition">
+    select *, (select country_bussid from country_info where id = college.college_country_id) as collegeCountryId from
+    (select id as planId, student_no,
+    (select country_bussid from country_info where id = nation) as nation,
+    apply_type, agency, add_status from plan_info where delete_status = 0
+    <if test="studentNo != null">
+      and student_no = #{studentNo}
+    </if>
+    <if test="planId != null">
+      and id = #{planId}
+    </if>
+    ) plan,
+    (select * from plan_college_info where delete_status = 0
+    <if test="collegeId != null">
+      and id = #{collegeId}
+    </if>
+    ) college
+    where plan.planId = college.plan_id
+  </select>
+
+  <!--管理层查看-->
+  <select id="queryPlanCollegeForManager" resultMap="PlanCollegeInfoMap" parameterType="java.util.Map">
+    select plan.*, college.*, (select country_bussid from country_info where id = college.college_country_id) as collegeCountryId from
+    (select * from student_info where delete_status = 0
+        <if test="planCollegeQueryReq.branchIds != null">
+        and branch_id in ( select seriaNo from branch_info where branch_id in
+        <foreach collection="planCollegeQueryReq.branchIds" item="branchId" open="(" close=")" separator=",">
+          #{branchId}
+        </foreach>
+        )
+        </if>
+        <if test="planCollegeQueryReq.countryIds != null">
+        and nation_id in ( select id from country_info where country_bussid in
+        <foreach collection="planCollegeQueryReq.countryIds" item="countryId" open="(" close=")" separator=",">
+          #{countryId}
+        </foreach>
+        )
+        </if>
+    ) student,
+    (select id as planId, student_no,
+    (select country_bussid from country_info where id = nation) as nation,
+    apply_type, agency, add_status from plan_info where delete_status = 0
+    <if test="planCollegeQueryReq.studentNo != null">
+      and student_no = #{planCollegeQueryReq.studentNo}
+    </if>
+    ) plan,
+    (select * from plan_college_info where delete_status = 0
+    <if test="planCollegeQueryReq.operatorNo != null and planCollegeQueryReq.operatorNo != ''">
+      and operator_no = #{planCollegeQueryReq.operatorNo}
+    </if>
+    <if test="planCollegeQueryReq.auditStatus != null">
+      and audit_status = #{planCollegeQueryReq.auditStatus}
+    </if>
+    ) college
+    where plan.planId = college.plan_id and student.student_no = plan.student_no
+      order by college.create_time desc
+    <if test="planCollegeQueryReq.page != null and planCollegeQueryReq.pageSize != null">
+      limit #{begin}, #{end}
+    </if>
+  </select>
+
+  <select id="queryPlanCollegeForManagerCount" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(*) from
+    (select * from student_info where delete_status = 0
+    <if test="planCollegeQueryReq.branchIds != null">
+      and branch_id in ( select seriaNo from branch_info where branch_id in
+      <foreach collection="planCollegeQueryReq.branchIds" item="branchId" open="(" close=")" separator=",">
+        #{branchId}
+      </foreach>
+      )
+    </if>
+    <if test="planCollegeQueryReq.countryIds != null">
+      and nation_id in ( select id from country_info where country_bussid in
+      <foreach collection="planCollegeQueryReq.countryIds" item="countryId" open="(" close=")" separator=",">
+        #{countryId}
+      </foreach>
+      )
+    </if>
+    ) student,
+    (select id as planId, student_no,
+    (select country_bussid from country_info where id = nation) as nation,
+    apply_type, agency, add_status from plan_info where delete_status = 0
+    <if test="planCollegeQueryReq.studentNo != null">
+      and student_no = #{planCollegeQueryReq.studentNo}
+    </if>
+    ) plan,
+    (select * from plan_college_info where delete_status = 0
+    <if test="planCollegeQueryReq.operatorNo != null and planCollegeQueryReq.operatorNo != ''">
+      and operator_no = #{planCollegeQueryReq.operatorNo}
+    </if>
+    <if test="planCollegeQueryReq.auditStatus != null">
+      and audit_status = #{planCollegeQueryReq.auditStatus}
+    </if>
+    ) college
+    where plan.planId = college.plan_id and student.student_no = plan.student_no
+  </select>
+
+  <update id="updateApplyDeadlineById" parameterType="com.aoji.model.PlanCollegeInfo">
+    update plan_college_info set apply_deadline = #{applyDeadline} , apply_deadline_remark = #{applyDeadlineRemark} where id = #{id}
+  </update>
+</mapper>

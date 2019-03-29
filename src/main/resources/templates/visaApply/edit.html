@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/datepicker.css}" />
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div th:include="fragments/student_info::student_info" th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                <h3 class="header smaller lighter blue">签证申请信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" id="resDomain" th:value="${resDomain}"/>
+                    <input type="hidden" name="id" id="id" th:value="${visaApplyInfo!=null}? ${visaApplyInfo.id}"/>
+                    <input type="hidden" id="input_nation" th:value="${country != null}?${country}" style="display: none"/>
+                    <input type="hidden" id="input_studentNo" th:value="${studentInfo!=null}? ${studentInfo.studentNo}" name="studentNo"/>
+                    <input type="hidden" name = "applyAuditStatus" th:value="${visaApplyInfo!=applyAuditStatus}? ${visaApplyInfo.applyAuditStatus}"/>
+                    <input id ="input_attachment_original_visaApply" type="hidden"  th:value ="${visaApplyInfo!=null}? ${visaApplyInfo.paymentSlip}"/>
+                    <input id ="input_fileName_visaApply" name="paymentSlip" style="display: none" th:value="${visaApplyInfo!=null}? ${visaApplyInfo.paymentSlip}"/>
+                    <input type="text" id="input_nationStatus" th:value="${studentInfo.nationStatus}" style="display: none"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px;display: none;" id="div_studentNation" >
+                                    <label class="col-sm-3 control-label no-padding-right blue">学生留学国家：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="studentNation" style="width:190px;height:25px;" readonly="readonly">
+                                        <option th:each="item: ${doubleSignCountry}" th:attr="nationId=${item.nationId}" th:value="${item.id}" th:text="${item.nationName}" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.studentNation==item.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 签证方式：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="visaWay" style="width:190px;height:25px;">
+                                        <option value="1" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.visaWay==1}">电签</option>
+                                        <option value="2" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.visaWay==2}">普签</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 送件日期：</label>
+                                    <input name="sendDate" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           th:value="${visaApplyInfo.sendDate!=null}?  ${#dates.format(visaApplyInfo.sendDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">签证分类：</label>
+                                    <select  type="" class="col-sm-3 form-control input-sm" name="studentVisaStatus" style="width:190px;height:25px;">
+                                        <option value="1" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.studentVisaStatus==true}">学生签证</option>
+                                        <option value="0" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.studentVisaStatus==false}">非学生签证</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">签证类型：</label>
+                                    <select  type="" class="col-sm-3 form-control input-sm" name="visaType" style="width:190px;height:25px;">
+                                        <option th:each="item: ${VisaType}" th:value="${item.id}" th:text="${item.visaName}" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.visaType == item.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 创建日期：</label>
+                                    <input class="Wdate col-sm-3" style="width: 190px" readonly="readonly"
+                                           th:value="${visaApplyInfo!=null and visaApplyInfo.createTime != null}?  ${#dates.format(visaApplyInfo.createTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 操作人：</label>
+                                    <input class="col-sm-3" disabled="disabled" style="width: 190px" id="operatorNo" th:value="${visaApplyInfo!=null}? ${visaApplyInfo.operatorName}"/>
+                                </div>
+                                <div class="form-group" style="height:29px;display: none;" id="div_160">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> DS160编号：</label>
+                                    <input class="col-sm-2" name = "ds160No" th:value="${visaApplyInfo.ds160No}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">DS160安全问答答案：</label>
+                                    <input class="col-sm-2" name="ds160Answer" th:value="${visaApplyInfo.ds160Answer}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 签证申请审核状态：</label>
+                                    <select id = "select_auditStatus" type="" class="col-sm-3 form-control input-sm" style="width:190px;height:25px;" disabled="disabled">
+                                        <option value="1" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.applyAuditStatus==1}">签证申请已递交</option>
+                                        <option value="2" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.applyAuditStatus==2}">签证申请审核中</option>
+                                        <option value="3" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.applyAuditStatus==3}">签证申请审核已通过</option>
+                                        <option value="4" th:selected="${visaApplyInfo!=null}? ${visaApplyInfo.applyAuditStatus==4}">签证申请审核不通过</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 备注：</label>
+                                    <textarea name="visaComment" class="col-sm-2" th:text="${visaApplyInfo!=null}? ${visaApplyInfo.visaComment}"></textarea>
+                                </div>
+
+                                <div class="form-group" style="height:29px;display: none;" id="div_trial">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 审案员：</label>
+                                    <input class="col-sm-3" disabled="disabled" style="width: 190px" th:value="${visaApplyInfo!=null}? ${visaApplyInfo.checkName}"></input>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden"  id="input_hasResult" th:value="${hasResult!=null}? ${hasResult}"/>
+                </form>
+                <form method="post" action="/upload" id="form_file_visaApply" enctype="multipart/form-data" style="margin-top: 29px;">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right blue">支出凭单：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;" id="div_attachment_visaApply">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <span id = "offer_attachment_visaApply" style="display: none">
+                                                    <span id = "offerAttachment_show_visaApply" th:text="${visaApplyInfo!=null}? ${visaApplyInfo.paymentSlip}"></span>
+                                                    <span class="btn btn-sm btn-primary" style="left:9%" id = "offer_show_visaApply">预览</span>
+                                                    <!--<a id="a_download_visaApply" th:href="${visaApplyInfo!=null}? ${visaApplyInfo.paymentSlip}" download="文件下载" ><span class="btn btn-sm btn-primary" style="left:15%" id = "offer_upload_visaApply">下载</span></a>-->
+                                                </span>
+                                                <input name ="fileInput"  type="file"  id="id-input-file-visaApply"/>
+                                                <label>
+                                                    <input type="checkbox" name="file-format" class="ace" />
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                <input name="privateAccess" type="hidden" value="true"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" flag="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+                </form>
+                <br/><br/>
+
+                <!-- 签证申请结果 -->
+                <div id="div_visaResult_edit" style="display: none;">
+                    <h3 class="header smaller lighter blue">签证申请结果信息</h3>
+                    <div>
+                        <form method="post" id="edit_visaResult">
+                            <input type="hidden" th:value="${studentInfo!=null}? ${studentInfo.studentNo}" name="studentNo"/>
+
+                            <input type="hidden" name="id" th:value="${visaResultInfo!=null}? ${visaResultInfo.id}"/>
+
+                            <input id ="input_attachment_original" type="hidden"  th:value ="${visaResultInfo!=null}? ${visaResultInfo.attachment}"/>
+                            <input id ="input_fileName" name="attachment" style="display: none" th:value="${visaResultInfo!=null}? ${visaResultInfo.attachment}"/>
+
+                            <input type="hidden" id = "applyAuditStatus_result" th:value="${visaResultInfo!=null}? ${visaResultInfo.visaStatus}"/>
+                            <input type="hidden" name="visaStatus" th:value="${visaResultInfo!=null}? ${visaResultInfo.visaStatus}"/>
+                            <div  class="tab-pane fade in active">
+                                <div class="container">
+                                    <div class="form-horizontal">
+                                        <div class="form-group" style="height:29px">
+                                            <label class="col-sm-3 control-label no-padding-right blue">签证结果：</label>
+                                            <select id="select_visaResult" type="" class="col-sm-3 form-control input-sm" name="visaResult" style="width:190px;height:25px;">
+                                                <option value="1" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaResult==1}">获签</option>
+                                                <option value="0" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaResult==0}">拒签</option>
+                                                <option value="2" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaResult==2}">撤签</option>
+                                            </select>
+                                            <label  class="col-sm-3 control-label no-padding-right blue"> 签证结果审核状态：</label>
+                                            <select  type="" class="col-sm-3 form-control input-sm" style="width:190px;height:25px;" disabled="disabled">
+                                                <option value="1" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaStatus==1}">签证结果已递交</option>
+                                                <option value="2" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaStatus==2}">签证结果审核中</option>
+                                                <option value="3" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaStatus==3}">签证结果审核已通过</option>
+                                                <option value="4" th:selected="${visaResultInfo!=null}? ${visaResultInfo.visaStatus==4}">签证结果审核不通过</option>
+                                            </select>
+                                        </div>
+                                        <div id="div_resultIsTrue" class="form-group" style="height:29px;padding-left: 0px;display: none;">
+                                            <label class="col-sm-3 control-label no-padding-right blue">签证到期日：</label>
+                                            <input class="Wdate col-sm-3" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px"
+                                                   name="dueDate" required="required" th:value="${visaResultInfo!=null and visaResultInfo.dueDate!=null}?  ${#dates.format(visaResultInfo.dueDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                            <label class="col-sm-3 control-label no-padding-right blue">获得日期：</label>
+                                            <input class="Wdate col-sm-3" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px"
+                                                   name="resultTime" required="required" th:value="${visaResultInfo!=null and visaResultInfo.resultTime!=null}?  ${#dates.format(visaResultInfo.resultTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                        </div>
+                                        <div class="form-group" style="height:129px;display: none;" id="div_rejectReason">
+                                            <label class="col-sm-3 control-label no-padding-right blue" id="label_reason">备注：</label>
+                                            <textarea class="col-sm-3" rows="8" th:text="${visaResultInfo!=null}? ${visaResultInfo.rejectReason}" name="rejectReason"></textarea>
+                                        </div>
+                                        <div class="form-group" style="height:29px;margin-top: 30px;">
+                                            <label class="col-sm-3 control-label no-padding-right blue">护照号：</label>
+                                            <input class="col-sm-3" name="passportNo" th:value="${visaResultInfo!=null}? ${visaResultInfo.passportNo}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" style="margin-top: 29px;">
+                            <div  class="tab-pane fade in active">
+                                <div class="container">
+                                    <div class="form-horizontal">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right blue">签证结果附件：</label>
+                                            <div class="col-sm-6" style="padding-left: 0px;" id="div_attachment">
+                                                <div class="widget-header">
+                                                    <h4>文件上传</h4>
+                                                </div>
+                                                <div class="widget-body">
+                                                    <div class="widget-main">
+                                                        <span id = "offer_attachment" style="display: none">
+                                                            <span id = "offerAttachment_show" th:text="${visaResultInfo!=null}? ${visaResultInfo.attachment}"></span>
+                                                            <span class="btn btn-sm btn-primary" style="left:9%" id = "offer_show">预览</span>
+                                                            <!--<a id="a_download" th:href="${visaResultInfo!=null}? ${visaResultInfo.attachment}" download="文件下载" ><span class="btn btn-sm btn-primary" style="left:15%" id = "offer_upload">下载</span></a>-->
+                                                        </span>
+                                                        <input name ="fileInput"  type="file"  id="id-input-file-3"/>
+                                                        <label>
+                                                            <input type="checkbox" name="file-format" class="ace" />
+                                                        </label>
+                                                        <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" flag="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                                <button type="button" class="btn btn-primary" id="submits_visaResult">保存</button>
+                            </div>
+                            <div id="alert_visaResult" class="alert alert-success" style="display: none;" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <span id="alertText_visaResult"></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function(){
+            this.studentNo;
+            this.uploadComplete_visaApply;
+            this.uploadComplete;
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+                },
+                getQueryData:function(){
+                    this.studentNo = $("#input_studentNo").val();
+                    this.uploadComplete = true;
+                    this.uploadComplete_visaApply = true;
+                    this.nationId = $("#input_nation").val();
+                    this.nationStatus = $("#input_nationStatus").val();
+                },
+                handelQueryData:function(){
+
+                },
+                render:function(){
+                    var _self = this;
+                    if(_self.nationId == "40" || _self.nationId == "41")
+                        _self.nationId="4";
+                    if(_self.nationId == "4") {
+                        $("#div_160").show();
+                    }
+                    if(_self.nationId == "3" || _self.nationId == "5") {
+                        $("#div_trial").show();
+                    }
+                    var auditStatus = $("#select_auditStatus option:selected").val();
+                    if(auditStatus == "2" || auditStatus == "3"){
+                        $("select[name='visaWay']").attr("disabled","disabled");
+                        $("select[name='studentVisaStatus']").attr("disabled","disabled");
+                        $("select[name='visaType']").attr("disabled","disabled");
+                        $("input[name='sendDate']").attr("readonly","readonly");
+                        $("textarea[name='visaComment']").attr("readonly","readonly");
+                        $("#id-input-file-visaApply").attr("disabled", "disabled");
+                        $("#submits").hide();
+                    }
+                    var auditStatus_result = $("#applyAuditStatus_result").val();
+                    if(auditStatus_result == "2" || auditStatus_result == "3"){
+                        $("select[name='visaResult']").attr("disabled","disabled");
+                        $("input[name='dueDate']").attr("readonly","readonly");
+                        $("input[name='resultTime']").attr("readonly","readonly");
+                        $("textarea[name='rejectReason']").attr("readonly","readonly");
+                        $("#id-input-file-3").attr("disabled", "disabled");
+                        $("#submits_visaResult").hide();
+                        $("input[name='passportNo']").attr("readonly","readonly");
+                    }
+                    if($("#input_hasResult").val() == "1"){
+                        $("#div_visaResult_edit").show();
+                    }
+                    $('#form-field-select-4').addClass('tag-input-style');
+                    if($("#input_fileName").val().length > 0) {
+                        $("#div_file").attr("style", "height:270px");
+                        $("#offer_attachment").show();
+                        if ($("#input_fileName").val().length > 50)
+                            $("#offerAttachment_show").text($("#input_fileName").val().substring(0, 50) + "...");
+
+                    }
+                    $('#form-field-select-visaApply').addClass('tag-input-style');
+                    if($("#input_fileName_visaApply").val().length > 0) {
+                        $("#div_file_visaApply").attr("style", "height:270px");
+                        $("#offer_attachment_visaApply").show();
+                        if ($("#input_fileName_visaApply").val().length > 50)
+                            $("#offerAttachment_show_visaApply").text($("#input_fileName_visaApply").val().substring(0, 50) + "...");
+
+                    }
+
+                    if(_self.nationStatus == "1" || _self.nationStatus == "2" || _self.nationStatus == "3"){
+                        $("#div_studentNation").show();
+                    }
+                },
+                addEvent:function(){
+                    var _self = this;
+//                    $("select[name='studentNation']").change(function(){
+//                        $this = $(this);
+//                        var index = $this.children("option:selected").val();
+//                        _self.studentNation = index;
+//                        $("select[name='studentVisaStatus']").trigger("change");
+//                    });
+                    $("#submits").click(function () {
+                        if(!_self.uploadComplete_visaApply){
+                            layer.msg('正在上传中,请稍后保存!');
+                            return;
+                        }
+                        $(this).attr("disabled","disabled");
+                        if ($("input[name='sendDate']").val() == "") {
+                            layer.alert('请填写送件日期！', {icon: 0});
+                            $("#submits").removeAttr("disabled");
+                            return;
+                        }
+                        if($("#input_isAmerica").val() == "1") {
+                            if ($("input[name='ds160No']").val() == "") {
+                                layer.alert('请填写DS160编号！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                return;
+                            }
+                            if ($("input[name='ds160Answer']").val() == "") {
+                                layer.alert('请填写DS160安全问答答案！', {icon: 0});
+                                $("#submits").removeAttr("disabled");
+                                return;
+                            }
+                        }
+                        $.ajax({
+                            url: "/visaApply/save",
+                            type: "post",
+                            data: $("#edit").serialize(),
+                            success: function (data) {
+                                var data = JSON.parse(data);
+                                if(data.code == 0){
+                                    layer.confirm("该数据审批状态为审批中或审批通过,不允许修改",{
+                                        btn: ['确定'] //按钮
+                                    },function () {
+                                        window.location.reload();
+                                    });
+                                }
+                                else if (data.code == 1) {
+                                    layer.confirm('操作成功，是否跳转到列表页？', {
+                                        btn: ['确定','取消'] //按钮
+                                    }, function(){
+                                        location.href = '/visaApply?studentNo='+_self.studentNo;
+                                    }, function(){
+                                        $("#submits").removeAttr("disabled");
+                                        location.reload(true);
+                                    });
+                                }
+                                else {
+                                    $("#submits").removeAttr("disabled");
+                                    $('#alertText').text('操作失败');
+                                    $('#alert').attr('class','alert alert-danger').show();
+                                    setTimeout("$('#alert').hide()", 2000);
+                                    $("#myModal").modal("hide");
+                                }
+                            }
+                        });
+                    });
+                    $("#submits_visaResult").click(function () {
+                        if(!_self.uploadComplete){
+                            layer.msg('正在上传中,请稍后保存!');
+                            return;
+                        }
+                        $(this).attr("disabled","disabled");
+                        var visaResult = $("select[name = 'visaResult']").children("option:selected").val();
+                        if(visaResult == "-1"){
+                            layer.alert("请选择签证结果！");
+                            $("#submits_visaResult").removeAttr("disabled");
+                            return false;
+                        }
+                        if(visaResult == "1"){
+                            if($("input[name='dueDate_string']").val() ==""){
+                                layer.alert("请填写签证到期日！");
+                                $("#submits_visaResult").removeAttr("disabled");
+                                return false;
+                            }
+                            if($("input[name='resultTime']").val() == ""){
+                                layer.alert("请填写获得日期！");
+                                $("#submits_visaResult").removeAttr("disabled");
+                                return false;
+                            }
+                        }
+                        else if (visaResult == "0" || visaResult == "2") {
+                            if ($("textarea[name='rejectReason']").val() == "") {
+                                if (visaResult == "0") {
+                                    layer.alert("请填写拒签分析！");
+                                }
+                                else if(visaResult == "2"){
+                                    layer.alert("请填写撤签理由！");
+                                }
+                                $("#submits_visaResult").removeAttr("disabled");
+                                return false;
+                            }
+                        }
+                        $.ajax({
+                            url: "/visaResult/save",
+                            type: "post",
+                            data: $("#edit_visaResult").serialize(),
+                            success: function (data) {
+                                var data = JSON.parse(data);
+                                if (data.code == 0) {
+                                    layer.confirm("该数据审批状态为审批中或审批通过,不允许修改",{
+                                        btn: ['确定'] //按钮
+                                    },function () {
+                                        window.location.reload();
+                                    });
+                                } else if (data.code == 1) {
+                                    layer.confirm('操作成功，是否跳转到列表页？', {
+                                        btn: ['确定','取消'] //按钮
+                                    }, function(){
+                                        location.href = '/visaApply?studentNo='+_self.studentNo;
+                                    }, function(){
+                                        $("#submits").removeAttr("disabled");
+                                        location.reload(true);
+                                    });
+                                }
+                                else {
+                                    $("#submits_visaResult").removeAttr("disabled");
+                                    $('#alertText').text('操作失败');
+                                    $('#alert').attr('class','alert alert-danger').show();
+                                    setTimeout("$('#alert').hide()", 2000);
+                                    $("#myModal").modal("hide");
+                                }
+                            }
+                        });
+                    });
+                    $('#id-input-file-3').ace_file_input({
+                        style:'well',
+                        btn_choose:'Drop files here or click to choose',
+                        btn_change:null,
+                        no_icon:'icon-cloud-upload',
+                        droppable:true,
+                        thumbnail:'small',//large | fit
+                        before_change:function(files, dropped) {
+                            return true;
+                        },
+                        before_remove : function() {
+                            $("#input_fileName").val($("#input_attachment_original").val());
+                            $("#offerAttachment_show").val($("#input_attachment_original").val().substring(0,50)+"...");
+                            $("#a_download").attr("href",$("#input_attachment_original").val())
+                            console.log($("#input_fileName").val());
+                            return true;
+                        },
+                        preview_error : function(filename, error_code) {
+
+                        }
+                    }).on('change', function(){
+                        if (!checkUp(this)) {
+                            return false;
+                        }
+                        _self.uploadComplete = false;
+                        layer.msg('正在上传中...',{
+                            icon:16,
+                            shade:0.01
+                        });
+                        $("#form_file").ajaxSubmit(function(message) {
+                            _self.uploadComplete = true;
+                            var fileName = message.obj;
+                            console.log(fileName);
+                            var code = message.code;
+                            if(code == "1"){
+                                layer.msg("请上传正确的文件格式!")
+                            }else if(message.success){
+                                $("#input_fileName").val(fileName);
+                                $("#a_download").attr("href", $("#resDomain").val()+fileName)
+                                layer.msg("上传成功!");
+                            }
+                        });
+                    });
+                    $("#offer_show").click(function(){
+                        $.post("/getPrivateUrl",{"fileUrl":$("#input_fileName").val()},function (data,status) {
+                            window.open(data);
+                        });
+                    });
+
+                    $('#id-input-file-visaApply').ace_file_input({
+                        style:'well',
+                        btn_choose:'Drop files here or click to choose',
+                        btn_change:null,
+                        no_icon:'icon-cloud-upload',
+                        droppable:true,
+                        thumbnail:'small',//large | fit
+                        before_change:function(files, dropped) {
+                            return true;
+                        },
+                        before_remove : function() {
+                            $("#input_fileName_visaApply").val($("#input_attachment_original_visaApply").val());
+                            $("#offerAttachment_show_visaApply").val($("#input_attachment_original_visaApply").val().substring(0,50)+"...");
+                            $("#a_download_visaApply").attr("href",$("#input_attachment_original_visaApply").val())
+                            console.log($("#input_fileName_visaApply").val());
+                            return true;
+                        },
+                        preview_error : function(filename, error_code) {
+
+                        }
+                    }).on('change', function(){
+                        if (!checkUp(this)) {
+                            return false;
+                        }
+                        _self.uploadComplete_visaApply = false;
+                        layer.msg('正在上传中...',{
+                            icon:16,
+                            shade:0.01
+                        });
+                        $("#form_file_visaApply").ajaxSubmit(function(message) {
+                            _self.uploadComplete_visaApply = true;
+                            var fileName = message.obj;
+                            console.log(fileName);
+                            var code = message.code;
+                            if(code == "1"){
+                                layer.msg("请上传正确的文件格式!")
+                            }else if(message.success){
+                                $("#input_fileName_visaApply").val(fileName);
+                                $("#a_download_visaApply").attr("href", $("#resDomain").val()+fileName)
+                                layer.msg("上传成功!");
+                            }
+                        });
+                    });
+                    $("#offer_show_visaApply").click(function(){
+                        $.post("/getPrivateUrl",{"fileUrl":$("#input_fileName_visaApply").val()},function (data,status) {
+                            window.open(data);
+                        });
+                    });
+
+                    $("select[name='studentVisaStatus']").change(function () {
+                        $this = $(this);
+                        var studentVisaStatus = $this.children("option:selected").val();
+                        $.post("/visaApply/getVisaTypeListBy",{"studentVisaStatus":studentVisaStatus,"nation":_self.nationId},function(data,status){
+                            $("select[name='visaType']").empty();
+                            $.each(data,function(index,item){
+                                $("select[name='visaType']").append($("<option value=" + item.id + ">" + item.visaName + "</option>"));
+                            })
+                        })
+                    });
+
+                    $("#select_visaResult").change(function(){
+                        var selectValue = $("#select_visaResult").children("option:selected").val();
+                        if(selectValue == "1"){
+                            $("#div_resultIsTrue").show();
+                            $("#div_rejectReason").hide();
+                        }
+                        else if(selectValue == "0"){
+                            $("#div_resultIsTrue").hide();
+                            $("#div_rejectReason").show();
+                            $("#label_reason").text("拒签分析:");
+                        }
+                        else if(selectValue == "2"){
+                            $("#div_resultIsTrue").hide();
+                            $("#div_rejectReason").show();
+                            $("#label_reason").text("撤签理由:");
+                        }
+                    });
+                    $("select[name='visaResult']").trigger("change");
+
+                    $("button[flag='returnPage']").click(function(){
+                        window.location.href="/visaApply?studentNo="+_self.studentNo;
+                    });
+
+                    var visaStatus = $("#select_visaResult option:selected").val();
+                    $("#select_visaResult").trigger("change");
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+    -->
+</script>
+</body>
+</html>

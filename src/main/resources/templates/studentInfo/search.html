@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner" style="margin-left:10px;">
+
+        <div class="form-group" style="height:29px;margin-top:50px;">
+                <label class="col-sm-1 control-label no-padding-right blue">分支机构：</label>
+                <select class="col-sm-2 input-sm" id="selectBranchSearch"
+                        style="width:150px;height:27px;margin:5px 0;"
+                        data-placeholder="--请选择分支机构--">
+                    <option></option>
+                    <option th:each="branch:${branchInfoList}" th:value="${branch.seriano}"
+                            th:text="${branch.branchName}"></option>
+                </select>
+                <label class="col-sm-1 control-label no-padding-right blue">留学国家：</label>
+                <select class="col-sm-2 input-sm" id="selectNationSearch"
+                        style="width:150px;height:27px;margin:5px 0;"
+                        data-placeholder="--请选择留学国家--">
+                    <option></option>
+                    <option th:each="country:${countryInfoList}" th:value="${country.id}"
+                            th:text="${country.countryName}"></option>
+                </select>
+                <label class="col-sm-1 control-label no-padding-right blue">签约日期：</label>
+                <input id="dateStartSearch" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                       style="width: 160px;margin:5px 0;height:27px;"
+                       name="birthday_string" required="required"/>
+                --
+                <input id="dateEndSearch" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                       style="width: 160px;margin:5px 0;height:27px;"
+                       name="birthday_string" required="required"/>
+            </div>
+
+        <div class="form-group" style="height:29px;margin-top:30px;">
+            <label class="col-sm-1 control-label no-padding-right blue">文案员：</label>
+            <input class="col-sm-2 input-sm" id="copySearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+            <label class="col-sm-1 control-label no-padding-right blue">业务员：</label>
+            <input class="col-sm-2 input-sm" id="visaOperatorSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+            <label class="col-sm-1 control-label no-padding-right blue">文书员：</label>
+            <input class="col-sm-2 input-sm" id="copierSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+
+        </div>
+
+        <div class="form-group" style="height:29px;margin-top:30px;">
+            <label class="col-sm-1 control-label no-padding-right blue">咨询顾问：</label>
+            <input class="col-sm-2 input-sm" id="salesConsultantSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+            <label class="col-sm-1 control-label no-padding-right blue">文签顾问：</label>
+            <input class="col-sm-2 input-sm" id="copyOperatorSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+            <label class="col-sm-1 control-label no-padding-right blue">制作文案：</label>
+            <input class="col-sm-2 input-sm" id="copyMakerSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+        </div>
+
+        <div class="form-group" style="height:29px;margin-top:50px;">
+            <label class="col-sm-1 control-label no-padding-right blue">首次递签日期：</label>
+            <input id="visaSendDate_Start_child" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>
+            --
+            <input id="visaSendDate_End_child" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>
+        </div>
+        <!--<div class="form-group" style="height:29px;margin-top:50px;">-->
+            <!--<label class="col-sm-1 control-label no-padding-right blue">分配文签顾问日期：</label>-->
+            <!--<input id="visaOperatorDate_Start_child" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>-->
+            <!--&#45;&#45;-->
+            <!--<input id="visaOperatorDate_End_child" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>-->
+        <!--</div>-->
+        <div class="form-group" style="height:29px;margin-top:50px;">
+            <label class="col-sm-1 control-label no-padding-right blue">出生日期：</label>
+            <input id="birthdayStartSearch" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>
+            --
+            <input id="birthdayEndSearch" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 160px;margin:5px 0;height:27px;" required="required"/>
+        </div>
+        <div class="form-group" style="height:29px;margin-top:50px;">
+            <label class="col-sm-1 control-label no-padding-right blue">代理名称：</label>
+            <input class="col-sm-2 input-sm" id="agencyNameSearch" style="width: 150px;margin:5px 0;height:27px;" required="required"/>
+        </div>
+
+        <div class="form-group" style="height:29px;margin-top:50px;">
+        <label class="col-sm-1 control-label no-padding-right blue">是否注册小希：</label>
+        <select class="col-sm-2 input-sm" id="registerStatusSearch"
+                style="width:150px;height:27px;margin:5px 0;"
+                data-placeholder="--请选择注册状态--">
+            <option></option>
+            <option value="0">未注册</option>
+            <option value="1">已注册</option>
+        </select>
+        </div>
+        <br/>
+        <br/>
+        <button onclick="search()" class="btn btn-primary" style="float:right;margin-right: 20px;">查询</button>
+        <!--<button onclick="repeat()" class="btn btn-primary" style="float:right;margin-right: 20px;">重置</button>-->
+
+
+    </div>
+
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/student/studentList.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:inline="javascript">
+
+</script>
+</body>
+</html>

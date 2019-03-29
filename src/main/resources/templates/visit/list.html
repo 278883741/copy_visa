@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+
+<head th:include="fragments/head::header">
+    <script src="../../static/assets/js/date-time/moment.min.js"></script>
+</head>
+<style>
+    .error {
+        color: #F00
+    }
+    .layui-layer-tips{
+        word-break: break-all;
+    }
+
+/*用于回显的图片进行压缩显示*/
+    .imgTable img {
+        width:10%;height:auto;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li>学生列表</li>
+                    <li id="college" style="display: none;">院校申请列表</li>
+                    <li id="follow" style="display: none;">后续申请列表</li>
+                    <li>回访记录列表</li>
+                </ul>
+            </div>
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div th:include="fragments/student_info::student_info"
+                                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                                <h3 class="header smaller lighter blue">回访记录列表</h3>
+                                <div class="table-header" style="line-height:43px">
+                                    <input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                                    <form class="form-inline">
+                                        <shiro:hasPermission name="visit:edit">
+                                            <input type="hidden" id="input_hasPermission_visit_edit" value="1"/>
+                                        </shiro:hasPermission>
+                                        <shiro:hasPermission name="visit:detail">
+                                            <input type="hidden" id="input_hasPermission_visit_detail" value="1"/>
+                                        </shiro:hasPermission>
+                                        <div class="form-group">
+                                        </div>
+                                        <shiro:hasPermission name="visit:add">
+                                            <a data-toggle="modal" class="btn btn-info pull-right"
+                                               href="javascript:void(0)" id="a_addData">添加回访记录</a>
+                                        </shiro:hasPermission>
+                                        <a data-toggle="modal" id="addVisitRemark" href="javascript:void(0);" class="btn btn-info pull-right">添加备注</a>
+                                        <a data-toggle="modal" id="a_college" style="display: none;"
+                                           data-target="#myModal" href="javascript:void(0);"
+                                           class="btn btn-info pull-right">院校申请列表</a>
+                                        <a data-toggle="modal" id="a_follow" style="display: none;"
+                                           data-target="#myModal" href="javascript:void(0);"
+                                           class="btn btn-info pull-right">后续回访列表</a>
+                                        <a data-toggle="modal" id="a_studentList" data-target="#myModal"
+                                           href="javascript:void(0);" class="btn btn-info pull-right">学生列表</a>
+                                    </form>
+                                </div>
+                                <div class="table-responsive">
+                                    <h3 id="demo" class="header smaller lighter blue">文签顾问回访列表</h3>
+                                    <!--<div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>-->
+                                    <table id="sample-table-2" class="imgTable table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>回访内容</th>
+                                            <th>回访类型</th>
+                                            <th>发送方</th>
+                                            <th>操作人</th>
+                                            <th>操作时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <h3 class="header smaller lighter blue">文签顾问call center回访列表</h3>
+                                    <table id="call-center-record" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>回访时间</th>
+                                            <th>回访录音</th>
+                                            <th>回访备注</th>
+                                            <th>回访顾问</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <h3 id="remark_title" class="header smaller lighter blue">回访备注列表</h3>
+                                    <table id="sample-table-remark" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>备注内容</th>
+                                            <th>备注时间</th>
+                                            <th>备注人</th>
+                                            <th>提醒时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                <div id="div_counselorVisit" style="display: none;">
+                                    <!--咨询顾问回访-->
+                                    <h3 class="header smaller lighter blue">咨询顾问回访列表</h3>
+                                    <!-- <div class="table-header" style="line-height:43px">
+                                         <form class="form-inline">
+                                             <div class="form-group">
+                                             </div>
+                                         </form>
+                                     </div>-->
+                                    <div class="table-responsive">
+                                        <table id="sample-table-counselorVisit"
+                                               class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th >回访内容</th>
+                                                <th >回访人姓名</th>
+                                                <th >回访时间</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!--客服回访-->
+                                <div id="div_serviceVisit" style="display: none;">
+                                    <h3 class="header smaller lighter blue">客服回访列表</h3>
+                                    <!-- <div class="table-header" style="line-height:43px">
+                                         <form class="form-inline">
+                                             <div class="form-group">
+                                             </div>
+                                         </form>
+                                     </div>-->
+                                    <div class="table-responsive">
+                                        <table id="sample-table-serviceVisit"
+                                               class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                            <tr>
+                                                <th >回访内容</th>
+                                                <th >回访人姓名</th>
+                                                <th >回访时间</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<div class="tab-pane fade in active" id="visit_remark">
+    <div class="form-group" style="height:29px">
+        <label class="col-sm-2 control-label no-padding-right blue"> 提醒日期：</label>
+        <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px;height: 25px"
+               id="remindTime" name="remindTime" />
+    </div>
+    <div class="form-group" style="height:29px">
+        <label class="col-sm-2 control-label no-padding-right blue">回访备注：</label>
+        <textarea class="col-sm-2" style="width: 300px;height: 200px" name="remark" id="remark"></textarea>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/date-time/moment.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function ($) {
+        var pageHelper = (function () {
+            this.studentNo;
+            this.oTable1;
+            this.oTable_counselorVisit;
+            this.oTable_serviceVisit;
+            this.businessId;
+            this.visitCase;
+            this.toDetailPage = function (id) {
+                window.open("/visit/detailPage?id=" + id, target = "_self");
+            }
+            this.toEditPage = function (id, businessId) {
+                if (businessId == null || businessId == undefined)
+                    window.open("/visit/editPage?id=" + id, target = "_self");
+                else
+                    window.open("/visit/editPage?id=" + id + "&businessId=" + businessId, target = "_self");
+            }
+            this.editRemark = function(id) {
+                $("#visit_remark").show();
+
+                this.getRemark(id);
+
+                layer.open({
+                    type: 1,
+                    title: "提示",
+                    area: ['500px', '350px'],
+                    fixed: false, //不固定
+                    btn: ['确定', '取消'],
+                    content: $("#visit_remark"),
+
+                    btn1: function (index, layero) {
+                        var studentNo = $("#studentNo").val();
+                        var remark = $("#remark").val();
+                        var remindTime = $("#remindTime").val();
+                        $.ajax({
+                            url: "/visit/editRemark",
+                            type: "post",
+                            data:
+                                {
+                                    id: id,
+                                    studentNo: studentNo,
+                                    remindTime: remindTime,
+                                    remark: remark
+                                },
+                            success: function (data) {
+                                if (data != null) {
+                                    layer.msg("修改成功!", {time: 1000}, function () {
+                                        window.parent.location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                } else {
+                                    layer.msg("修改失败!", {time: 1000}, function () {
+                                        window.parent.location.reload();
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        parent.layer.close(index);
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            this.getRemark = function(id) {
+                if(id != null && id  != "" && id != undefined){
+                    $.ajax({
+                        url: "/visit/getRemark",
+                        type: "post",
+                        data:
+                            {
+                                id: id
+                            },
+                        success: function (data) {
+                            if (data != null) {
+                                var date = getTimeString(new Date(data.remindTime));
+
+                                $("#remindTime").val(date);
+                                $("#remark").val(data.remark);
+                            } else {
+                                $("#remindTime").val("0000-00-00 00:00:00");
+                                $("#remark").val("查询不到此条记录");
+                            }
+                        }
+                    });
+                }
+
+            }
+            return {
+                init: function () {
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+
+                    if (this.visitCase == "3" || this.visitCase=="2") {
+                        $("#demo").hide();
+                    }
+                    $("#sample-table-counselorVisit_paginate").hide();
+                    $("#sample-table-serviceVisit_paginate").hide();
+                    $("#visit_remark").hide();
+                },
+                getQueryData: function () {
+                    this.businessId = GetQueryString("businessId");
+                    this.visitCase = GetQueryString("visitCase");
+                    this.studentNo = GetQueryString("studentNo");
+                },
+                handelQueryData: function () {
+                    if (this.visitCase == null) {
+                        alert("参数非法!");
+                        window.history.go(-1);
+                    }
+                },
+                render: function () {
+                    var _self = this;
+                    _self.oTable1 = $('#sample-table-2').dataTable({
+
+                        "sScrollY": "100%",
+                        "bFilter": false,//是否使用搜索
+                        "bProcessing": true,
+                        "bDeferRender": true,//
+                        "sPaginationType": "bs_normal",//分页样式
+                        "bRetrieve": true,//是否调用后台
+                        "bServerSide": true,//是否以后台分页
+                        "sAjaxSource": "/visit/list/query",//请求路径
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            aoData.push({"name": "studentNo", "value": _self.studentNo});
+                            aoData.push({"name": "visitCase", "value": _self.visitCase});
+                            if (_self.businessId != null) {
+                                aoData.push({"name": "businessId", "value": _self.businessId});
+                            }
+                            $.ajax({
+                                "dataType": 'json',
+                                "type": "GET",
+                                "url": sSource,
+                                "data": aoData,
+                                "success": fnCallback
+                            });
+                        },
+                        "aaSorting": [[1, "desc"]],
+                        "aoColumns": [
+                            /*{"sClass": "left", "bSortable": false, sWidth: "62%", "mData": "content"},*/
+                            {"sClass": "left", "bSortable": false, sWidth: "62%", "mData": "content"},
+                            {"sClass": "center", "bSortable": false, "mData": "visitType_string"},
+                            {"sClass": "center", "bSortable": false, "mData": "senderType_string"},
+                            {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                            {
+                                "sClass": "center", "bSortable": false, "mData": "createTime",
+                                "mRender": function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm:ss");
+                                }
+                            },
+                            {
+                                "sClass": "center", "bSortable": false, "mData": function (data) {
+                                    var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                                    var check = '';
+                                    if ($("#input_hasPermission_visit_detail").val() == "1") {
+                                        check = '<a class="blue" href="javascript:void(0);" onclick="toDetailPage(' + data.id + ',' + _self.businessId + ')"><i class="icon-zoom-in bigger-130"></i></a>';
+                                    }
+                                    var editOperation = '';
+                                    if ($("#input_hasPermission_visit_edit").val() == "1") {
+                                        if (data.visitCase == "2") {
+                                            editOperation = '<a class="green" href="javascript:void(0);" onclick="toEditPage(' + data.id + ')"><i class="icon-pencil bigger-130"></i></a>';
+                                        }
+                                    }
+                                    return styleDiv + check + editOperation;
+                                }
+                            }
+                        ],
+                        "oLanguage": {
+                            "sLengthMenu": "每页 _MENU_条 ",
+                            "sZeroRecords": "对不起，查询不到任何相关数据",
+                            "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                            "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                            "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                            "sProcessing": "正在加载中...",
+                            "sSearch": "搜索",
+                            "sUrl": "",
+                            "oPaginate": {
+                                "sFirst": "第一页",
+                                "sPrevious": " 上一页 ",
+                                "sNext": " 下一页 ",
+                                "sLast": " 最后一页 "
+                            }
+                        }
+                    });
+
+                    // call center回访记录
+                    _self.oTableCallCenter = $('#call-center-record').dataTable({
+                        "scrollY": '450px',
+                        "sScrollY": "100%",
+                        "bFilter": false,//是否使用搜索
+                        "bProcessing": true,
+                        "bDeferRender": true,//
+                        // "sPaginationType": "bs_normal",//分页样式
+                        "bRetrieve": true,//是否调用后台
+                        // "bServerSide": true,//是否以后台分页
+                        "sAjaxSource": "/visit/callcenter/record",//请求路径
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            aoData.push({"name": "studentNo", "value": _self.studentNo});
+                            $.ajax({
+                                "dataType": 'json',
+                                "type": "GET",
+                                "url": sSource,
+                                "data": aoData,
+                                "success": fnCallback
+                            });
+                        },
+                        "aaSorting": [[1, "desc"]],
+                        "aoColumns": [
+                            {"sClass": "center", "bSortable": false, "mData": "createtime"},
+                            {"sClass": "center", "bSortable": false, "mData": function(data){
+                                var path = data.serverfilepath;
+                                if(path != ''){
+                                    return '<audio src="'+path+'" controls="controls"></audio>';
+                                }
+                                return "";;
+                            }},
+                            {"sClass": "center", "bSortable": false, "mData": "remark"},
+                            {"sClass": "center", "bSortable": false, "mData": "userName"}
+                        ],
+                        "oLanguage": {
+                            "sLengthMenu": "",
+                            "sZeroRecords": "对不起，查询不到任何相关数据",
+                            "sInfo": "共 _TOTAL_ 条记录 ",
+                            "sInfoEmpty": "共 0 条记录",
+                            "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                            "sProcessing": "正在加载中...",
+                            "sSearch": "搜索",
+                            "sUrl": "",
+                            "oPaginate": {
+                                "sFirst": "第一页",
+                                "sPrevious": " 上一页 ",
+                                "sNext": " 下一页 ",
+                                "sLast": " 最后一页 "
+                            }
+                        }
+                    });
+
+                    //回访备注列表
+                    _self.oTable_remark = $('#sample-table-remark').dataTable({
+
+                        "sScrollY": "100%",
+                        "bFilter": false,//是否使用搜索
+                        "bProcessing": true,
+                        "bDeferRender": true,//
+                        "sPaginationType": "bs_normal",//分页样式
+                        "bRetrieve": true,//是否调用后台
+                        "bServerSide": true,//是否以后台分页
+                        "sAjaxSource": "/visitRemark/list/query",//请求路径
+                        "fnServerData": function (sSource, aoData, fnCallback) {
+                            aoData.push({
+                                "name": "studentNo", "value": _self.studentNo
+                            });
+                            $.ajax({
+                                "dataType": 'json',
+                                "type": "GET",
+                                "url": sSource,
+                                "data": aoData,
+                                "success": fnCallback
+                            });
+                        },
+                        "aaSorting": [[1, "desc"]],
+                        "aoColumns": [
+                            {
+                                "sClass": "left", "bSortable": false, sWidth: "62%", "mData": function (data) {
+                                if(data.remark==null|| data.remark==""){
+                                    return ""
+                                }
+//                                if (data.remark.length > 18) {
+//                                    return '<a href="javascript:void(0);" id="'+data.id+'" onclick="toTipContent(' + data.id + ',\'' +  data.remark.replace(/\r\n/mg,'  ') + '\')" >'+data.remark.substring(0,17)+"..."+'</a>';
+//                                }
+                                else{
+                                    return data.remark;
+                                }
+
+                            }
+                            },
+                            {
+                                "sClass": "center", "bSortable": false, "mData":
+                                function (data) {
+                                    if(data.createTime == null || data.createTime == ""){
+                                        return null
+                                    }else {
+                                        return getTimeString(new Date(data.createTime))
+                                    }
+                                }
+                            },
+                            {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                            {
+                                "sClass": "center", "bSortable": false, "mData":
+                                function (data) {
+                                    if(data.remindTime == null || data.remindTime == ""){
+                                        return null
+                                    }else {
+                                        return getTimeString(new Date(data.remindTime))
+                                    }
+                                }
+                            },
+                            {
+                                "sClass": "center", "bSortable": false, "mData": function (data) {
+                                var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                                var editOperation = '<a class="green" href="javascript:void(0);" onclick="editRemark(' + data.id + ')"><i class="icon-pencil bigger-130"></i></a>';
+
+                                return styleDiv + editOperation;
+                            }
+                            }
+                        ],
+                        "oLanguage": {
+                            "sLengthMenu": "每页 _MENU_条 ",
+                            "sZeroRecords": "对不起，查询不到任何相关数据",
+                            "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                            "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                            "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                            "sProcessing": "正在加载中...",
+                            "sSearch": "搜索",
+                            "sUrl": "",
+                            "oPaginate": {
+                                "sFirst": "第一页",
+                                "sPrevious": " 上一页 ",
+                                "sNext": " 下一页 ",
+                                "sLast": " 最后一页 "
+                            }
+                        }
+                    });
+                    if (this.visitCase == "1" || this.visitCase == "3") {
+                        /* 文案及后续回访隐藏列表中的发送方,回访途径,关联业务id */
+                        this.oTable1.fnSetColumnVis(1, false);
+                        this.oTable1.fnSetColumnVis(2, false);
+                        if (this.visitCase == "1") {
+                            $("#div_counselorVisit").show();
+                            $("#div_serviceVisit").show();
+
+                            // 咨询顾问回访列表
+                            _self.oTable_counselorVisit = $('#sample-table-counselorVisit').dataTable({
+                                "bFilter" : false,//是否使用搜索
+                                "bProcessing" : true,
+                                "bDeferRender" : true,//
+                                "sPaginationType" : "bs_normal",//分页样式
+                                "bRetrieve" : true,//是否调用后台
+                                "bServerSide" : true,//是否以后台分页
+                                "sAjaxSource": "/counselorVisit/list/query",//请求路径
+                                "fnServerData": function (sSource, aoData, fnCallback) {
+                                    aoData.push({"name": "studentNo", "value": _self.studentNo});
+                                    $.ajax({
+                                        "dataType": 'json',
+                                        "type": "GET",
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": fnCallback
+                                    });
+                                },
+                                "aaSorting": [[1, "desc"]],
+                                "aoColumns": [
+                                    {"sClass": "left", "bSortable": false,sWidth: "65%", "mData": "content"},
+                                    {"sClass": "center", "bSortable": false, "mData": "name"},
+                                    {"sClass": "center", "bSortable": false, "mData": "itime"}
+                                ],
+                                "oLanguage": {
+                                    "sLengthMenu": "",
+                                    "sZeroRecords": "对不起，查询不到任何相关数据",
+                                    "sInfo": "共 _TOTAL_ 条记录 ",
+                                    "sInfoEmpty": "共 0 条记录",
+                                    "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                                    "sProcessing": "正在加载中...",
+                                    "sSearch": "搜索",
+                                    "sUrl": "",
+                                    "oPaginate": {
+                                        "sFirst": "第一页",
+                                        "sPrevious": " 上一页 ",
+                                        "sNext": " 下一页 ",
+                                        "sLast": " 最后一页 "
+                                    }
+                                }
+                            });
+                            // 客服回访列表
+                            _self.oTable_serviceVisit = $('#sample-table-serviceVisit').dataTable({
+
+                                "paging": false,
+                                "bFilter": false,//是否使用搜索
+                                "bProcessing": true,
+                                "bDeferRender": true,//
+                                "paging": false,
+                                // "sPaginationType" : "bs_normal",//分页样式
+                                "bRetrieve": true,//是否调用后台
+                                "bServerSide" : true,//是否以后台分页
+                                "sAjaxSource": "/serviceVisit/list/query",//请求路径
+                                "fnServerData": function (sSource, aoData, fnCallback) {
+                                    aoData.push({"name": "studentNo", "value": _self.studentNo});
+                                    $.ajax({
+                                        "dataType": 'json',
+                                        "type": "GET",
+                                        "url": sSource,
+                                        "data": aoData,
+                                        "success": fnCallback
+                                    });
+                                },
+                                "aaSorting": [[1, "desc"]],
+                                "aoColumns": [
+                                    {"sClass": "left", "bSortable": false, sWidth: "65%", "mData": "content"},
+                                    {"sClass": "center", "bSortable": false, "mData": "name"},
+                                    {"sClass": "center", "bSortable": false, "mData": "itime"}
+                                ],
+                                "oLanguage": {
+                                    "sLengthMenu": "",
+                                    "sZeroRecords": "对不起，查询不到任何相关数据",
+                                    "sInfo": "共 _TOTAL_ 条记录 ",
+                                    "sInfoEmpty": "共 0 条记录",
+                                    "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                                    "sProcessing": "正在加载中...",
+                                    "sSearch": "搜索",
+                                    "sUrl": "",
+                                    "oPaginate": {
+                                        "sFirst": "第一页",
+                                        "sPrevious": " 上一页 ",
+                                        "sNext": " 下一页 ",
+                                        "sLast": " 最后一页 "
+                                    }
+                                }
+                            });
+                        }
+                        if (this.visitCase == "3") {
+                            /* 后续回访显示部分标签,用于跳转后续列表页 */
+                            $("#a_follow").show();
+                            $("#follow").show();
+                        }
+                    }
+                    else if (this.visitCase == "2") {
+                        /* 后续回访显示部分标签,用于跳转院校列表页 */
+                        $("#a_college").show();
+                        $("#college").show();
+                    }
+                },
+                addEvent: function () {
+                    var _self = this;
+                    $("#a_addData").click(function () {
+                        if (_self.businessId == null)
+                            window.open("/visit/addPage?studentNo=" + _self.studentNo + "&visitCase=" + _self.visitCase, target = "_self");
+                        else
+                            window.open("/visit/addPage?studentNo=" + _self.studentNo + "&visitCase=" + _self.visitCase + "&businessId=" + _self.businessId, target = "_self");
+                    });
+                    $("#a_studentList").click(function () {
+                        location.href = "/studentInfo";
+                    });
+                    $("#a_college").click(function () {
+                        location.href = "/apply?studentNo=" + _self.studentNo;
+                    });
+                    $("#a_follow").click(function () {
+                        location.href = "/followService/list?studentNo=" + _self.studentNo;
+                    });
+                    //添加回访备注
+                    $("#addVisitRemark").click(function () {
+                        $("#visit_remark").show();
+                        layer.open({
+                            type: 1,
+                            title: "提示",
+                            area: ['500px', '350px'],
+                            fixed: false, //不固定
+                            btn: ['确定','取消'],
+                            content: $("#visit_remark"),
+                            btn1: function (index, layero) {
+                                var studentNo = $("#studentNo").val();
+                                var remark = $("#remark").val();
+                                var remindTime = $("#remindTime").val();
+
+                                $.ajax({
+                                    url: "/visit/addRemark",
+                                    type: "post",
+                                    data:
+                                        {
+                                            studentNo : studentNo,
+                                            remindTime : remindTime,
+                                            remark: remark
+                                        },
+                                    success: function (data) {
+
+                                        if(data > 0){
+                                            layer.msg("添加成功!", {time: 1000},function(){
+                                                window.parent.location.reload();
+                                                var index = parent.layer.getFrameIndex(window.name);
+                                                parent.layer.close(index);
+                                            });
+                                        }else{
+                                            layer.msg("添加失败!", {time: 1000},function(){
+                                                window.parent.location.reload();
+                                                var index = parent.layer.getFrameIndex(window.name);
+                                                parent.layer.close(index);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+        }());
+        pageHelper.init();
+    });
+
+
+
+
+
+    //编辑回访备注
+
+
+    function getRemark(id) {
+        if(this.id != null && this.id  != "" && this.id != undefined){
+            $.ajax({
+                url: "/visit/getRemark",
+                type: "post",
+                data:
+                    {
+                        id: id
+                    },
+                success: function (data) {
+                    if (data.result > 0) {
+                        $("#remindTime").val(data.remindTime);
+                        $("#remark").val(data.remark);
+                    } else {
+                        $("#remindTime").val("0000-00-00 00:00:00");
+                        $("#remark").val("查询不到此条记录");
+                    }
+                }
+            });
+        }
+
+    }
+
+    function getTimeString(date){
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m :'0'+m;
+        var d = date.getDate();
+        d = d >= 10 ? d :'0'+d;
+        var h = date.getHours();
+        h = h >= 10 ? h :'0'+h;
+        var minute = date.getMinutes();
+        minute = minute >= 10 ? minute :'0'+minute;
+        var second = date.getSeconds();
+        second = second >= 10 ? second :'0'+second;
+        return  y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+    }
+
+    function toTipContent(id,content){
+        layer.tips(content, $("#"+id), {
+            tips: [1, '#3595CC'],
+            time: 3000
+        });
+    }
+
+
+    -->
+</script>
+</body>
+</html>

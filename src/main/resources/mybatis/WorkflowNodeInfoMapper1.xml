@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.WorkflowNodeInfoMapper1">
+
+    <select id="getWorkflowNodeInfoList" parameterType="com.aoji.vo.WorkflowNodeInfoVo" resultType="map">
+        SELECT
+            wni.id,
+            su.username        AS userName,
+            su.oaid            AS oaId,
+            wni.audit_sequence AS auditSequence,
+            wni.last_status    AS lastStatus,
+            wni.operator_name  AS operatorName,
+            wni.flow_id        AS flowId
+        FROM
+            workflow_node1_info wni
+            LEFT JOIN workflow1_info wi ON wni.flow_id = wi.id
+            LEFT JOIN sys_user su ON su.oaid = wni.oaid
+        WHERE
+            wni.flow_id = #{flowId}
+        ORDER BY wni.audit_sequence ASC
+    </select>
+</mapper>

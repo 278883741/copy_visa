@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.UserTaskRelationMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.UserTaskRelation">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="oaid" jdbcType="VARCHAR" property="oaid" />
+    <result column="template_id" jdbcType="INTEGER" property="templateId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="read_status" jdbcType="BIT" property="readStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="task_type" jdbcType="INTEGER" property="taskType" />
+    <result column="contant" jdbcType="VARCHAR" property="contant" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="QueryMessageResult" type="com.aoji.vo.MessageVO">
+    <result column="url" jdbcType="VARCHAR" property="url" />
+  </resultMap>
+
+  <select id="queryList" parameterType="com.aoji.model.UserTaskRelation" resultMap="QueryMessageResult">
+    SELECT
+    utr.*, tti.url
+    FROM
+    user_task_relation utr,
+    task_template_info tti
+    WHERE
+    utr.template_id = tti.id
+    AND utr.delete_status = 0
+    AND tti.delete_status = 0
+    <if test="oaid != null">
+      AND urt.oaid = #{oaid}
+    </if>
+  </select>
+  <select id="queryTaskList" resultType="com.aoji.model.UserTaskRelation">
+    SELECT ur.id,ur.oaid,ur.template_id templateId, ur.read_status readStatus,ur.create_time createTime,ur.update_time updateTime,ur.delete_status deleteStatus,ur.operator_no operatorNo, ur.task_type taskType,ur.contant,ti.url
+    FROM user_task_relation ur,task_template_info ti
+    WHERE ur.template_id = ti.id and ur.delete_status = '0' and ur.oaid = #{oaid}
+    ORDER BY ur.read_status, ur.create_time DESC
+  </select>
+  <select id="getTypeList" resultType="com.aoji.vo.UserTaskRelationVO">
+    SELECT utr.*, tti.url from
+    (select id,oaid,student_no studentNo, template_id templateId,read_status readStatus,create_time createTime,update_time updateTime,delete_status deleteStatus,operator_no operatorNo, task_type taskType,content
+    from user_task_relation where delete_status = 0 and oaid = #{oaid} and task_type = #{taskType}) utr,
+    (select id, url from task_template_info where delete_status = 0) tti where utr.templateId = tti.id
+    ORDER BY readStatus, createTime DESC limit #{pageIndex},10
+  </select>
+  <select id="getworkTableCount" resultType="com.aoji.vo.WorkTableCountVo">
+      SELECT workPage.*,workNotread.*,warningPageCount.*,warningNotRead.*,approvalPageCount.*,approvalRead.*,affichePageCount.*
+      FROM(
+      (
+      SELECT COUNT(id) AS workPageCount
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '3' and oaid = #{oaid}) workPage,
+      (
+      SELECT COUNT(id) AS workNotRead
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '3' AND read_status = '0' and oaid =#{oaid}) workNotread,
+      (
+      SELECT COUNT(id) AS warningPageCount
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '1' and oaid = #{oaid}) warningPageCount,
+      (
+      SELECT COUNT(id) AS warningNotRead
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '1' AND read_status = '0' and oaid = #{oaid}) warningNotRead,
+      (
+      SELECT COUNT(id) AS approvalPageCount
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '2' and oaid = #{oaid}) approvalPageCount,
+      (
+      SELECT COUNT(id) AS approvalNotRead
+      FROM user_task_relation
+      WHERE delete_status = '0' AND task_type = '2' AND read_status = '0' and oaid = #{oaid}) approvalRead,
+      (select count(id) AS affichePageCount
+		FROM news_info
+		where delete_status = '0' and enable_status = 1 ) affichePageCount
+      )
+    </select>
+  <select id="getWorkCount" resultType="com.aoji.vo.WorkCountVO" parameterType="String">
+    SELECT applyResultCount.*,visaApplyCount.*,visaRecordCount.*,visaResultCount.*,studentDelayCount.*,studentSettleCount.*,schoolConfirmCount.*,toAuditVisaApplyCount.*,toAuditVisaRecordCount.*,toAuditCOECount.*,myFirstBonusUnAuditCount.*,FirstBonusToAuditCount.*
+      FROM(
+      (
+      SELECT COUNT(applyResult.id) AS applyResultCount
+      FROM apply_result_info  applyResult,audit_apply_info audit
+      WHERE applyResult.operator_no = #{operatorNo} and applyResult.audit_status !=3 and applyResult.delete_status = 0 and audit.case_id = 3 and audit.business_id =applyResult.id and audit.delete_status = 0 ) applyResultCount,
+      (
+        SELECT count(1) AS visaApplyCount from
+        (
+          (SELECT id,student_no,operator_name,create_time FROM visa_apply_info where delete_status = 0 and apply_audit_status = 1 and operator_no = #{visaApplyInfo.operatorNo}) as visaApply
+          INNER JOIN
+          (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+          on visaApply.student_no = studentInfo.student_no
+        )
+      ) visaApplyCount,
+      (SELECT COUNT(id) AS visaRecordCount FROM visa_record_info WHERE operator_no = #{operatorNo} and audit_status =1 and delete_status = 0) visaRecordCount,
+      (
+        SELECT count(1) AS visaResultCount from
+        (
+          (SELECT id,student_no,operator_name,create_time,visa_id FROM visa_result_info where delete_status = 0 and visa_status = 1 and operator_no = #{operatorNo}) as visaResult
+          INNER JOIN
+          (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+          on visaResult.student_no = studentInfo.student_no
+        )
+      ) visaResultCount,
+      (
+      SELECT COUNT(id) AS studentDelayCount
+      FROM student_delay_info
+      WHERE operator_no = #{operatorNo} and audit_status =1 and delete_status = 0) studentDelayCount,
+      (
+      SELECT COUNT(id) AS studentSettleCount
+      FROM student_settle_info
+      WHERE operator_no = #{operatorNo} and audit_status =1 and delete_status = 0) studentSettleCount,
+      (
+      SELECT COUNT(*) AS schoolConfirmCount
+      FROM (
+      SELECT pi.student_no, pi.nation, pi.agency, pi.apply_type, pci.*, si.student_name, si.branch_name, si.sales_consultant
+      FROM
+      (
+      SELECT student_no, student_name, status, branch_name, sales_consultant FROM student_info WHERE delete_status = 0 AND status != 90 and copy_operator_no = #{operatorNo}) si,
+      (
+      SELECT id, student_no, nation, agency, apply_type FROM plan_info WHERE delete_status = 0 ) pi,
+      (
+      SELECT id, plan_id, college_no, college_name, college_type, major_name, course_name, course_id, course_remark, school_area, school_length, major_detail, major_url, apply_deadline, course_start_time, plan_comment, plan_no, reduce_credit_status, confirm_file, operator_no, operator_name, create_time, audit_status FROM plan_college_info WHERE delete_status = 0 and audit_status not in (0, 2) and audit_status = 1 ) pci
+      WHERE pi.id = pci.plan_id and si.student_no = pi.student_no) sc ) schoolConfirmCount,
+      (
+        SELECT count(id) AS toAuditVisaApplyCount from
+            (
+              SELECT * from visa_apply_info where student_no in
+              (
+                SELECT student_no from student_info where nation_id in
+                (
+                  SELECT id from country_info where country_group in
+                  (
+                    SELECT nation from user_group where id in
+                    (
+                      SELECT group_id from user_group_relation where oaid = #{operatorNo} and delete_status = 0
+                    ) and delete_status = 0
+                  )
+                )
+              )and delete_status = 0
+            ) as visaApply INNER JOIN (SELECT DISTINCT(business_id) FROM audit_apply_info where delete_status = 0 and case_id = 5) as audit
+            on visaApply.id = audit.business_id
+      ) toAuditVisaApplyCount,
+      (
+        SELECT count(id) AS toAuditVisaRecordCount from
+            (
+              SELECT * from visa_record_info where student_no in
+              (
+                SELECT student_no from student_info where nation_id in
+                (
+                  SELECT id from country_info where country_group in
+                  (
+                    SELECT nation from user_group where id in
+                    (
+                      SELECT group_id from user_group_relation where oaid = #{operatorNo} and delete_status = 0
+                    ) and delete_status = 0
+                  )
+                )
+              )and delete_status = 0
+            ) as visaRecord INNER JOIN (SELECT DISTINCT(business_id) FROM audit_apply_info where delete_status = 0 and case_id = 7) as audit
+            on visaRecord.id = audit.business_id
+      ) toAuditVisaRecordCount,
+
+
+      (
+
+SELECT count(id) AS toAuditCOECount FROM
+(
+SELECT * FROM coe_apply_info WHERE student_no IN
+(
+SELECT student_no FROM student_info WHERE nation_id IN
+(
+SELECT id FROM country_info WHERE country_group IN
+(
+SELECT nation FROM user_group WHERE id IN
+(
+SELECT group_id FROM user_group_relation WHERE oaid = #{operatorNo} AND delete_status = 0
+) AND delete_status = 0
+)
+) AND delete_status = 0
+) AND delete_status = 0
+) AS coe INNER JOIN ( SELECT DISTINCT (business_id) FROM audit_apply_info WHERE delete_status = 0 AND case_id = 4) AS audit
+ON coe.id = audit.business_id
+
+    ) toAuditCOECount,
+
+    (
+    SELECT count(id) AS myFirstBonusUnAuditCount FROM
+     student_info where contract_type IN (1,2) AND copy_operator_no = #{operatorNo} AND status >= 30 and first_bonus_status != 2 AND create_time>='2018-05-07' AND delete_status = 0
+    ) myFirstBonusUnAuditCount,
+    (
+    SELECT count(id) AS FirstBonusToAuditCount FROM student_info
+    where contract_type IN (1,2) AND status >= 30 and first_bonus_status != 2 AND create_time>='2018-05-07'
+    AND delete_status = 0 AND nation_id IN
+(
+SELECT id FROM country_info WHERE country_group IN
+(
+SELECT nation FROM user_group WHERE id IN
+(
+SELECT group_id FROM user_group_relation WHERE oaid = #{operatorNo} AND delete_status = 0
+) AND delete_status = 0
+)
+)
+    )FirstBonusToAuditCount
+      )
+  </select>
+  <select id="getVisitCount" resultType="java.lang.Integer">
+    select count(1) from student_info where sign_date > DATE_SUB(now(), interval 2 YEAR ) and sign_date <![CDATA[ < ]]> now() and channel_status !=1 and status not in ('90', '100') and contract_no not like '%单项目%'
+    and nation_name not in('昆省预科（unilearn)','NCUK IFY课程','NCUK PMP课程','美国AUP预科','加拿大  预科','昆省IFY(AU)','IFY昆省(UK)','NCC IFY','NCC PMP','UNSW预科','美国USPP项目')
+    and (DATE_FORMAT(now( ), '%Y-%m' ) != DATE_FORMAT(last_visit_time, '%Y-%m' )  or last_visit_time is null) and delete_status = 0 and student_status != 2
+    <if test="roleName == '文案顾问'">
+      and (copy_operator_no = #{operator} OR copy_maker_no = #{operator} OR copy_no = #{operator} OR visa_operator_no = #{operator} OR copier_no = #{operator})
+    </if>
+    <if test="roleName == '文案经理'">
+      and
+      (
+        copy_operator_no in
+        (
+          SELECT oaid from user_group_relation where group_id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+          ) and delete_status = 0 and oaid != #{operator}
+        )
+        or
+        copy_maker_no in
+        (
+          SELECT oaid from user_group_relation where group_id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+          ) and delete_status = 0 and oaid != #{operator}
+        )
+        or
+        copy_no in
+        (
+          SELECT oaid from user_group_relation where group_id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+          ) and delete_status = 0 and oaid != #{operator}
+        )
+        or
+        visa_operator_no in
+        (
+          SELECT oaid from user_group_relation where group_id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+          ) and delete_status = 0 and oaid != #{operator}
+        )
+        or
+        copier_no in
+        (
+          SELECT oaid from user_group_relation where group_id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0 and leader_status = 1
+          ) and delete_status = 0 and oaid != #{operator}
+        )
+      )
+    </if>
+    <if test="roleName == '文签总监'">
+      and nation_id in
+      (
+        SELECT id from country_info where country_group in
+        (
+          SELECT nation from user_group where id in
+          (
+            SELECT group_id from user_group_relation where oaid = #{operator} and delete_status = 0
+          ) and delete_status = 0
+        )
+      )
+    </if>
+    <if test="roleName == '总经理'">
+    </if>
+  </select>
+</mapper>

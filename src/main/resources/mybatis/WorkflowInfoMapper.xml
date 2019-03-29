@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.WorkflowInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.WorkflowInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="audit_cycle" jdbcType="INTEGER" property="auditCycle" />
+    <result column="case_id" jdbcType="INTEGER" property="caseId" />
+  </resultMap>
+
+    <select id="getWorkFlowList" parameterType="com.aoji.vo.WorkFlowVo" resultType="com.aoji.vo.WorkFlowVo">
+        SELECT
+        wi.id,
+        ug.group_name AS userGroup,
+        wi.case_id AS caseId,
+        wi.operator_name AS operatorName,
+        GROUP_CONCAT(su.username) AS userName
+        FROM
+        workflow1_info wi
+        LEFT JOIN workflow_node1_info wni ON wi.id = wni.flow_id
+        LEFT JOIN user_group ug ON ug.id = wi.user_group
+        LEFT JOIN sys_user su ON wni.oaid = su.oaid
+        AND wi.delete_status = 0
+        AND wni.delete_status = 0
+        where 1 = 1
+        <if test="userGroup != null and userGroup != ''">
+            AND wi.user_group = #{userGroup}
+        </if>
+        GROUP BY wi.id
+    </select>
+</mapper>

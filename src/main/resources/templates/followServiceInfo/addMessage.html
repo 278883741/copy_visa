@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>-->
+                    <!--<li><a href="#">系统管理</a></li>-->
+                    <!--<li><a href="/member/list">申请结果信息</a></li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <input id="applyId" th:value="${applyId}" type="text" name="stu_id" style="display: none"/>
+                                <input id="studentNo" th:value="${studentNo}" type="text" name="studentNo" style="display: none"/>
+                                <input id = "input_fileName"  style="display: none"/>
+                                <h3 class="header smaller lighter blue">申请结果信息</h3>
+                                <br/>
+                                <div  class="tab-pane fade in active">
+                                    <div class="container">
+                                        <div class="form-horizontal">
+                                            <div class="form-group" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 申请结果：</label>
+                                                    <select type="" class="col-sm-3 form-control input-sm" id="application_result" style="width:190px;height:25px;">
+                                                        <option selected="selected" value="0">请选择</option>
+                                                        <option value="1" >录取</option>
+                                                        <option value="2" >拒绝</option>
+                                                    </select>
+                                                <label class="col-sm-3 control-label no-padding-right"> 申请结果到达方式：</label>
+                                                <select type="" class="col-sm-3 form-control input-sm" id="application_result_reply_way" style="width:190px;height:25px;">
+                                                    <option selected="selected" value="0">请选择</option>
+                                                    <option value="1" >传真</option>
+                                                    <option value="2" >电话</option>
+                                                    <option value="3" >电子版</option>
+                                                    <option value="4" >扫描件</option>
+                                                    <option value="5" >原件</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group offer_info" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 申请结果到达日期：</label>
+                                                <input id="application_result_date" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                                                <!--<label class="col-sm-3 control-label no-padding-right"> 接受offer截止日期：</label>-->
+                                                <!--<input id="application_result_dateline" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>-->
+                                            </div>
+                                            <div class="form-group reply_reason" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 申请结果到达日期：</label>
+                                                <input id="application_result_date_refuse" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"/>
+                                                <label class="col-sm-3 control-label no-padding-right"> 拒绝原因：</label>
+                                                <input id = "reply_reason_id" class = " col-sm-3" style="width: 190px" />
+                                            </div>
+                                            <!--<div class="form-group studetn_info" style="height:32px">-->
+                                                <!--<label class="col-sm-3 control-label no-padding-right"> 学生确认offer回复日期：</label>-->
+                                                <!--<input id="application_student_reply_date" class="Wdate col-sm-3" style="width: 190px"    readOnly="true"/>-->
+                                                <!--<label class="col-sm-3 control-label no-padding-right"> 实际接受offer回复日期：</label>-->
+                                                <!--<input id="application_argue_date" class="Wdate col-sm-3" style="width: 190px"  readOnly="true" />-->
+                                            <!--</div>-->
+                                            <!--<div class="form-group school_info" style="height:32px">-->
+                                                <!--<label class="col-sm-3 control-label no-padding-right"> 学校确认offer日期：</label>-->
+                                                <!--<input id="application_school_reply_date" class="Wdate col-sm-3" style="width: 190px"  readOnly="true"/>-->
+                                            <!--</div>-->
+                                            <div class="form-group" style="height:220px" id = "upload_offer">
+                                                <label class="col-sm-3 control-label no-padding-right"> offer扫描件：</label>
+                                                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" >
+                                                    <div  class="tab-pane fade in active">
+                                                        <div class="container">
+                                                            <div class="form-horizontal">
+                                                                <div class="form-group">
+                                                                    <div class="col-sm-6" style="padding-left: 0px;" >
+                                                                        <div class="widget-header">
+                                                                            <h4>文件上传</h4>
+                                                                        </div>
+                                                                        <div class="widget-body">
+                                                                            <div class="widget-main">
+                                                                                <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                                                <label>
+                                                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                                                </label>
+                                                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf，&nbsp;.eml</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="form-group" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 备注：</label>
+                                                <div class="col-sm-3" style="padding-left: 0px;">
+                                                    <textarea rows="5" cols="76" name="comment" id="textarea_comment" ></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_return">返回</button>
+                <button type="button" class="btn btn-primary" id="btn_save">保存</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script type="text/javascript">
+    var boolResult = true;
+    var uploadResult = true;
+    $("#btn_file_submit").click(function(){
+        $("#form_file").submit();
+    });
+    var country = "meiguo";
+    $(function () {
+
+      //1查看  2修改
+        var type = $("#type").val();
+
+        if(type == "1" ){
+            $("#btn_save").hide();
+            $("#btn_return").show();
+        }else if(type == '2'){
+            $("#btn_return").hide();
+            $("#btn_save").show();
+        }
+
+        $('#id-input-file-3').ace_file_input({
+            style:'well',
+            btn_choose:'Drop files here or click to choose',
+            btn_change:null,
+            no_icon:'icon-cloud-upload',
+            droppable:true,
+            thumbnail:'small',//large | fit
+            before_change:function(files, dropped) {
+                return true;
+            },
+            before_remove : function() {
+                $("#upload_offer").attr("style","height:220px");
+                $("#input_fileName").val("");
+                return true;
+            },
+            preview_error : function(filename, error_code) {
+            }
+        }).on('change', function(){
+            //获取文件大小
+            if (!checkUp(this)) {
+                return false;
+            }
+            uploadResult = false;
+            layer.msg('正在上传中...', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $("#form_file").ajaxSubmit(function(message) {
+                uploadResult = true;
+                console.log(message);
+                var fileName = message.obj;
+                var code = message.code;
+                if(code == "1"){
+                    layer.msg("请上传正确的文件格式!")
+                }else if(message.success){
+                    $("#upload_offer").attr("style", "height:160px");
+                    $("#input_fileName").val(fileName);
+                    layer.msg("上传成功!");
+                }
+            });
+        });
+        console.log("保存时:"+boolResult);
+        $("#btn_save").click(function(){
+            if(boolResult == true){
+                if(uploadResult == false){
+                    layer.msg('正在上传中,请稍后保存!');
+                }else{
+                    postData(2);
+                }
+
+            }
+
+        });
+        $("#btn_return").click(function () {
+            postData(1);
+        });
+    });
+
+</script>
+</body>
+</html>

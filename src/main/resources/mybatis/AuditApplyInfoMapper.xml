@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.AuditApplyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.AuditApplyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="case_id" jdbcType="INTEGER" property="caseId" />
+    <result column="oaid" jdbcType="VARCHAR" property="oaid" />
+    <result column="oa_name" jdbcType="VARCHAR" property="oaName" />
+    <result column="business_id" jdbcType="INTEGER" property="businessId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="last_audit" jdbcType="INTEGER" property="lastAudit" />
+    <result column="audit_sequence" jdbcType="INTEGER" property="auditSequence" />
+  </resultMap>
+    <select id="getAuditApplyInfo" resultType="com.aoji.model.AuditApplyInfo">
+      select id,case_id as caseId,oaid,business_id as businessId,operator_no as operatorNo,operator_name as operatorName,last_audit as lastAudit,audit_sequence as auditSequence  from audit_apply_info where business_id = #{bussinessId} and case_id = #{caseId} and delete_status = 0
+    </select>
+  <select id="queryAuditUser" resultType="java.util.Map">
+select *
+from
+(
+    SELECT 'coe信息' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批coe信息'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT  '后续结果' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批后续结果'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '学生停办' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批学生停办'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '学生结案' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批学生结案'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '签证申请' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批签证申请'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '签证结果' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批签证结果'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '获签信息' as caseId,username ,'' as path from sys_user where oaid in
+    (
+      SELECT oaid from sys_user_role where role_id in
+      (
+        SELECT id from sys_role where role_name = '审批获签信息'
+      ) and delete_status = 0
+    ) and delete_status = 0
+    UNION ALL
+    SELECT '寄出绩效' as caseId,username ,'' as path from sys_user where oaid in
+     (
+       SELECT oaid FROM sys_user_role WHERE role_id IN
+       (
+         SELECT role_id FROM sys_role_permission WHERE permission_id = (SELECT id FROM sys_permission WHERE permission_name = '两次寄出绩效审核') and delete_status = 0
+       )and delete_status = 0
+     )and delete_status = 0
+    UNION ALL
+    SELECT '院校申请结果' as caseId,'学生的销售顾问' as username ,'' as path
+    UNION ALL
+    SELECT '定校方案' as caseId,'非美高学生m1审,美高咨询顾问提的规划顾问审,规划顾问提的规划经理审' as username,'' as path
+)as temp
+  </select>
+</mapper>

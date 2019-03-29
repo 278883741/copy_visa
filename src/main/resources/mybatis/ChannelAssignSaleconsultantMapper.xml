@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.ChannelAssignSaleconsultantMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.ChannelAssignSaleconsultant">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="old_sales_consultant" jdbcType="VARCHAR" property="oldSalesConsultant" />
+    <result column="old_sales_consultant_no" jdbcType="VARCHAR" property="oldSalesConsultantNo" />
+    <result column="new_sales_consultant" jdbcType="VARCHAR" property="newSalesConsultant" />
+    <result column="new_sales_consultant_no" jdbcType="VARCHAR" property="newSalesConsultantNo" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+  </resultMap>
+</mapper>

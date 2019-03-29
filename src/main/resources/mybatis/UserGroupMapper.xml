@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.UserGroupMapper">
+    <resultMap id="BaseResultMap" type="com.aoji.model.UserGroup">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="group_name" jdbcType="VARCHAR" property="groupName"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delete_status" jdbcType="BIT" property="deleteStatus"/>
+        <result column="operator_no" jdbcType="VARCHAR" property="operatorNo"/>
+        <result column="nation" jdbcType="INTEGER" property="nation"/>
+        <result column="enable_status" jdbcType="BIT" property="enableStatus"/>
+    </resultMap>
+    <update id="deleteUserGroup">
+        UPDATE user_group
+        SET delete_status = 1
+        WHERE id = #{id}
+    </update>
+    <select id="getUserGroup" resultType="com.aoji.model.UserGroup">
+        select id, group_name groupName,content,create_time createTime,update_time updateTime,delete_status
+        deleteStatus,operator_no operatorNo,nation,enable_status enableStatus from user_group where delete_status = '0'
+        <if test="groupName != null and groupName != ''">
+            AND group_name like #{groupName}
+        </if>
+    </select>
+    <select id="getUserGroupById" resultType="com.aoji.model.UserGroup">
+        SELECT
+            id,
+            group_name    groupName,
+            content,
+            create_time   createTime,
+            update_time   updateTime,
+            delete_status deleteStatus,
+            operator_no   operatorNo,
+            nation
+        FROM user_group
+        WHERE id = #{id} AND delete_status = '0'
+    </select>
+    <select id="getGroupIds" resultType="java.lang.Integer">
+        SELECT ur.group_id
+        FROM user_group_relation ur, sys_user su
+        WHERE ur.oaid = su.oaid AND ur.delete_status = '0' AND ur.oaid = (SELECT oaid
+                                                                          FROM sys_user
+                                                                          WHERE id = #{id})
+    </select>
+
+
+    <select id="getByoaidAndLeaderStatus" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select ug.* from
+        (select * from user_group_relation where delete_status = 0 and oaid = #{oaid}
+        <if test="leaderStatus != null">
+            and leader_status = #{leaderStatus}
+        </if>
+        ) ugr,
+        (select * from user_group where delete_status = 0) ug
+        where ugr.group_id = ug.id
+    </select>
+    <select id="selectNationByGroupName" resultType="java.lang.String">
+        SELECT nation
+        FROM user_group
+        WHERE group_name = #{groupName} AND delete_status = 0
+    </select>
+
+    <!--
+     根据用户组的id，获取当前用户组下的所有用户成员
+     -->
+    <select id="getUserByUserGroupId" parameterType="int" resultType="map">
+        SELECT
+            su.oaid           AS oaId,
+            su.username       AS userName,
+            ugr.leader_status AS leaderStatus
+        FROM
+            user_group_relation ugr
+            LEFT JOIN sys_user su ON ugr.oaid = su.oaid
+        WHERE
+            ugr.delete_status = 0
+            AND su.delete_status = 0
+            AND ugr.group_id = #{userGroup}
+        ORDER BY ugr.leader_status DESC
+    </select>
+    <select id="getNation" resultType="java.lang.String">
+          select userGroup.nation from user_group_relation relation,user_group userGroup where userGroup.id = relation.group_id and  relation.oaid = #{oaid} and relation.delete_status = 0 and userGroup.delete_status = 0
+    </select>
+
+</mapper>

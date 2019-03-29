@@ -1,0 +1,109 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="col-xs-12" >
+                    <form method="post" id="edit">
+                        <input id = "studentNo"  th:value="${studentNo}" style="display: none"/>
+                        <input id = "type"  th:value="${type}" style="display: none"/>
+                        <input id = "schoolId"  th:value="${schoolId}" style="display: none"/>
+                        <input id = "applyId"  th:value="${applyId}" style="display: none"/>
+                        <input id = "nationStatus"  th:value="${nationStatus}" style="display: none"/>
+
+                        <input id="input_type" type="hidden" th:value="${type != null}?${type}" />
+                        <span style="display:inline-block;width:72px;text-align:right;">申请国家: </span>
+                        <select class="col-sm-1 "  id="nation" name="nation" style="width: 200px;margin-top: 25px;height: 30px;">
+                            <option value = "0">请选择</option>
+                            <option th:each="item: ${list_doubleSignCountry}" th:attr="nationId=${item.nationId}" th:value="${item.id}" th:text="${item.nationName}"  ></option>
+                        </select>
+                    </form>
+                    <div class="modal-footer" style="margin-top: 50px">
+                        <button type="button" class="btn btn-primary" id="nation_submit" >保存</button>
+                        <button type="button" class="btn btn-default" id="nation_back" >返回</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/business/user/groupTree.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    <!--
+    var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+    $(function () {
+        $("#nation_submit").click(function(){
+            if($("#nation").val() == '0' || $("#nation").val() == ''){
+                layer.msg('请选择国家', {time: 1000});
+                return;
+            }else {
+                var doubleSignId = $("#nation").children("option:selected").val();
+                var type = $("#type").val();
+                if (type == "visaRecord") {
+                    window.open("/visaRecord/addPage?studentNo=" + $("#studentNo").val() + "&doubleSignId=" + doubleSignId + "");
+                }else if (type == "visaApply"){
+                    window.open("/visaApply/addPage?studentNo=" + $("#studentNo").val() + "&doubleSignId=" + doubleSignId + "");
+                }
+                parent.layer.close(index);
+            }
+
+        })
+        $("#nation_back").click(function(){
+            layer.closeAll();
+            parent.location.reload();
+        })
+    });
+    -->
+</script>
+</body>
+</html>

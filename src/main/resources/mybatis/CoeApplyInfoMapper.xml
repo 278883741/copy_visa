@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CoeApplyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CoeApplyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="apply_comment" jdbcType="VARCHAR" property="applyComment" />
+    <result column="apply_status" jdbcType="INTEGER" property="applyStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="scholarship_status" jdbcType="BIT" property="scholarshipStatus" />
+    <result column="scholarship_amount" jdbcType="INTEGER" property="scholarshipAmount" />
+    <result column="scholarship_unit" jdbcType="INTEGER" property="scholarshipUnit" />
+    <result column="tuition" jdbcType="INTEGER" property="tuition" />
+    <result column="tuition_unit" jdbcType="INTEGER" property="tuitionUnit" />
+    <result column="deposit_payment_date" jdbcType="TIMESTAMP" property="depositPaymentDate" />
+    <result column="insurance_buy_status" jdbcType="BIT" property="insuranceBuyStatus" />
+    <result column="coe_date" jdbcType="TIMESTAMP" property="coeDate" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="apply_attachment" jdbcType="VARCHAR" property="applyAttachment" />
+  </resultMap>
+
+  <select id="getToAuditCOEList" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT coe.*,audit.oa_name AS oaName from
+    (
+    SELECT * from coe_apply_info where student_no in
+    (
+    SELECT student_no from student_info where nation_id in
+    (
+    SELECT id from country_info where country_group in
+    (
+    SELECT nation from user_group where id in
+    (
+    SELECT group_id from user_group_relation where oaid = #{oaid} and delete_status = 0
+    ) and delete_status = 0
+    ) and delete_status = 0
+    ) and delete_status = 0
+    ) and delete_status = 0
+    <if test="studentNo != null and studentNo !=''">
+      AND student_no = #{studentNo}
+    </if>
+    ) AS coe INNER JOIN (SELECT DISTINCT(business_id),oa_name FROM audit_apply_info where delete_status = 0 and case_id = 4
+    <if test="oaName != null and oaName !=''">
+      AND oa_name = #{oaName}
+    </if>
+    ) as audit
+    on coe.id = audit.business_id
+    order by coe.student_no desc
+  </select>
+
+</mapper>

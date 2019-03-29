@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.FollowServiceResultMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.FollowServiceResult">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="reply_way" jdbcType="INTEGER" property="replyWay" />
+    <result column="result_type" jdbcType="INTEGER" property="resultType" />
+    <result column="result_date" jdbcType="TIMESTAMP" property="resultDate" />
+    <result column="student_reply_date" jdbcType="TIMESTAMP" property="studentReplyDate" />
+    <result column="school_reply_date" jdbcType="TIMESTAMP" property="schoolReplyDate" />
+    <result column="offer_attachment" jdbcType="VARCHAR" property="offerAttachment" />
+    <result column="reply_deadline" jdbcType="TIMESTAMP" property="replyDeadline" />
+    <result column="reply_reason" jdbcType="VARCHAR" property="replyReason" />
+    <result column="result_comment" jdbcType="VARCHAR" property="resultComment" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="argue_date" jdbcType="TIMESTAMP" property="argueDate" />
+    <result column="audit_status" jdbcType="INTEGER" property="auditStatus" />
+  </resultMap>
+    <select id="getFollowServiceResultById" resultType="com.aoji.model.FollowServiceResult">
+      SELECT id,apply_id applyId,reply_way replyWay,result_type resultType,result_date resultDate,student_reply_date studentReplyDate,school_reply_date schoolReplyDate,offer_attachment offerAttachment,reply_deadline replyDeadline,reply_reason replyReason,result_comment resultComment,create_time createTime,update_time updateTime,delete_status deleteStatus,operator_no operatorNo,operator_name operatorName,
+        argue_date argueDate,audit_status auditStatus
+      FROM follow_service_result
+      WHERE id = #{id} AND delete_status = 0
+    </select>
+  <update id="updateFollowServicResult">
+    update follow_service_result set reply_way = #{followServiceResult.replyWay},result_date = #{followServiceResult.resultDate},
+    result_type = #{followServiceResult.resultType},offer_attachment = #{followServiceResult.offerAttachment},reply_deadline=#{followServiceResult.replyDeadline},result_comment=#{followServiceResult.resultComment},
+    reply_reason = #{followServiceResult.replyReason},update_time = #{followServiceResult.updateTime} where id = #{followServiceResult.id}
+  </update>
+
+</mapper>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.ApplyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.ApplyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="college_id" jdbcType="VARCHAR" property="collegeId" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="major_id" jdbcType="INTEGER" property="majorId" />
+    <result column="major_detail" jdbcType="VARCHAR" property="majorDetail" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="course_type" jdbcType="INTEGER" property="courseType" />
+    <result column="school_length" jdbcType="VARCHAR" property="schoolLength" />
+    <result column="course_length" jdbcType="VARCHAR" property="courseLength" />
+    <result column="course_start_time" jdbcType="TIMESTAMP" property="courseStartTime" />
+    <result column="copy_operator" jdbcType="VARCHAR" property="copyOperator" />
+    <result column="connector" jdbcType="VARCHAR" property="connector" />
+    <result column="connector_name" jdbcType="VARCHAR" property="connectorName" />
+    <result column="apply_status_code" jdbcType="INTEGER" property="applyStatusCode" />
+    <result column="delay_status" jdbcType="BIT" property="delayStatus" />
+    <result column="delay_date" jdbcType="TIMESTAMP" property="delayDate" />
+    <result column="deposit_amount" jdbcType="DECIMAL" property="depositAmount" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="deposit_payment_deadline" jdbcType="TIMESTAMP" property="depositPaymentDeadline" />
+    <result column="apply_type" jdbcType="INTEGER" property="applyType" />
+    <!--<result column="relation_id" jdbcType="INTEGER" property="relationId" />-->
+    <result column="apply_way" jdbcType="INTEGER" property="applyWay" />
+    <result column="commit_date" jdbcType="TIMESTAMP" property="commitDate" />
+    <result column="tuition" jdbcType="DECIMAL" property="tuition" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <!--<result column="school_area" jdbcType="VARCHAR" property="schoolArea" />-->
+    <result column="plan_id" jdbcType="INTEGER" property="planId" />
+    <result column="reply_cycle" jdbcType="INTEGER" property="replyCycle" />
+    <result column="plan_college_id" jdbcType="INTEGER" property="planCollegeId" />
+    <result column="scholarship_amount" jdbcType="DECIMAL" property="scholarshipAmount" />
+    <result column="registration_fee" jdbcType="DECIMAL" property="registrationFee" />
+    <result column="education_section" jdbcType="INTEGER" property="educationSection" />
+    <result column="agency_no" jdbcType="INTEGER" property="agencyNo" />
+    <result column="agency_name" jdbcType="VARCHAR" property="agencyName" />
+  </resultMap>
+    <update id="updateCopyUrl">
+          update apply_info set college_copy = #{copyUrl} where student_no = #{studentNo} and id = #{applyId}
+    </update>
+    <select id="getApplyInfoByStudentNo" resultType="java.lang.String">
+      select connector from apply_info where student_no = #{studentNo} and delete_status = 0 group by connector
+    </select>
+
+    <select id="selectByPlanCollegeId" resultType="java.lang.Integer" resultMap="BaseResultMap">
+        select * from apply_info where plan_college_id = #{planCollegeId} and delete_status = 0 limit 0, 1
+    </select>
+    <select id="getSumTuition" resultType="java.lang.Integer">
+      select
+      <if test="costInfo.id == 4 ">
+        sum(tuition) as tuition
+      </if>
+      <if test="costInfo.id == 5 ">
+        sum(deposit_amount) as depositAmount
+      </if>
+      from apply_info where delete_status = #{applyInfo.deleteStatus} and plan_course_status = #{applyInfo.planCourseStatus} and student_no = #{applyInfo.studentNo}
+    </select>
+  <select id="getCollegeByStudentNo" resultType="java.lang.String">
+    select college_name as college from apply_info where plan_course_status = 1 and delete_status = 0 and student_no = #{studentNo}
+  </select>
+
+
+  <select id="selectByPlanCourseStatus" resultType="com.aoji.model.ApplyInfo">
+
+    select a.ID as id,
+            a.college_name as collegeName,
+            a.course_name  as courseName,
+            a.school_length as schoolLength,
+            a.course_start_time as courseStartTime,
+            a.create_time as createTime ,
+            a.major_name  as  majorName,
+            a.registration_fee as registrationFee,
+            a.tuition as tuition,
+            a.deposit_amount as depositAmount
+    from apply_info a
+    where
+     plan_course_status=1 and  delete_status = 0 and  student_no=#{applyInfo.studentNo}
+     order by update_time desc
+  </select>
+  <select id="basicCostApplylist" resultType="com.aoji.model.ApplyInfo">
+    SELECT
+            a.id as id,
+            a.student_no as studentNo,
+            a.create_time as createTime ,
+            a.update_time as updateTime,
+            a.registration_fee as registrationFee,
+            a.tuition as tuition,
+            a.deposit_amount as depositAmount
+    FROM apply_info a  WHERE  plan_course_status=1 and  delete_status = 0  and id=#{applyInfo.id}
+  </select>
+
+    <select id="checkAllApplyList" resultType="com.aoji.model.ApplyInfo">
+
+        select a.ID as id,
+        a.student_no   as  studentNo,
+        b.student_name as studentName,
+        b.sales_consultant as salesConsultant,
+        b.copy_operator    as copyOperator,
+        b.nation_id    as nationId,
+        b.nation_name    as nationName,
+        b.status     as    status,
+        b.branch_id    as branchId,
+        b.branch_name  as branchName,
+        a.course_start_time as courseStartTime,
+        a.create_time  as  createTime,
+        a.apply_status_code as applyStatusCode,
+        a.apply_type   as  applyType,
+        a.commit_date  as  commitDate,
+        a.connector_name   as  connectorName,
+        a.college_material as collegeMaterial,
+        a.college_name as collegeName,
+        a.course_name  as courseName,
+        a.major_name  as  majorName
+        from apply_info a,student_info b
+        where
+        a.student_no = b.student_no
+        AND a.delete_status = 0 AND  b.delete_status = 0
+        <if test="applyInfo.studentNo != null and applyInfo.studentNo !=''">AND a.student_no = #{applyInfo.studentNo}
+        </if>
+        <if test="applyInfo.studentName != null and applyInfo.studentName !=''">AND b.student_name = #{applyInfo.studentName}
+        </if>
+        <if test="applyInfo.nationId != null and applyInfo.nationId !=''">AND b.nation_id = #{applyInfo.nationId}
+        </if>
+        <if test="applyInfo.branchId != null and applyInfo.branchId !=''">AND b.branch_id = #{applyInfo.branchId}
+        </if>
+        <if test="applyInfo.status != null and applyInfo.status !=''">AND b.status = #{applyInfo.status}
+        </if>
+        <if test="applyInfo.applyStatusCode != null and applyInfo.applyStatusCode !=''">AND a.apply_status_code = #{applyInfo.applyStatusCode}
+        </if>
+        <if test="applyInfo.copyOperator != null and applyInfo.copyOperator !=''">AND a.copy_operator LIKE
+            CONCAT('%',#{applyInfo.copyOperator},'%' )
+        </if>
+        <if test="applyInfo.collegeName != null and applyInfo.collegeName !=''">AND a.college_name LIKE
+            CONCAT('%',#{applyInfo.collegeName},'%' )
+        </if>
+        <if test="applyInfo.majorName != null and applyInfo.majorName !=''">AND a.major_name LIKE
+            CONCAT('%',#{applyInfo.majorName},'%' )
+        </if>
+        <if test="dateStart != null and dateStart !=''">
+            AND course_start_time &gt;= DATE_FORMAT(#{dateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="dateEnd != null and dateEnd !=''">
+            AND course_start_time &lt;= DATE_FORMAT(#{dateEnd}, '%Y-%m-%d %T')
+        </if>
+        order by a.create_time desc
+    </select>
+</mapper>

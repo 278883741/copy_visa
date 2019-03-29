@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionRecordInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionRecordInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="commission_date" jdbcType="TIMESTAMP" property="commissionDate" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="college_id" jdbcType="INTEGER" property="collegeId" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="account" jdbcType="VARCHAR" property="account" />
+    <result column="money" jdbcType="VARCHAR" property="money" />
+    <result column="currency" jdbcType="VARCHAR" property="currency" />
+    <result column="commission_type" jdbcType="INTEGER" property="commissionType" />
+    <result column="invoice_id" jdbcType="VARCHAR" property="invoiceId" />
+    <result column="target_num" jdbcType="VARCHAR" property="targetNum" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+  </resultMap>
+  <select id="getList" resultType="com.aoji.model.CommissionRecordInfo">
+    SELECT
+    id AS id,
+    commission_date AS commissionDate,
+    nation_id AS nationId,
+    nation_name AS nationName,
+    college_id AS collegeId,
+    college_name AS collegeName,
+    account AS account,
+    money AS money,
+    currency AS currency,
+    commission_type AS commissionType,
+    invoice_id as invoiceId,
+    target_num as targetNum,
+    create_time as createTime,
+    update_time as updateTime,
+    delete_status as deleteStatus,
+    operator_no as operatorNo,
+    operator_name as operatorName
+
+    FROM
+    commission_record_info
+    WHERE delete_status = 0
+    <if test="dateStart != null and dateStart !=''">
+      AND commission_date &gt;= DATE_FORMAT(#{dateStart}, '%Y-%m-%d %T')
+    </if>
+    <if test="dateEnd != null and dateEnd !=''">
+      AND commission_date &lt;= DATE_FORMAT(#{dateEnd}, '%Y-%m-%d %T')
+    </if>
+    order by create_time desc
+  </select>
+</mapper>

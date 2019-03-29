@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+
+    .DTFC_LeftBodyLiner {
+        height: 910px ! important;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">查看所有院校申请列表</h3>
+
+                                <input type="hidden" id="planCollegeId"
+                                       th:value="${planCollegeId}"/>
+
+                                <div class="table-header">
+                                <form class="form-inline">
+                                <div class="form-group">
+
+                                    <label for="sNo">院校名称：</label>
+                                    <input type="text" id="collegeName" class="form-control input-sm"
+                                           placeholder="" style="width:60px;" onkeyup="changeTable()"/>
+                                    <label for="sName">专业名称：</label>
+                                    <input type="text" id="majorName" class="form-control input-sm" placeholder=""
+                                           style="width:60px;" onkeyup="changeTable()"/>
+                                </div>
+
+                                    <div class="form-group">
+                                        <label for="sStatus">申请进程：</label>
+                                        <select type="" class="form-control input-sm" id="sStatus"
+                                                style="width:100px;" onchange="changeTable()">
+                                            <option value="">请选择</option>
+                                            <option value="10">未上传文书材料</option>
+                                            <option value="20">未递交申请材料</option>
+                                            <option value="30">未收到申请结果</option>
+                                            <option value="40">未确认录取院校</option>
+                                            <!--<option value="50">未进行签证辅导</option>-->
+                                            <option value="60">未递交签证申请</option>
+                                            <option value="70">未收到签证结果</option>
+                                            <option value="80">未填写获签信息</option>
+                                            <option value="90">已结案</option>
+                                            <option value="100">已退费</option>
+                                            <option value="85">待结案</option>
+                                        </select>
+                                        <label for="applyStatus">申请状态：</label>
+                                        <select type="" class="form-control input-sm" id="applyStatus"
+                                                style="width:60px;" onchange="changeTable()">
+                                            <option value="">请选择</option>
+                                            <option value="10">未提交院校申请</option>
+                                            <option value="20">未收到院校结果</option>
+                                            <option value="30">未确认录取院校</option>
+                                            <option value="40">确认录取已完成</option>
+                                            <option value="50">确认拒绝已完成</option>
+                                        </select>
+                                    </div>
+                                        <div class="form-group">
+                                            <label for="selectNationSearch">留学国家：</label>
+                                            <select class="form-control input-sm" id="selectNationSearch"
+                                                    style="width:150px;height:27px;margin:5px 0;" onchange="changeTable()"
+                                                    data-placeholder="--请选择留学国家--">
+                                                <option></option>
+                                                <option th:each="country:${countryInfoList}" th:value="${country.id}"
+                                                        th:text="${country.countryName}"></option>
+                                            </select>
+                                        </div>
+
+                                    <div class="form-group">
+                                        <label for="sNo">学号：</label>
+                                        <input type="text" id="sNo" class="form-control input-sm"
+                                               placeholder="" style="width:60px;" onkeyup="changeTable()"/>
+                                        <label for="sName">姓名：</label>
+                                        <input type="text" id="sName" class="form-control input-sm" placeholder=""
+                                               style="width:60px;" onkeyup="changeTable()"/>
+
+                                    </div>
+                                <div class="form-group">
+                                    <label for="branch">签约分支：</label>
+                                    <select class="form-control input-sm" id="branch"
+                                            style="width:150px;height:27px;margin:5px 0;" onchange="changeTable()"
+                                            data-placeholder="--请选择留学国家--">
+                                        <option></option>
+                                        <option th:each="branch:${branchInfoList}" th:value="${branch.branchId}"
+                                             th:text="${branch.branchName}"></option>
+                                    </select>
+                                    <label for="sCopy">文签顾问：</label>
+                                    <input type="text" id="sCopy" class="form-control input-sm" placeholder=""
+                                           style="width:60px;" onkeyup="changeTable()"/>
+                                </div>
+
+
+
+                                        <div class="form-group">
+                                            <label>开学时间：</label>
+                                            <input id="dateStart" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width: 160px;margin:5px 0;height:27px;"
+                                                   />
+                                            --
+                                            <input id="dateEnd" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width: 160px;margin:5px 0;height:27px;"
+                                                   />
+                                        </div>
+                                    <button type="button" id="query" class="btn btn-success"
+                                            onclick="changeTable()">查询
+                                    </button>
+                                    <button  class="btn btn-warning">清空</button>
+                                </form>
+                                </div>
+                                <div class="table-responsive">
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th>学号</th>
+                                            <th>姓名</th>
+                                            <th>国家</th>
+                                            <th>咨询顾问</th>
+                                            <th>文签顾问</th>
+                                            <th>申请状态</th>
+                                            <th>申请类型</th>
+                                            <th>院校名称</th>
+                                            <th>专业名称</th>
+                                            <th>学位名称</th>
+                                            <th>申请提交日期</th>
+                                            <th>外联顾问</th>
+                                            <th>申请材料</th>
+                                            <th>申请进程</th>
+                                            <th>开学时间</th>
+                                            <th>签约分支</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>-->
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script type="text/javascript">
+
+    /*<![CDATA[*/
+    var currentUser = $("#currentUser").val();
+    var oTable1;
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter" : false,//是否使用搜索
+            "bProcessing" : true,
+            "bDeferRender" : true,//
+            "sPaginationType" : "bs_normal",//分页样式
+            "bRetrieve" : true,//是否调用后台
+            "bServerSide" : true,//是否以后台分页
+            "bAutoWidth": true,
+            "scrollX": true,
+            "autoWidth":true,
+            "fixedColumns": { //固定列的配置项
+                "leftColumns": 2, //固定左边第一列
+            },
+            "sAjaxSource": "/management/checkAllApplyList",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {name: "collegeName", value: $("#collegeName").val() == "" ? null : $.trim($("#collegeName").val())},
+                    {name: "majorName",   value: $("#majorName").val() == "" ? null : $.trim($("#majorName").val())},
+                    {name: "nationId", value: $("#selectNationSearch").find("option:selected").val() == "" ? null : $("#selectNationSearch").find("option:selected").val()},
+                    {name: "branchId", value: $("#branch").find("option:selected").val() == "" ? null : $("#branch").find("option:selected").val()},
+                    {name: "applyStatusCode", value: $("#applyStatus").find("option:selected").val() == "" ? null : $("#applyStatus").find("option:selected").val()},
+                    {name: "status", value: $("#sStatus").find("option:selected").val() == "" ? null : $("#sStatus").find("option:selected").val()},
+                    {name: 'copyOperator', value: $("#sCopy").val() == "" ? null : $.trim($("#sCopy").val())},
+                    {name: 'studentNo', value: $("#sNo").val() == "" ? null : $.trim($("#sNo").val())},
+                    {name: 'studentName', value: $("#sName").val() == "" ? null : $.trim($("#sName").val())},
+                    {name: 'dateStart', value: $("#dateStart").val() == "" ? null : $.trim($("#dateStart").val())},
+                    {name: 'dateEnd', value: $("#dateEnd").val() == "" ? null : $.trim($("#dateEnd").val())}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": false,
+            "aoColumns": [
+                {"sClass": "center", "bSortable": false,"mData":
+                    function (data) {
+                        var studentDetail = "";
+                        if(data.studentNo.indexOf('TY') == 0){
+                            studentDetail = '<a class="blue" href="javascript:void(0);" onclick="toChannelStudentDetail(\'' + data.studentNo + '\')">' + data.studentNo + '</a>';
+                        }else{
+                            studentDetail = '<a class="blue" href="javascript:void(0);" onclick="toStudentDetail(\'' + data.studentNo + '\')">' + data.studentNo + '</a>';
+                        }
+
+                        return studentDetail;
+                    }},
+                {"sClass": "center", "bSortable": false,"mData": "studentName"},
+                {"sClass": "center", "bSortable": false,"mData": "nationName"},
+                {"sClass": "center", "bSortable": false,"mData": "salesConsultant"},
+                {"sClass": "center", "bSortable": false,"mData": "copyOperator"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function(data){
+                        if (data.applyStatusCode == 10) return "未提交院校申请";
+                        if (data.applyStatusCode == 11) return "未补件";
+                        if (data.applyStatusCode == 20) return "未收到院校结果";
+                        if (data.applyStatusCode == 30) return "未确认录取院校";
+                        if (data.applyStatusCode == 40) return "确认录取已完成";
+                        if (data.applyStatusCode == 50) return "确认拒绝已完成";
+                        return "";
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.applyType == 1){
+                            return "主课";
+                        }
+                        else if (data.applyType == 2){
+                            return "语言";
+                        }
+                        else if (data.applyType == 3){
+                            return "预备";
+                        }
+                        else{
+                            return "";
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false,"mData": "collegeName"},
+                {"sClass": "center", "bSortable": false, "mData": "majorName"},
+                {"sClass": "center", "bSortable": false, "mData": "courseName"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if(data.commitDate == null || data.commitDate == ""){
+                            return null
+                        }else {
+                            return getTimeString(new Date(data.commitDate))
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData":"connectorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.collegeMaterial == null || data.collegeMaterial == "") {
+                            return null;
+                        }
+                        else {
+                            var showImg = '<a onclick="showAttachment(\'' + data.collegeMaterial + '\')">查看</a>';
+                            return showImg;
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.status == 10) {
+                            return "未上传文书材料";
+                        } else if (data.status == 20) {
+                            return "未递交申请材料";
+                        } else if (data.status == 30) {
+                            return "未收到申请结果";
+                        } else if (data.status == 40) {
+                            return "未确认录取院校";
+                        } else if (data.status == 50) {
+                            return "未进行签证辅导";
+                        } else if (data.status == 60) {
+                            return "未递交签证申请";
+                        } else if (data.status == 70) {
+                            return "未收到签证结果";
+                        } else if (data.status == 80) {
+                            return "未填写获签信息";
+                        } else if (data.status == 90) {
+                            return "已结案";
+                        } else if (data.status == 100) {
+                            return "已退费";
+                        } else if (data.status == 85) {
+                            return "待结案";
+                        } else {
+                            return "";
+                        }
+
+                    }},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if(data.courseStartTime == null || data.courseStartTime == ""){
+                            return null
+                        }else {
+                            return getTimeString(new Date(data.courseStartTime))
+                        }
+                    }},
+                {"sClass": "center", "bSortable": false, "mData": "branchName"}
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        });
+    })
+
+    function changeTable() {
+        oTable1.fnDraw()
+    }
+
+    function getTimeString(date){
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m :'0'+m;
+        var d = date.getDate();
+        d = d >= 10 ? d :'0'+d;
+        var h = date.getHours();
+        h = h >= 10 ? h :'0'+h;
+        var minute = date.getMinutes();
+        minute = minute >= 10 ? minute :'0'+minute;
+        var second = date.getSeconds();
+        second = second >= 10 ? second :'0'+second;
+        return  y + '-' + m + '-' + d;
+    }
+
+    function showAttachment(showAttachment) {
+        $.post("/getPrivateUrl",{"fileUrl":showAttachment},function (data,status) {
+            window.open(data);
+        });
+    }
+
+    //跳转学生详情页
+    function toStudentDetail(studentNo) {
+        window.open('/student/detail?studentNo=' + studentNo);
+    }
+
+    //渠道学生详情
+    function toChannelStudentDetail(studentNo) {
+        window.open('/channelStudent/detail?studentNo=' + studentNo);
+    }
+
+    /*]]>*/
+
+</script>
+</body>
+</html>

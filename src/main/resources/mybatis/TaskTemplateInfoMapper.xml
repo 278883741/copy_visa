@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.TaskTemplateInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.TaskTemplateInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="message" jdbcType="VARCHAR" property="message" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="service_code" jdbcType="VARCHAR" property="serviceCode" />
+    <result column="student_nation" jdbcType="VARCHAR" property="studentNation" />
+    <result column="student_visa_type" jdbcType="BIT" property="studentVisaType" />
+  </resultMap>
+</mapper>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="col-sm-6">
+    <div class="table-responsive">
+        <table id="sample-table-3" class="table table-striped table-bordered table-hover">
+            <tbody>
+                <tr th:each="coe : ${coeList}">
+                    <td th:text="${coe}" th:id="${coe}" onclick="coe(id)" ></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+function coe(id){
+    window.open(id)
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="col-xs-12" >
+                    <input id = "id" class = " col-sm-3" style="display:none" th:value="${userGroup!=null}? ${userGroup.id}" />
+                    <input id = "operator" class = " col-sm-3" style="display:none" th:value="${userGroup!=null}? ${userGroup.operatorNo}" />
+                    <input id = "type" class = " col-sm-3" style="display:none" th:value="${type!=null}? ${type}" />
+                    <div class="form-group" style="height:32px">
+                        <span style="display:inline-block;width:72px;text-align:right;">小组名称: </span>
+                        <input id = "group_name" class = " col-sm-3" style="width: 150px" th:value="${userGroup!=null}? ${userGroup.groupName}" />
+                    </div>
+                    <div class="form-group" style="height:32px">
+                        <span style="display:inline-block;width:72px;text-align:right;">国家组: </span>
+                        <select class="col-sm-1 "  id="nation" name="nation" style="width:151px;height:30px;" required="required">
+                            <option value = "0">请选择</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==99}" value="99">渠道组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==101}" value="101">澳新组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==102}" value="102">英国组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==103}" value="103">加拿大组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==104}" value="104">美高组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==105}" value="105">美普组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==106}" value="106">亚洲组</option>
+                            <option th:selected="${userGroup!=null}? ${userGroup.nation==107}" value="107">欧洲组</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="nation_submit" style="display: none" >保存</button>
+                        <button type="button" class="btn btn-default" id="nation_submit_back" style="display: none" >返回</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/business/user/groupTree.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+        var operator = parent.$("#group_operator").val();
+        //保存操作
+        if($("#type").val() != 1){
+            $("#nation_submit").show();
+        }else{
+            $("#nation_submit_back").show();
+        }
+
+        $("#nation_submit_back").click(function(){
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            console.log(index);
+            parent.layer.close(index);
+        })
+
+        $("#nation_submit").click(function () {
+            if($("#nation").children("option:selected").val() == 0){
+                layer.msg("请选择国家组",{time:1500});
+                return;
+            }
+
+            var dataModel={
+                "id":$("#id").val(),
+                "operator":$("#operator").val(),//操作人
+                "groupName":$("#group_name").val(),//小组名称
+                "nation":$("#nation").children("option:selected").val(),
+            }
+            console.log(dataModel);
+
+            $.post("/userGroup/saveGroup", {"data": JSON.stringify(dataModel)},function(data,status) {
+                if(data){
+                    if($("#id").val() == ""){
+                        layer.msg("小组添加成功!",{time:1000},function(){
+                            window.parent.location.reload();
+                            parent.layer.close(index);
+                        })
+                    }else{
+                        layer.msg("小组修改成功!",{time:1000},function(){
+                            window.parent.location.reload();
+                            parent.layer.close(index);
+                        })
+                    }
+
+                }
+
+            });
+        });
+
+    });
+</script>
+</body>
+</html>

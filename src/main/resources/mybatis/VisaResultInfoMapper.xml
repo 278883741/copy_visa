@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.VisaResultInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.VisaResultInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="visa_id" jdbcType="INTEGER" property="visaId" />
+    <result column="visa_result" jdbcType="INTEGER" property="visaResult" />
+    <result column="result_time" jdbcType="TIMESTAMP" property="resultTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="visa_status" jdbcType="INTEGER" property="visaStatus" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="due_date" jdbcType="TIMESTAMP" property="dueDate" />
+    <result column="reject_reason" jdbcType="VARCHAR" property="rejectReason" />
+    <result column="passport_no" jdbcType="VARCHAR" property="passportNo" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <select id="getManageList" resultType="java.util.Map" parameterType="java.util.Map">
+  SELECT id, (SELECT id from visa_apply_info WHERE delete_status = 0 and id = visa_id) as visaApplyId,visaResult.student_no as student_no,student_name,ifnull(nation_name,'') as nation_name,ifnull(create_time,'') as create_time,ifnull(operator_name,'') as operator_name ,visa_status,visa_result,ifnull(attachment,'') as attachment from
+  (
+  (
+  SELECT *  FROM visa_result_info WHERE delete_status = 0
+  <if test="searchOption.searchStudentNo != null and searchOption.searchStudentNo != ''">
+    and student_no = #{searchOption.searchStudentNo}
+  </if>
+  <if test="searchOption.searchVisaResult != null and searchOption.searchVisaResult !='-999'">
+    AND visa_result = #{searchOption.searchVisaResult}
+  </if>
+  <if test="searchOption.searchCreateDateStart != null and searchOption.searchCreateDateStart !=''">
+    AND create_time &gt;= DATE_FORMAT(#{searchOption.searchCreateDateStart}, '%Y-%m-%d %T')
+  </if>
+  <if test="searchOption.searchCreateDateEnd != null and searchOption.searchCreateDateEnd !=''">
+    AND create_time &lt;= DATE_FORMAT(#{searchOption.searchCreateDateEnd}, '%Y-%m-%d %T')
+  </if>
+  <if test="searchOption.searchIsAudited != null and searchOption.searchIsAudited == 1">
+    AND visa_status in (3,4)
+  </if>
+  <if test="searchOption.searchIsAudited != null and searchOption.searchIsAudited == 0">
+    AND visa_status in (1,2)
+  </if>
+  ) as visaResult
+  INNER JOIN
+  (
+  SELECT student_no,student_name, nation_id ,nation_name from student_info where delete_status = 0
+  <if test="searchOption.searchStudentName != null and searchOption.searchStudentName != ''">
+    and student_name LIKE CONCAT('%',#{searchOption.searchStudentName},'%' )
+  </if>
+  <if test="searchOption.searchNationId != null and searchOption.searchNationId != '-999'">
+    and nation_id = #{searchOption.searchNationId}
+  </if>
+  ) as studentInfo
+  ON visaResult.student_no = studentInfo.student_no
+  )ORDER BY visaResult.create_time desc
+</select>
+  <select id="getToAuditList" resultType="java.util.Map" parameterType="java.util.Map">
+    SELECT visaResult.*,studentInfo.student_name from
+    (
+      (SELECT id,student_no,operator_name,create_time,visa_id FROM visa_result_info where delete_status = 0 and visa_status = 1 and operator_no = #{visaResultInfo.operatorNo}) as visaResult
+      INNER JOIN
+      (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+      on visaResult.student_no = studentInfo.student_no
+    )
+  </select>
+</mapper>

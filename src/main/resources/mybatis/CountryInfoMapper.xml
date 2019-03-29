@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CountryInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CountryInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="country_bussid" jdbcType="INTEGER" property="countryBussid" />
+    <result column="country_name" jdbcType="VARCHAR" property="countryName" />
+    <result column="country_group" jdbcType="INTEGER" property="countryGroup" />
+    <result column="country_xiaoxi" jdbcType="INTEGER" property="countryXiaoxi" />
+  </resultMap>
+    <select id="getGroupList" resultType="com.aoji.model.CountryInfo">
+      select id,country_bussid countryBussid,country_name countryName,country_group countryGroup from country_info group by country_group
+    </select>
+    <select id="oldNationId" resultType="java.lang.Integer">
+        select country_bussid from country_info where country_name = '昆省预科（unilearn）'
+    </select>
+    <select id="selectCountryNameByVisaManagerOrDirector" resultType="com.aoji.model.CountryInfo">
+
+         SELECT
+            ci.id,
+            ci.country_name as countryName
+        FROM
+            user_group_relation ugr
+        INNER JOIN user_group ug ON ugr.group_id = ug.id
+        AND ugr.delete_status = 0
+        INNER JOIN country_info ci ON ug.nation = ci.country_group
+        WHERE 1=1
+        <if test="oaid !=null and oaid !=''">
+            and
+            ugr.oaid = #{oaid}
+        </if>
+        GROUP BY
+            ci.country_name
+    </select>
+</mapper>

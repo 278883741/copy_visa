@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.TransferSendMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.TransferSend">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="transfer_id" jdbcType="INTEGER" property="transferId" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="receive_no" jdbcType="VARCHAR" property="receiveNo" />
+    <result column="receive_name" jdbcType="VARCHAR" property="receiveName" />
+    <result column="transfer_type" jdbcType="INTEGER" property="transferType" />
+    <result column="operator_type" jdbcType="INTEGER" property="operatorType" />
+    <result column="transfer_reason" jdbcType="INTEGER" property="transferReason" />
+    <result column="confirm_status" jdbcType="INTEGER" property="confirmStatus" />
+    <result column="enable_status" jdbcType="BIT" property="enableStatus" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+  </resultMap>
+
+  <update id="updateByTransferId" parameterType="java.util.Map">
+    update transfer_send set enable_status = #{enableStatus} where enable_status != #{enableStatus} and transfer_id = #{transferId}
+  </update>
+
+  <select id="selectLastReceiver" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select send.* from
+    (select id from transfer_info where delete_status = 0 and transfer_type = #{transferType} and student_no = #{studentNo}) info,
+    (select * from transfer_send where transfer_type = 2 and delete_status = 0 and confirm_status = 1
+    <if test="operatorType != null">
+      and operator_type = #{operatorType}
+    </if>
+    ) send
+    where info.id = send.transfer_id order by send.create_time desc
+  </select>
+
+  <update id="disableByTransferIdAndOperatorType" parameterType="java.util.Map">
+    update transfer_send set enable_status = 0 where operator_type = #{operatorType} and transfer_id in
+    <foreach collection="sendIds" item="id" open="(" close=")" separator=",">
+      #{id}
+    </foreach>
+  </update>
+</mapper>

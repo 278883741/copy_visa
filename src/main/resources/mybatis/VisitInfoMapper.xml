@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.VisitInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.VisitInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="visit_date" jdbcType="TIMESTAMP" property="visitDate" />
+    <result column="visit_no" jdbcType="VARCHAR" property="visitNo" />
+    <result column="visit_name" jdbcType="VARCHAR" property="visitName" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="sender_type" jdbcType="INTEGER" property="senderType" />
+    <result column="visit_way" jdbcType="INTEGER" property="visitWay" />
+    <result column="visit_case" jdbcType="INTEGER" property="visitCase" />
+    <result column="business_id" jdbcType="INTEGER" property="businessId" />
+    <result column="deadline" jdbcType="TIMESTAMP" property="deadline" />
+    <result column="visit_type" jdbcType="INTEGER" property="visitType" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="next_date" jdbcType="TIMESTAMP" property="nextDate" />
+    <result column="is_public" jdbcType="INTEGER" property="isPublic" />
+  </resultMap>
+
+
+
+  <select id="selectLastVisitDateByStudentNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT *
+    FROM visit_info
+    WHERE delete_status = 0
+    <if test="_parameter != null and _parameter !=''">AND student_no = #{_parameter} </if>
+    AND visit_case = 1
+  </select>
+</mapper>

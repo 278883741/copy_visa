@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+	.error {
+		color: #F00
+	}
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+	<div class="main-container-inner">
+		<div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+		<div class="main-content">
+			<div class="breadcrumbs" id="breadcrumbs">
+				<ul class="breadcrumb">
+					<li><i class="icon-home home-icon"></i>首页</li>
+					<li>佣金系统</li>
+					<li>澳洲代理</li>
+				</ul>
+			</div>
+
+			<div class="page-content">
+				<div class="row">
+					<div class="col-xs-12">
+						<!-- PAGE CONTENT BEGINS -->
+						<div class="row">
+							<div class="col-xs-12">
+								<h3 class="header smaller lighter blue">澳洲代理</h3>
+								<div class="table-header">
+									<form class="form-inline">
+										<div class="form-group">
+											<label for="agentName">代理名称：</label>
+											<input type="text" id="agentName" class="form-control input-sm"  style="width:100px;height:27px;"/>
+										</div>
+										<button type="button" id="query" class="btn btn-success" style="left:120px;">查询</button>
+										<button type="reset" class="btn btn-warning" style="left: 125px;">清空</button>
+										<a href="javascript:void(0);" class="btn btn-info pull-right" onclick="addAgent('')">新增</a>
+									</form>
+								</div>
+								<div class="table-responsive">
+									<div id="alert" class="alert alert-success" style="display: none;" role="alert">
+										<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+										<span id="alertText"></span>
+									</div>
+									<table id="sample-table-2" class="table table-striped table-bordered table-hover">
+										<thead>
+										<tr>
+											<th width="40%">代理名称</th>
+											<th width="20%">操作人名称</th>
+											<th width="20%">创建时间</th>
+											<th width="20%">操作</th>
+										</tr>
+										</thead>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /.col -->
+				</div>
+				<!-- /.row -->
+			</div>
+			<!-- /.page-content -->
+		</div>
+
+		<div th:include="fragments/bottom::bottom"></div>
+	</div>
+
+	<a href="#" id="btn-scroll-up"
+	   class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="icon-double-angle-up icon-only bigger-110"></i>
+	</a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	 aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content"></div>
+	</div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/user/user.js}" charset="UTF-8"></script>
+<script th:src="@{/business/apply/apply.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+	<!--
+    var oTable1;
+    var oaid = "";
+    jQuery(function($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter" : false,//是否使用搜索
+            "bProcessing" : true,
+            "bDeferRender" : true,//
+            "aLengthMenu": [10,20, 50, 100],  //用户可自选每页展示数量 5条或10条
+
+            "scrollX": true,
+            "scrollCollapse": true,
+            scrollY: 400,
+            scroller: {
+                loadingIndicator: true
+            },
+            "sPaginationType" : "bs_normal",//分页样式
+            "bRetrieve" : true,//是否调用后台
+            "bServerSide" : true,//是否以后台分页
+            "sAjaxSource" : "/commissionAusAgent/query",//请求路径
+            "fnServerData" : function(sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name":"agentName","value":$("#agentName").val()==""? null:$("#agentName").val()}
+                )
+                $.ajax({
+                    "dataType" : 'json',
+                    "type" : "GET",
+                    "url" : sSource,
+                    "data" : aoData,
+                    "success" : fnCallback
+                });
+            },
+            "aaSorting" : [ [ 0, "desc" ] ],
+			"bSort":true,
+            "aoColumns" : [
+                {"sClass": "center", "bSortable": false,"mData":"agentName"},
+                {"sClass": "center", "bSortable": false,"mData":
+					function(data){
+						if(data.operatorName == null || data.operatorName == ""){
+						    return ""
+						}else{
+						    return data.operatorName;
+						}
+					}
+				},
+                {"sClass": "center", "bSortable": false,"mData":
+                    function(data){
+                        if(data.createTime == null || data.createTime == ""){
+                            return ""
+                        }else{
+                            return getTimeString(new Date(data.createTime));
+                        }
+                    }
+				},
+                {"sClass" : "center", "bSortable" : false, "mData" : function (data) {
+
+                    var edit='<a href="javascript:void(0);" onclick="addAgent('+data.id+')" >修改</a>&nbsp;&nbsp;&nbsp;&nbsp;';
+                    var toDelete='<a href="javascript:void(0);" onclick="toDeleteAgent('+data.id+')" >删除</a>';
+
+
+
+                    return edit+toDelete;
+                }}
+
+            ],
+            "oLanguage" : {
+                "sLengthMenu" : "每页 _MENU_条 ",
+                "sZeroRecords" : "对不起，查询不到任何相关数据",
+                "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty" : "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered" : "数据表中共为 _MAX_ 条记录)",
+                "sProcessing" : "正在加载中...",
+                "sSearch" : "搜索",
+                "sUrl" : "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate" : {
+                    "sFirst" : "第一页",
+                    "sPrevious" : " 上一页 ",
+                    "sNext" : " 下一页 ",
+                    "sLast" : " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        $("#query").click(function() {
+            oTable1.fnDraw();
+        })
+
+    })
+    function addAgent(id){
+        layer.open({
+            title: '添加代理',
+            type: 2,
+            area: ['450px', '238px'],
+            fixed: false, //不固定
+            content: "/commissionAusAgent/add?id="+id,
+        })
+    }
+
+    function toDeleteAgent(id) {
+        parent.layer.confirm('确定要删除该条记录吗？', {
+            icon: 3,
+            btn: ['确认', '取消'],
+            btn1: function (index, layero) {
+                $.ajax({
+                    url: "/commissionAusAgent/remove",
+                    type: "post",
+                    data: {id : id},
+                    success: function (data) {
+                        if (data) {
+                            layer.msg('操作成功', {time: 1000});
+                            oTable1.fnDraw();
+                        } else {
+                            layer.msg('操作失败', {time: 1000});
+                        }
+                    }
+                });
+            }
+        });
+    }
+  -->
+</script>
+</body>
+</html>

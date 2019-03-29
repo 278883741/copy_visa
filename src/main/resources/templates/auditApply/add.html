@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <form method="post" id="edit">
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <input type="text" name="studentNo"  style="display: none;" th:value="${studentNo}"/>
+                                <input type="text" name="caseId"  style="display: none;" th:value="${auditApplyInfo.caseId}"/>
+                                <input type="text" name="applyId" style="display: none;" th:value="${auditApplyInfo.id}"/>
+                                <input type="text" name="businessId" style="display: none;" th:value="${auditApplyInfo.businessId}"/>
+                                <input type="text" name="lastAudit" style="display: none;" th:value="${auditApplyInfo.lastAudit}"/>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 审批结果：</label>
+                                    <label>
+                                        <input name="applyStatus" type="radio" class="ace" value="1" checked="checked"/>
+                                        <span class="lbl">不通过</span>
+                                    </label>
+                                    <label style="margin-left: 10px;">
+                                        <input name="applyStatus" type="radio" class="ace" value="2"/>
+                                        <span class="lbl">通过</span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 审批意见：</label>
+                                    <textarea class="col-sm-4" name="reason" rows="10" cols="40"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+                <!-- 用于判断此表单审批人是不是当前登录人 -->
+                <input type="text" id="input_currUserNo" th:value="${currUserNo}" style="display: none;"/>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/business/common.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        console.log("当前待审批数据businessId为"+$("input[name='businessId']").val()+",caseId为"+$("input[name='caseId']").val()+",学号为"+$("input[name='studentNo']").val()+"");
+
+        $("#submits").click(function () {
+            $("#submits").attr("disabled","disabled");
+            $.ajax({
+                url: "/auditApply/audit",
+                type: "post",
+                data: $("#edit").serialize(),
+                success: function (data) {
+                    if (data) {
+                        $(".alert-success").text("操作成功").show();
+                        $('#alert').attr('class', 'alert alert-success').show();
+                        setTimeout(
+                            function(){"$('#alert').hide()"
+                            $("#myModal").modal("hide");
+                            window.parent.window.location.reload();}
+                        , 2000);
+
+                    } else {
+                        $('#alertText').text('操作失败');
+                        $('#alert').attr('class', 'alert alert-danger').show();
+                        setTimeout("$('#alert').hide()", 2000);
+                        $("#myModal").modal("hide");
+                        $("#submits").removeAttr("disabled");
+                    }
+                }
+            });
+            //监听modal关闭事件，清除整个页面的缓存数据
+            $("#myModal").on("hidden.bs.modal", function () {
+                $(this).removeData("bs.modal");
+            });
+        });
+    });
+</script>
+</body>
+</html>

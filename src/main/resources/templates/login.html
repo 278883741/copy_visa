@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>登录</title>
+	<link href="css/login.css" rel="stylesheet" />
+	<link href="css/reset.css" rel="stylesheet" />
+	<script src="js/jquery-2.1.4.js"></script>
+	<script src="js/rollups/aes.js"></script>
+	<script src="js/components/mode-ecb.js"></script>
+	<style>
+		input:-webkit-autofill {
+			-webkit-box-shadow: 0 0 0px 1000px white inset;
+			-webkit-text-fill-color: #333;
+		}
+	</style>
+</head>
+
+<body>
+ <form action="/checkLogin" method="post" >
+<div class="wrap clear">
+
+	<div class="box">
+		<h2>用户登录</h2>
+		<div class="form" >
+
+			<div class="phone">
+				<span></span>
+				<input id="oaid" name="oaid" class="user-name" type="text" placeholder="请输入用户名"  value=""/>
+				<i></i>
+			</div>
+			<div class="password">
+				<span></span>
+				<input id="password" name="password" type="password" class="user-pw" placeholder="请输入密码" value=""/>
+			</div>
+
+		</div>
+		<button id="submit" type="submit" class="login" style="margin-top: 40px">登录</button>
+		<div class="tips clear">
+			<p style="color: red;" th:text="${message}"></p>
+			<a id="unLogin" href="javascript:;">无法登录？</a>
+		</div>
+	</div>
+
+</div>
+<div class="opacity">
+	<div class="tips-box">
+		<span></span>
+		<button class="onOff">确定</button>
+	</div>
+</div>
+ </form>
+<script>
+	 function check(){
+         document.getElementById("password").value = "admin";
+     }
+ </script>
+</body>
+</html>

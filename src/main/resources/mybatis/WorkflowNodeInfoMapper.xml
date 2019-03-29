@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.WorkflowNodeInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.WorkflowNodeInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="flow_id" jdbcType="INTEGER" property="flowId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="audit_sequence" jdbcType="INTEGER" property="auditSequence" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="role" jdbcType="INTEGER" property="role" />
+    <result column="last_status" jdbcType="INTEGER" property="lastStatus" />
+  </resultMap>
+</mapper>

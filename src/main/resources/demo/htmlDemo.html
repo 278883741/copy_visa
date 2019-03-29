@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- basic styles -->
+    <link href="../static/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="../static/assets/css/font-awesome.min.css" rel="stylesheet"/>
+    <!-- fonts -->
+    <link href="../static/assets/css/cyrillic.css" rel="stylesheet"/>
+    <!-- ace styles -->
+    <link href="../static/assets/css/ace.min.css" rel="stylesheet"/>
+    <link href="../static/assets/css/ace-rtl.min.css" rel="stylesheet"/>
+    <link href="../static/assets/css/ace-skins.min.css" rel="stylesheet"/>
+    <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="../static/assets/css/jquery-ui-1.10.3.custom.min.css" />
+    <link rel="stylesheet" href="../static/assets/css/jquery.gritter.css" />
+    <link rel="stylesheet" href="../static/assets/css/chosen.css" />
+    <link rel="stylesheet" href="../static/assets/css/datepicker.css" />
+    <link rel="stylesheet" href="../static/assets/css/bootstrap-timepicker.css" />
+    <link rel="stylesheet" href="../static/assets/css/daterangepicker.css" />
+    <link rel="stylesheet" href="../static/assets/css/colorpicker.css" />
+
+    <script src="../static/assets/js/jquery-2.0.3.min.js"></script>
+
+    <script src="../static/assets/js/bootstrap.min.js"></script>
+    <script src="../static/assets/js/typeahead-bs2.min.js"></script>
+
+    <script src="../static/assets/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="../static/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script src="../static/assets/js/bootbox.min.js"></script>
+    <script src="../static/assets/js/jquery.easy-pie-chart.min.js"></script>
+    <script src="../static/assets/js/chosen.jquery.min.js"></script>
+    <script src="../static/assets/js/date-time/bootstrap-datepicker.min.js"></script>
+    <script src="../static/assets/js/date-time/bootstrap-timepicker.min.js"></script>
+    <script src="../static/assets/js/date-time/moment.min.js"></script>
+    <script src="../static/assets/js/bootstrap-colorpicker.min.js"></script>
+    <script src="../static/assets/js/jquery.knob.min.js"></script>
+    <script src="../static/assets/js/jquery.autosize.min.js"></script>
+    <script src="../static/assets/js/jquery.inputlimiter.1.3.1.min.js"></script>
+    <script src="../static/assets/js/jquery.maskedinput.min.js"></script>
+    <script src="../static/assets/js/bootstrap-tag.min.js"></script>
+    <script src="../static/assets/js/fuelux/data/fuelux.tree-sampledata.js"></script>
+    <script src="../static/assets/js/fuelux/fuelux.tree.min.js"></script>
+    <script src="../static/assets/js/ace-elements.min.js"></script>
+    <script src="../static/assets/js/ace.min.js"></script>
+    <script src="../static/assets/js/ace-extra.min.js"></script>
+</head>
+<body>
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+    </script>
+    <div class="main-container-inner">
+        <a class="menu-toggler" id="menu-toggler" href="#">
+            <span class="menu-text"></span>
+        </a>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- 字体 -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">字体</span>
+                                </h3>
+                                <p>
+                                    <div class="col-sm-6">
+                                        <h1>h1. Heading 1</h1>
+                                <p class="lead">
+                                    Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis,
+                                    est non commodo luctus.
+                                </p>
+                                <h2>h2. Heading 2</h2>
+                                <p>
+                                    Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
+                                    mus. Donec ullamcorper nulla non metus auctor fringilla. Duis mollis, est non
+                                    commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Donec
+                                    ullamcorper nulla non metus auctor fringilla.
+                                </p>
+                                <h3>h3. Heading 3</h3>
+                                <p>
+                                    Nullam quis risus eget urna mollis ornare vel eu leo. Cum sociis natoque penatibus
+                                    et magnis dis parturient montes, nascetur ridiculus mus. Nullam id dolor id nibh
+                                    ultricies vehicula.
+                                </p>
+                                <h4>h4. Heading 4</h4>
+                                <h5>h5. Heading 5</h5>
+                                <h6>h6. Heading 6</h6>
+                            </div>
+                            </p>
+                        </div>
+                        <!-- 按钮 -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">按钮</span>
+                                </h3>
+                                <p>
+                                    <button class="btn btn-minier">Default </button>
+                                    <button class="btn btn-minier btn-info">Info</button>
+                                    <button class="btn btn-minier btn-success">Success</button>
+                                    <button class="btn btn-minier btn-warning">Warning</button>
+                                    <button class="btn btn-minier btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn btn-xs">Default </button>
+                                    <button class="btn btn-xs btn-info">Info</button>
+                                    <button class="btn btn-xs btn-success">Success</button>
+                                    <button class="btn btn-xs btn-warning">Warning</button>
+                                    <button class="btn btn-xs btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn btn-sm">Default </button>
+                                    <button class="btn btn-sm btn-info">Info</button>
+                                    <button class="btn btn-sm btn-success">Success</button>
+                                    <button class="btn btn-sm btn-warning">Warning</button>
+                                    <button class="btn btn-sm btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn">Default </button>
+                                    <button class="btn btn-info">Info</button>
+                                    <button class="btn btn-success">Success</button>
+                                    <button class="btn btn-warning">Warning</button>
+                                    <button class="btn btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn btn-lg">Default </button>
+                                    <button class="btn btn-lg btn-info">Info</button>
+                                    <button class="btn btn-lg btn-success">Success</button>
+                                    <button class="btn btn-lg btn-warning">Warning</button>
+                                    <button class="btn btn-lg btn-danger">Danger</button>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">按钮(禁用状态)</span>
+                                </h3>
+                                <p>
+                                    <button class="btn disabled btn-minier">Default </button>
+                                    <button class="btn disabled btn-minier btn-info">Info</button>
+                                    <button class="btn disabled btn-minier btn-success">Success</button>
+                                    <button class="btn disabled btn-minier btn-warning">Warning</button>
+                                    <button class="btn disabled btn-minier btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn disabled btn-xs">Default </button>
+                                    <button class="btn disabled btn-xs btn-info">Info</button>
+                                    <button class="btn disabled btn-xs btn-success">Success</button>
+                                    <button class="btn disabled btn-xs btn-warning">Warning</button>
+                                    <button class="btn disabled btn-xs btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn disabled btn-sm">Default </button>
+                                    <button class="btn disabled btn-sm btn-info">Info</button>
+                                    <button class="btn disabled btn-sm btn-success">Success</button>
+                                    <button class="btn disabled btn-sm btn-warning">Warning</button>
+                                    <button class="btn disabled btn-sm btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn disabled">Default </button>
+                                    <button class="btn disabled btn-info">Info</button>
+                                    <button class="btn disabled btn-success">Success</button>
+                                    <button class="btn disabled btn-warning">Warning</button>
+                                    <button class="btn disabled btn-danger">Danger</button>
+                                </p>
+                                <p>
+                                    <button class="btn disabled btn-lg">Default </button>
+                                    <button class="btn disabled btn-lg btn-info">Info</button>
+                                    <button class="btn disabled btn-lg btn-success">Success</button>
+                                    <button class="btn disabled btn-lg btn-warning">Warning</button>
+                                    <button class="btn disabled btn-lg btn-danger">Danger</button>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- 分页 -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">分页</span>
+                                </h3>
+                                <p><div>
+                                <ul class="pagination">
+                                    <li class="disabled"><a href="#"><i class="icon-double-angle-left"></i></a></li>
+                                    <li class="active"><a href="#">1</a></li>
+                                    <li><a href="#">2</a></li>
+                                    <li><a href="#">3</a></li>
+                                    <li><a href="#">4</a></li>
+                                    <li><a href="#">5</a></li>
+                                    <li><a href="#"><i class="icon-double-angle-right"></i></a></li>
+                                </ul>
+                            </div></p>
+                            </div>
+                        </div>
+                        <!-- 树形菜单 -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">树形菜单</span>
+                                </h3>
+                                <div class="widget-box">
+                                    <div class="widget-header header-color-green2">
+                                        <h4 class="lighter smaller">Browse Files</h4>
+                                    </div>
+                                    <div class="widget-body">
+                                        <div class="widget-main padding-8">
+                                            <div id="tree2" class="tree"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            var $assets = "assets";//this will be used in fuelux.tree-sampledata.js
+                            $('#tree2').ace_tree({
+                                dataSource: treeDataSource2 ,
+                                loadingHTML:'<div class="tree-loading"><i class="icon-refresh icon-spin blue"></i></div>',
+                                'open-icon' : 'icon-folder-open',
+                                'close-icon' : 'icon-folder-close',
+                                'selectable' : false,
+                                'selected-icon' : null,
+                                'unselected-icon' : null
+                            });
+                        </script>
+                        <!-- 文本框-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">文本框</span>
+                                </h3>
+                                <div class="form-group">
+                                    <label for="inputWarning" class="col-xs-12 col-sm-3 control-label no-padding-right">文本框</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" placeholder="Username" class="width-100">
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputWarning" class="col-xs-12 col-sm-3 control-label no-padding-right">文本框 - 密码</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="password" placeholder="Password" class="width-100">
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputError" class="col-xs-12 col-sm-3 col-md-3 control-label no-padding-right">文本框 - 只读</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input readonly="" type="text" class="width-100">
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputError" class="col-xs-12 col-sm-3 col-md-3 control-label no-padding-right">文本框 - 提示</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input data-rel="tooltip" type="text" placeholder="Tooltip on hover" title="Hello Tooltip!" data-placement="bottom">
+                                            <span class="help-button" data-rel="popover" data-trigger="hover" data-placement="left" data-content="More details." title="Popover on hover">?</span>
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+
+                                    </div>
+                                </div>
+                                <div class="form-group has-warning">
+                                    <label for="inputWarning" class="col-xs-12 col-sm-3 control-label no-padding-right">Input with warning</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="inputWarning" class="width-100">
+                                            <i class="icon-leaf"></i>
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+                                        Warning tip help!
+                                    </div>
+                                </div>
+                                <div class="form-group has-error">
+                                    <label for="inputError" class="col-xs-12 col-sm-3 col-md-3 control-label no-padding-right">Input with error</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="inputError" class="width-100">
+                                            <i class="icon-remove-sign"></i>
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline"> Error tip help! </div>
+                                </div>
+                                <div class="form-group has-success">
+                                    <label for="inputSuccess" class="col-xs-12 col-sm-3 control-label no-padding-right">Input with success</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="inputSuccess" class="width-100">
+                                            <i class="icon-ok-sign"></i>
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline">
+                                        Success tip help!
+                                    </div>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="inputInfo" class="col-xs-12 col-sm-3 control-label no-padding-right">Input with info</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <input type="text" id="inputInfo" class="width-100">
+                                            <i class="icon-info-sign"></i>
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline"> Info tip help! </div>
+                                </div>
+                                <div class="form-group has-info">
+                                    <label for="inputInfo" class="col-xs-12 col-sm-3 control-label no-padding-right">文本域</label>
+                                    <div class="col-xs-12 col-sm-5">
+                                        <span class="block input-icon input-icon-right">
+                                            <textarea class="form-control" placeholder="Default Text"></textarea>
+
+                                        </span>
+                                    </div>
+                                    <div class="help-block col-xs-12 col-sm-reset inline"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 开关-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">开关</span>
+                                </h3>
+                                <p>
+                                    <label>
+                                        <input name="switch-field-1" class="ace ace-switch ace-switch-3" type="checkbox">
+                                        <span class="lbl"></span>
+                                    </label>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- 日期控件-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">日期控件</span>
+                                </h3>
+                                <p>
+                                <div class="input-group col-sm-3">
+                                    <input class="form-control date-picker" id="id-date-picker-1" type="text" data-date-format="dd-mm-yyyy">
+                                    <span class="input-group-addon"><i class="icon-calendar bigger-110"></i></span>
+                                </div>
+                                </p>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            $('.date-picker').datepicker({autoclose:true}).next().on(ace.click_event, function(){
+                                $(this).prev().focus();
+                            });
+                        </script>
+                        <!-- 上传文件-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">文件上传</span>
+                                </h3>
+                                <p>
+                                <div class="input-group col-sm-4">
+                                    <div class="widget-box">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input type="file" id="id-input-file-2" />
+                                                <input multiple="" type="file" id="id-input-file-3" />
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                    <span class="lbl"> Allow only images</span>
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+<script>
+                                $('#id-input-file-1 , #id-input-file-2').ace_file_input({
+                                no_file:'No File ...',
+                                btn_choose:'Choose',
+                                btn_change:'Change',
+                                droppable:false,
+                                onchange:null,
+                                thumbnail:false //| true | large
+                                //whitelist:'gif|png|jpg|jpeg'
+                                //blacklist:'exe|php'
+                                //onchange:''
+                                //
+                                });
+
+                                $('#id-input-file-3').ace_file_input({
+                                style:'well',
+                                btn_choose:'Drop files here or click to choose',
+                                btn_change:null,
+                                no_icon:'icon-cloud-upload',
+                                droppable:true,
+                                thumbnail:'small'//large | fit
+                                //,icon_remove:null//set null, to hide remove/reset button
+                                /**,before_change:function(files, dropped) {
+                                //Check an example below
+                                //or examples/file-upload.html
+                                return true;
+                                }*/
+                                /**,before_remove : function() {
+                                return true;
+                                }*/
+                                ,
+                                preview_error : function(filename, error_code) {
+                                //name of the file that failed
+                                //error_code values
+                                //1 = 'FILE_LOAD_FAILED',
+                                //2 = 'IMAGE_LOAD_FAILED',
+                                //3 = 'THUMBNAIL_FAILED'
+                                //alert(error_code);
+                                }
+
+                                }).on('change', function(){
+                                //console.log($(this).data('ace_input_files'));
+                                //console.log($(this).data('ace_input_method'));
+                                });
+
+
+                                //dynamically change allowed formats by changing before_change callback function
+                                $('#id-file-format').removeAttr('checked').on('change', function() {
+                                var before_change
+                                var btn_choose
+                                var no_icon
+                                if(this.checked) {
+                                btn_choose = "Drop images here or click to choose";
+                                no_icon = "icon-picture";
+                                before_change = function(files, dropped) {
+                                var allowed_files = [];
+                                for(var i = 0 ; i < files.length; i++) {
+                                var file = files[i];
+                                if(typeof file === "string") {
+                                //IE8 and browsers that don't support File Object
+                                if(! (/\.(jpe?g|png|gif|bmp)$/i).test(file) ) return false;
+                                }
+                                else {
+                                var type = $.trim(file.type);
+                                if( ( type.length > 0 && ! (/^image\/(jpe?g|png|gif|bmp)$/i).test(type) )
+                                || ( type.length == 0 && ! (/\.(jpe?g|png|gif|bmp)$/i).test(file.name) )//for android's default browser which gives an empty string for file.type
+                                ) continue;//not an image so don't keep this file
+                                }
+
+                                allowed_files.push(file);
+                                }
+                                if(allowed_files.length == 0) return false;
+
+                                return allowed_files;
+                                }
+                                }
+                                else {
+                                btn_choose = "Drop files here or click to choose";
+                                no_icon = "icon-cloud-upload";
+                                before_change = function(files, dropped) {
+                                return files;
+                                }
+                                }
+                                var file_input = $('#id-input-file-3');
+                                file_input.ace_file_input('update_settings', {'before_change':before_change, 'btn_choose': btn_choose, 'no_icon':no_icon})
+                                file_input.ace_file_input('reset_input');
+                                });
+
+</script>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- 下拉框 -- 单选-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">下拉框</span>
+                                </h3>
+                                <p>
+                                <div class="input-group col-sm-6">
+                                    <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right">下拉框-单选</label>
+                                    <div class="col-sm-4">
+                                        <select class="width-80 chosen-select" id="form-field-select-3" data-placeholder="Choose a Country...">
+                                            <option value="">&nbsp;</option>
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CA">California</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NY">New York</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                </div>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- 下拉框 -- 多选-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <p>
+                                <div class="input-group col-sm-6">
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label no-padding-right">下拉框-单选</label>
+                                        <div class="col-sm-4">
+                                            <select multiple="" class="width-80 chosen-select" id="form-field-select-4" data-placeholder="Choose a Country...">
+                                        <option value="">&nbsp;</option>
+                                        <option value="AL">Alabama</option>
+                                        <option value="AK">Alaska</option>
+                                        <option value="AZ">Arizona</option>
+                                        <option value="AR">Arkansas</option>
+                                        <option value="OK">Oklahoma</option>
+                                        <option value="OR">Oregon</option>
+                                        <option value="PA">Pennsylvania</option>
+                                        <option value="RI">Rhode Island</option>
+                                        <option value="SC">South Carolina</option>
+                                        <option value="SD">South Dakota</option>
+                                        <option value="TN">Tennessee</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="UT">Utah</option>
+                                        <option value="VT">Vermont</option>
+                                        <option value="VA">Virginia</option>
+                                        <option value="WA">Washington</option>
+                                        <option value="WV">West Virginia</option>
+                                        <option value="WI">Wisconsin</option>
+                                        <option value="WY">Wyoming</option>
+                                    </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                </p>
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            $(".chosen-select").chosen();
+                            $('#form-field-select-4').addClass('tag-input-style');
+                        </script>
+                        <!-- checkbox-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">checkbox</span>
+                                </h3>
+                                <p>
+                                <div class="input-group col-sm-3">
+                                    <div class="form-group">
+                                        <div class="col-sm-4">
+                                            <div class="control-group">
+                                                <label class="control-label bolder blue">Checkbox</label>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input name="form-field-checkbox" type="checkbox" class="ace">
+                                                        <span class="lbl"> choice 1</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input name="form-field-checkbox" type="checkbox" class="ace">
+                                                        <span class="lbl"> choice 2</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input name="form-field-checkbox" class="ace ace-checkbox-2" type="checkbox">
+                                                        <span class="lbl"> choice 3</span>
+                                                    </label>
+                                                </div>
+                                                <div class="checkbox">
+                                                    <label class="block">
+                                                        <input name="form-field-checkbox" disabled="" type="checkbox" class="ace">
+                                                        <span class="lbl"> disabled</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- radio-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">radio</span>
+                                </h3>
+                                <p>
+                                    <div class="col-xs-12 col-sm-6">
+                                        <div class="control-group">
+                                        <label class="control-label bolder blue">Radio</label>
+
+                                        <div class="radio">
+                                            <label>
+                                                <input name="form-field-radio" type="radio" class="ace">
+                                                <span class="lbl"> radio option 1</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="radio">
+                                            <label>
+                                                <input name="form-field-radio" type="radio" class="ace">
+                                                <span class="lbl"> radio option 2</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="radio">
+                                            <label>
+                                                <input name="form-field-radio" type="radio" class="ace">
+                                                <span class="lbl"> radio option 3</span>
+                                            </label>
+                                        </div>
+
+                                        <div class="radio">
+                                            <label>
+                                                <input disabled="" name="form-field-radio" type="radio" class="ace">
+                                                <span class="lbl"> disabled</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </p>
+                            </div>
+                            </div>
+                        <!-- 进度条 -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">进度条</span>
+                                </h3>
+                                <p>
+                                    <div class="col-sm-3">
+                                        <div class="progress progress-striped" data-percent="25%">
+                                            <div class="progress-bar progress-bar-success" style="width: 25%;"></div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                        <div class="col-sm-3">
+                            <div class="easy-pie-chart percentage" data-percent="90" data-color="#87B87F">
+                                <span class="percent">90</span>%
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            var oldie = /msie\s*(8|7|6)/.test(navigator.userAgent.toLowerCase());
+                            $('.easy-pie-chart.percentage').each(function(){
+                                $(this).easyPieChart({
+                                    barColor: $(this).data('color'),
+                                    trackColor: '#EEEEEE',
+                                    scaleColor: false,
+                                    lineCap: 'butt',
+                                    lineWidth: 8,
+                                    animate: oldie ? false : 1000,
+                                    size:75
+                                }).css('color', $(this).data('color'));
+                            });
+                        </script>
+                    </div>
+                        <!-- tab -->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h3 class="row-fluid header smaller lighter purple">
+                                    <span class="span7">tab标签</span>
+                                </h3>
+                                <p>
+                                    <div class="col-sm-6">
+                                        <div class="tabbable">
+                                            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab4">
+                                                <li class="active"><a data-toggle="tab" href="#home4">Home</a></li>
+                                                <li><a data-toggle="tab" href="#profile4">Profile</a></li>
+                                                <li><a data-toggle="tab" href="#dropdown14">More</a></li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div id="home4" class="tab-pane in active"><p>Raw denim you probably haven't heard of them jean shorts Austin.</p></div>
+                                                <div id="profile4" class="tab-pane"><p>Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid.</p></div>
+                                                <div id="dropdown14" class="tab-pane"><p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade.</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- tabend -->
+                        <!-- Accordion -->
+                        <div class="row">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <h3 class="row-fluid header smaller lighter purple">
+                                        <span class="span7">Accordion</span>
+                                    </h3>
+                                    <p>
+                                    <div id="accordion" class="accordion-style1 panel-group col-sm-6">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                                        <i class="bigger-110 icon-angle-right" data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i>
+                                                        &nbsp;Group Item #1
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapseOne" style="height: 0px;">
+                                                <div class="panel-body">
+                                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                                                        <i class="bigger-110 icon-angle-right" data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i>
+                                                        &nbsp;Group Item #2
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapseTwo" style="height: 0px;">
+                                                <div class="panel-body">
+                                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <h4 class="panel-title">
+                                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+                                                        <i class="bigger-110 icon-angle-right" data-icon-hide="icon-angle-down" data-icon-show="icon-angle-right"></i>
+                                                        &nbsp;Group Item #3
+                                                    </a>
+                                                </h4>
+                                            </div>
+                                            <div class="panel-collapse collapse" id="collapseThree" style="height: 0px;">
+                                                <div class="panel-body">
+                                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

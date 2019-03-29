@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+
+    .DTFC_LeftBodyLiner {
+        height: 910px ! important;
+    }
+
+    #sample-table-2 {
+        width: 100% !important;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i>首页</li>
+                    <li>佣金系统管理</li>
+                    <li>佣金学生列表</li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">佣金管理</h3>
+                                <div class="table-header">
+                                    <shiro:hasRole name="佣金系统_海外操作">
+                                        <input type="hidden" id="permission_commissionOverseas" value="1"/>
+                                    </shiro:hasRole>
+                                    <form class="form-inline row">
+                                        <div class="form-group col-lg-2">
+                                            <label for="studentName">姓名/拼音：</label>
+                                            <input type="text" id="studentName" class="form-control input-sm"
+                                                   style="width:50%;height:27px;"  onchange="changeTable()"/>
+                                        </div>
+
+                                        <div class="form-group col-lg-2">
+                                            <label for="studentNo">澳际学号：</label>
+                                            <input type="text" id="studentNo" class="form-control input-sm"
+                                                   style="width:50%;height:27px;"  onchange="changeTable()"/>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                            <label for="contractType">合同类型：</label>
+                                            <select type="" class="form-control input-sm" id="contractType"
+                                                    style="width:50%;height:27px;"  onchange="changeTable()">
+                                                <option value="" selected="selected">--请选择--</option>
+                                                <option value="1">全程合同</option>
+                                                <option value="2">单申请合同</option>
+                                                <option value="3">单文书合同</option>
+                                                <option value="4">单签证合同</option>
+                                                <option value="5">预科合同</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                            <label for="visaNation">获签国家：</label>
+                                            <select type="" class="form-control input-sm" id="visaNation"
+                                                    style="width:50%;height:27px;" onchange="changeTable()">
+                                                <option value="" selected="selected">--请选择--</option>
+                                                <option value="99">澳洲</option>
+                                                <option value="100">非澳洲</option>
+                                                <option th:each="item: ${countryList}" th:value="${item.id}" th:text="${item.countryName}"></option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-4">
+                                            <label for="openSchoolTime">开学时间：</label>
+                                            <input id="openSchoolTime" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                            --
+                                            <input id="endSchoolTime" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                        </div>
+
+
+                                        <div class="form-group col-lg-2">
+                                            <label for="college">学校：</label>
+                                            <input type="text" id="college" class="form-control input-sm" style="width:67%;height:27px;" onchange="changeTable()"/>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                            <label for="schoolStatus">专业类型：</label>
+                                            <select type="" class="form-control input-sm" id="schoolStatus"
+                                                    style="width:50%;height:27px;" onchange="changeTable()">
+                                                <option value="" selected="selected">--请选择--</option>
+                                                <option value="1">主课</option>
+                                                <option value="2">语言</option>
+                                                <option value="3">预备</option>
+                                                <option value="4">快捷</option>
+                                                <option value="5">夏校</option>
+                                                <option value="6">桥梁</option>
+                                                <option value="7">top up</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-lg-2">
+                                            <label for="maidAttach">结佣归属：</label>
+                                            <select type="" class="form-control input-sm" id="maidAttach"
+                                                    style="width:50%;height:27px;" onchange="changeTable()">
+                                                <option value="" selected="selected">--请选择--</option>
+                                                <option value="1">AEA</option>
+                                                <option value="2">ECIE</option>
+                                                <option value="2">BAEC</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                            <label for="maidStatus">结佣状态：</label>
+                                            <select type="" class="form-control input-sm" id="maidStatus"
+                                                    style="width:50%;height:27px;" onchange="changeTable()">
+                                                <option value="" selected="selected">--请选择--</option>
+                                                <option value="1">未开始</option>
+                                                <option value="2">进行中</option>
+                                                <option value="3">已结束</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-lg-4">
+                                            <label for="enteringTime">获签日期：</label>
+                                            <input id="enteringTime" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                            --
+                                            <input id="enteringTimeEnd" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                        </div>
+
+                                        <div class="form-group col-lg-4">
+                                            <label for="coeDateStartString">登记日期：</label>
+                                            <input id="coeDateStartString" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                            --
+                                            <input id="coeDateEndString" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                        </div>
+                                        <div class="form-group col-lg-2">
+                                            <label for="consulter">咨询顾问：</label>
+                                            <input type="text" id="consulter" class="form-control input-sm"
+                                                   style="width:50%;height:27px;"  onchange="changeTable()"/>
+                                        </div>
+                                        <div class="form-group col-lg-4">
+                                            <label for="birthday_string">生日：</label>
+                                            <input id="birthday_string" class="Wdate"
+                                                   onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:30%;margin:5px 0;height:27px;" onchange="changeTable()"/>
+                                        </div>
+                                        <div class="form-group col-lg-4" style="float:right; width:100%">
+                                            <div style="float:right">
+                                                <button onclick="changeTable()"  class="btn btn-warning">清空</button>
+                                                <button type="button" id="btnAll" class="btn btn-success">添加至Invoice(0)
+                                                </button>
+                                                <button type="button" id="commissionAdd" class="btn btn-success">新增
+                                                </button>
+                                                <button type="button" id="commissionExcel" class="btn btn-success">导出
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th class="center">
+                                                <input type="checkbox" class="checkall" onclick="checkAll(this)"/>
+                                            </th>
+                                            <th>澳际学号</th>
+                                            <th>姓名</th>
+                                            <th>拼音</th>
+                                            <th>出生日期</th>
+                                            <th>获签国家</th>
+                                            <th>获签日期</th>
+                                            <th>合作机构</th>
+                                            <th>学校名称</th>
+                                            <th>开学时间</th>
+                                            <th>专业类型</th>
+                                            <th>学位名称</th>
+                                            <th>上课校区</th>
+                                            <th>结佣归属</th>
+                                            <th>结佣状态</th>
+                                            <th>学生备注</th>
+                                            <th>课程备注</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!-- page specific plugin scripts -->
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/pagination.input.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/temp.js}"></script>
+<script th:src="@{/business/apply/apply.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    var schoolIdSet = new Set([]);
+    var oTable1;
+    var oaid = "";
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "ordering": false, // 禁止排序
+
+            "aLengthMenu": [50, 100, 200, 500],  //用户可自选每页展示数量
+
+            "scrollX": true,
+            "scrollCollapse": true,
+            scrollY: '450px',
+            scroller: {
+                loadingIndicator: true
+            },
+            "bProcessing": true,//显示搜索样式
+            "bDeferRender": true,//延迟加载表格
+//            <!--"fixedColumns": { //固定列的配置项-->
+//                <!--"leftColumns": 3, //固定左边第一列-->
+//            <!--},-->
+            "buttons": [
+                {"extend": 'create', "editor": "myEditor"},
+                {"extend": 'edit', "editor": "myEditor"},
+                {"extend": 'remove', "editor": "myEditor"}
+            ],
+            "bInfo": true,
+            "bFilter": false,//是否使用搜索
+            "sPaginationType": "bs_normal",//分页样式
+            'pagingType': 'input',
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/commissionManage_queryStus",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "studentNo", "value": $("#studentNo").val() == "" ? null : $("#studentNo").val()},//学号
+                    {"name": "studentName", "value": $("#studentName").val() == "" ? null : $("#studentName").val()},//姓名或拼音
+                    {"name": "consulter", "value": $("#consulter").val() == "" ? null : $("#consulter").val()},//咨询顾问
+                    {
+                        "name": "contractType",
+                        "value": $("#contractType").children('option:selected').val() == "" ? null : $("#contractType").children('option:selected').val()
+                    },//合同类型
+                    {
+                        "name": "nationName",
+                        "value": $("#visaNation").children('option:selected').val() == "" ? null : $("#visaNation").children('option:selected').val()
+                    },//获签国家
+                    {
+                        "name": "comissionBelong",
+                        "value": $("#maidAttach").children('option:selected').val() == "" ? null : $("#maidAttach").children('option:selected').val()
+                    },//结佣归属
+                    {
+                        "name": "status",
+                        "value": $("#maidStatus").children('option:selected').val() == "" ? null : $("#maidStatus").children('option:selected').val()
+                    },//结佣状态
+                    {"name": "schoolName", "value": $("#college").val() == "" ? null : $.trim($("#college").val())},//学校名称
+                    {
+                        "name": "collegeType",
+                        "value": $("#schoolStatus").children('option:selected').val() == "" ? null : $("#schoolStatus").children('option:selected').val()
+                    },//学校类型
+                    {
+                        "name": 'startDate_string',
+                        "value": $("#openSchoolTime").val() == "" ? null : $("#openSchoolTime").val()
+                    },//开学时间
+                    {
+                        "name": 'endDate_string',
+                        "value": $("#endSchoolTime").val() == "" ? null : $("#endSchoolTime").val()
+                    },//开学时间(查询最后)
+                    {
+                        "name": 'createTime_string',
+                        "value": $("#enteringTime").val() == "" ? null : $("#enteringTime").val()
+                    },//录入日期
+                    {
+                        "name": 'createTimeEnd_string',
+                        "value": $("#enteringTimeEnd").val() == "" ? null : $("#enteringTimeEnd").val()
+                    },//录入日期(查询最后)
+                    //生日
+                    {
+                        "name": 'birthday_string',
+                        "value": $("#birthday_string").val() == "" ? null : $("#birthday_string").val()
+                    },
+                    //登记日期(开始时间)
+                    {
+                        "name": 'coeDateStartString',
+                        "value": $("#coeDateStartString").val() == "" ? null : $("#coeDateStartString").val()
+                    },//登记日期（结束时间）
+                    {
+                        "name": 'coeDateEndString',
+                        "value": $("#coeDateEndString").val() == "" ? null : $("#coeDateEndString").val()
+                    }
+
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data, row) {
+                        for(var i of schoolIdSet){
+                            if(i == data.id){
+                                return '<input type="checkbox" onclick="check(this)" checked="checked" class="checkchild" name="checkchild" value="' + data.id + '"/> ';
+                            }
+                        }
+                        return '<input type="checkbox" onclick="check(this)" class="checkchild" name="checkchild" value="' + data.id + '"/> ';
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        var studentDetail = '<a class="blue" href="javascript:void(0);" onclick="toCommissionEdit(\'' + data.studentId + '\')">' + data.studentNo + '</a>';
+                        return studentDetail;
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.studentName == "" || data.studentName == null) {
+                            return "";
+                        } else {
+                            return data.studentName;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.pinyin == "" || data.pinyin == null) {
+                            return "";
+                        } else {
+                            return data.pinyin;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.birthday == "" || data.birthday == null) {
+                            return ""
+                        } else {
+                            return getTimeString_day(new Date(data.birthday))
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.nationName == "" || data.nationName == null) {
+                            return "";
+                        } else {
+                            return data.nationName;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.visaDate == "" || data.visaDate == null) {
+                            return "";
+                        } else {
+                            return getTimeString_day(new Date(data.visaDate))
+                        }
+                    }
+                },
+
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.agencyName == "" || data.agencyName == null) {
+                            return "";
+                        } else {
+                            return data.agencyName;
+                        }
+                    }
+                },
+
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.schoolName == "" || data.schoolName == null) {
+                            return "";
+                        } else {
+                            return data.schoolName;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.startDate == "" || data.startDate == null) {
+                            return "";
+                        } else {
+                            return getTimeString_day(new Date(data.startDate))
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.collegeType == "" || data.collegeType == null) {
+                            return "";
+                        } else {
+                            if (data.collegeType == "1") {
+                                return "主课";
+                            } else if (data.collegeType == "2") {
+                                return "语言";
+                            } else if (data.collegeType == "3") {
+                                return "预备";
+                            }else if (data.collegeType == "4") {
+                                return "快捷";
+                            }else if (data.collegeType == "5") {
+                                return "夏校";
+                            }else if(data.collegeType == "6"){
+                                return "桥梁";
+                            }else if(data.collegeType == "7"){
+                                return "top up";
+                            }
+                            else {
+                                return "";
+                            }
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.courseName == "" || data.courseName == null) {
+                            return "";
+                        } else {
+                            return data.courseName;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.schoolArea == "" || data.schoolArea == null) {
+                            return "";
+                        } else {
+                            return data.schoolArea;
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.comissionBelong == "" || data.comissionBelong == null) {
+                            return "";
+                        } else if (data.comissionBelong == "1") {
+                            return "AEA";
+                        } else if (data.comissionBelong == "2") {
+                            return "ECIE"
+                        } else if (data.comissionBelong == "3") {
+                            return "BAEC"
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                    if (data.status == "1") {
+                        return "未开始";
+                    } else if (data.status == "2") {
+                        return "进行中";
+                    } else if (data.status == "3") {
+                        return "已结束";
+                    } else {
+                        return "";
+                    }
+                }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.remarkOne == null || data.remarkOne == "") {
+                            return ""
+                        }
+                        if (data.remarkOne.length > 6) {
+                            return '<a href="javascript:void(0);" id="' + data.id + '" onclick="toTipContent(' + data.id + ',\'' + data.remarkOne.replace(/\r\n/mg, '  ') + '\')" >' + data.remarkOne.substring(0, 7) + "..." + '</a>';
+                        } else {
+                            return data.remarkOne;
+                        }
+                        return data.remarkOne;
+
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.remarkTwo == null || data.remarkTwo == "") {
+                            return ""
+                        }
+                        if (data.remarkTwo.length > 6) {
+                            return '<a href="javascript:void(0);" id="' + data.id + '" onclick="toTipContent(' + data.id + ',\'' + data.remarkTwo.replace(/\r\n/mg, '  ') + '\')" >' + data.remarkTwo.substring(0, 7) + "..." + '</a>';
+                        } else {
+                            return data.remarkTwo;
+                        }
+                        return data.remarkTwo;
+                    }
+                },
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+
+    })
+    function checkAll(that) {
+        if (that.checked) {
+            $(that).attr('checked', 'checked')
+            $('.checkchild').each(function () {
+                this.checked = true;
+                schoolIdSet.add(this.value);
+            });
+        } else {
+            $(that).removeAttr('checked')
+            $('.checkchild').each(function () {
+                this.checked = false;
+                schoolIdSet.delete(this.value);
+            });
+        }
+        console.log(schoolIdSet.size);
+        $("#btnAll").text("添加至Invoice("+schoolIdSet.size+")");
+    }
+
+    function check(label){
+        if(label.checked){
+            schoolIdSet.add(label.value);
+        }else{
+            schoolIdSet.delete(label.value);
+        }
+        console.log(schoolIdSet.size);
+        $("#btnAll").text("添加至Invoice("+schoolIdSet.size+")");
+    }
+
+    //批量编辑
+    $('#btnAll').on('click', function () {
+        var number = '';
+        var arr = '';
+        $('input:checkbox[name=checkchild]:checked').each(function (k) {
+            if (k == 0) {
+                number = $(this).val();
+            } else {
+                number += ',' + $(this).val();
+            }
+            if (k == 0) {
+                arr = 1;
+            } else if (k > 0) {
+                arr = number.split(",").length;
+            } else {
+                arr = 0;
+            }
+        })
+       var schoolIdStr = "";
+        for(var i of schoolIdSet){
+            schoolIdStr += i;
+            schoolIdStr += ',';
+        }
+        if(schoolIdStr == ""){
+            layer.alert("请勾选至少一条记录！",{
+                icon: 0
+            })
+            return;
+        }
+
+        window.open("/invoice/add?schoolIdStr="+schoolIdStr);
+    });
+
+    $("#commissionAdd").click(function () {
+        location.href = "/commissionManage/add";
+    })
+
+    function toCommissionEdit(studentId) {
+        window.open("/commissionManage/edit?studentId=" + studentId);
+    }
+
+    $("#commissionExcel").click(function(){
+        location.href = '/commissionManage/excel';
+    })
+
+    function toTipContent(id, content) {
+        layer.tips(content, $("#" + id), {
+            tips: [1, '#3595CC'],
+            time: 3000
+        });
+    }
+
+    function getTimeString_day(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m : '0' + m;
+        var d = date.getDate();
+        d = d >= 10 ? d : '0' + d;
+        return y + '-' + m + '-' + d;
+    }
+
+    function changeTable() {
+        oTable1.fnDraw()
+    }
+
+    $(function () {
+        if ($("#permission_commissionOverseas").val() == 1) {
+                $("#btnAll").hide();
+        }
+    });
+
+
+
+    $(document).ready(function(){
+        document.onkeydown=function(evt){
+            if(evt.keyCode ==13){
+                return false;
+            }
+        }
+    });
+
+
+
+
+
+
+    
+
+</script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/datepicker.css}" />
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+            <!--<ul class="breadcrumb">-->
+            <!--<li>首页</li>-->
+            <!--<li>院校申请</li>-->
+            <!--<li>添加补件信息</li>-->
+            <!--</ul>-->
+            <!--</div>-->
+
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">添加佣金记录</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="applyId" id="applyId" th:value="${#httpServletRequest.getParameter('applyId')}"/>
+                    <input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                    <input type="hidden" name="nationName" id="nationName"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">佣金类型：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="commissionType" name="commissionType" style="width:190px;height:25px;">
+                                        <option value="-1" >请选择</option>
+                                        <option value="1" >市场费</option>
+                                        <option value="2" >Bonus</option>
+                                        <option value="3" >后续佣金</option>
+                                        <option value="4" >外训机票款</option>
+                                    </select>
+                                    <label class="col-sm-2 control-label no-padding-right blue">佣金日期：</label>
+                                    <div class="input-group col-sm-3" style="padding-left:0px;">
+                                        <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 190px"
+                                               name="commissionDate" id="commissionDate" required="required"/>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">国家：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" style="width:190px;height:25px;" name="nationId" id="nationId" data-placeholder="--请选择国家--">
+                                        <option value="" >请选择</option>
+                                        <option th:each="country:${countryInfoList}" th:value="${country.id}"
+                                        th:text="${country.countryName}"></option>
+                                    </select>
+                                    <label  class="col-sm-2 control-label no-padding-right blue">学校：</label>
+                                    <input class="col-sm-2" name="collegeName" id="collegeName"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label  class="col-sm-3 control-label no-padding-right blue">账户：</label>
+                                    <input class="col-sm-2" name="account" id="account"/>
+                                    <label  class="col-sm-2 control-label no-padding-right blue">invoice编号：</label>
+                                    <input class="col-sm-2" name="invoiceId" id="invoiceId"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label  class="col-sm-3 control-label no-padding-right blue">金额：</label>
+                                    <input class="col-sm-2" name="money" id="money"/>
+                                    <label  class="col-sm-2 control-label no-padding-right blue">币种：</label>
+                                    <input class="col-sm-2" name="currency" id="currency"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label  class="col-sm-3 control-label no-padding-right blue">目标数：</label>
+                                    <input class="col-sm-2" name="targetNum" id="targetNum"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
+                    <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                    <span id="alertText"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/uploadimg.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/ajaxfileupload.js}" charset="UTF-8"></script>
+<script th:src="@{/business/supplement/add.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+
+<script th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script th:src="@{/assets/js/date-time/bootstrap-datepicker.min.js}"></script>
+<script th:src="@{/assets/js/date-time/bootstrap-timepicker.min.js}"></script>
+<script type="text/javascript">
+    var applyId = $("#applyId").val();
+    var studentNo = $("#studentNo").val();
+    var boolResult = true;
+    var uploadResult = true;
+    $("#btn_file_submit").click(function(){
+        $("#form_file").submit();
+    });
+
+    $("#submits").click(function () {
+        if($("#commissionType").val() == ""){
+            layer.alert('请选择佣金类型！', {icon: 0});
+            return;}
+        if($("input[name='commissionDate']").val() == ""){
+            layer.alert('请填写佣金日期！', {icon: 0});
+            return;}
+        if(boolResult == true) {
+            postData();
+        }
+    });
+
+    $("#returnPage").click(function(){
+        returnPage();
+    });
+
+    function returnPage() {
+        location.href = "/commission/record/list";
+    }
+
+    function postData() {
+        boolResult = false;
+        $.ajax({
+            url: "/commission/add",
+            type: "post",
+            data: $("#edit").serialize(),
+            success: function (data) {
+                if (data) {
+                    boolResult = true;
+                    layer.confirm('操作成功，是否跳转到列表页？', {
+                        btn: ['确定','取消'] //按钮
+                    }, function(){
+                        location.href = "/commission/record/list";
+                    }, function(){
+                        location.reload(true);
+                    });
+                } else {
+                    layer.confirm('操作失败，是否跳转到列表页？', {
+                        btn: ['确定','取消'] //按钮
+                    }, function(){
+                        location.href = "/commission/record/list";
+                    }, function(){
+                        location.reload(true);
+                    });
+                }
+            }
+        });
+    }
+
+    $("#nationId").change(function(){
+        // alert($("#expressCompanyCode").find("option:selected").text());
+        $("#nationName").val($("#nationId").find("option:selected").text());
+        $("#nationId").val($("#nationId").find("option:selected").val());
+    });
+
+    $("#nationName").val($("#nationId").find("option:selected").text());
+    $("#nationId").val($("#nationId").find("option:selected").val());
+</script>
+</body>
+</html>

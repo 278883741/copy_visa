@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.VisaResultRecordInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.VisaResultRecordInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="school_area" jdbcType="VARCHAR" property="schoolArea" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="course_type" jdbcType="INTEGER" property="courseType" />
+    <result column="school_length" jdbcType="VARCHAR" property="schoolLength" />
+    <result column="course_length" jdbcType="VARCHAR" property="courseLength" />
+    <result column="course_start_time" jdbcType="TIMESTAMP" property="courseStartTime" />
+    <result column="tuition" jdbcType="DECIMAL" property="tuition" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="college_id" jdbcType="INTEGER" property="collegeId" />
+    <result column="major_id" jdbcType="INTEGER" property="majorId" />
+    <result column="course_id" jdbcType="INTEGER" property="courseId" />
+    <result column="visa_record_id" jdbcType="INTEGER" property="visaRecordId" />
+    <result column="currency" jdbcType="INTEGER" property="currency" />
+    <result column="course_end_time" jdbcType="VARCHAR" property="courseEndTime" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="prepaid_tuition" jdbcType="DECIMAL" property="prepaidTuition" />
+    <result column="education_section" jdbcType="INTEGER" property="educationSection" />
+    <result column="cooperation_id" jdbcType="INTEGER" property="cooperationId" />
+    <result column="cooperation_name" jdbcType="VARCHAR" property="cooperationName" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+</mapper>

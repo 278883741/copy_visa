@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+
+    .DTFC_LeftBodyLiner {
+        height: 910px ! important;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">编辑认账</h3>
+                                <div class="table-header">
+                                    <form class="form-inline" id="edit">
+                                        <input type="hidden" id="invoiceIdStrOld" th:value="${invoiceListVO.invoiceIdStr}"/>
+                                        <input type="hidden" id="invoiceIdStr" name="invoiceIdStr"/>
+                                        <input type="hidden" id="bankAccountStr" th:value="${bankAccountListStr}"/>
+                                        <input type="hidden" id="commissionBalanceStr" th:value="${commissionBalanceListStr}"/>
+                                        <input type="hidden" id="accountCurrencyStr" th:value="${currencyInfoStr}"/>
+                                        <input type="hidden" id="type" name="type" value="2"/>
+                                        <div class="form-group">
+                                            <label>InvoiceNo：</label>
+                                            <input type="text" id="invoiceNo" readonly="readonly" class="form-control input-sm" th:value="${invoice.invoiceNo}"
+                                                   placeholder="" style="width:100px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>发出日期：</label>
+                                            <input type="text" id="sendDate" readonly="readonly" class="form-control input-sm"
+                                                   th:value="${invoice != null and invoice.sendDate != null}? ${#dates.format(invoice.sendDate, 'yyyy-MM-dd')}" style="width:120px; height:30px"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>结佣状态：</label>
+                                            <select type="" class="form-control input-sm" id="" name="status"
+                                                    style="width:75px;">
+                                                <option value="">请选择</option>
+                                                <option value="1">未开始</option>
+                                                <option value="2">进行中</option>
+                                                <option value="3">已结束</option>
+                                                <option value="4">已取消</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>到账日期：</label>
+                                            <input type="text" id="returnDate" name="returnDate" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px; height:30px"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>账户币种：</label>
+                                            <select type="" class="form-control input-sm" id="accountCurrency" name="accountCurrency"
+                                                    style="width:75px;">
+                                                <option value="">请选择</option>
+                                                <option th:each="currency : ${currencyInfos }" th:value="${currency.enName}" th:text="${currency.enName}"></option>
+                                            </select>
+                                        </div>
+                                        <!--<div class="form-group">-->
+                                            <!--<label>到账币种：</label>-->
+                                            <!--<select type="" class="form-control input-sm" id="returnCurrency" name="returnCurrency"-->
+                                                    <!--style="width:75px;">-->
+                                                <!--<option value="">请选择</option>-->
+                                                <!--<option th:each="currency : ${currencyInfos }" th:value="${currency.enName}" th:text="${currency.enName}"></option>-->
+                                            <!--</select>-->
+                                        <!--</div>-->
+                                        <div class="form-group">
+                                            <label>银行账户：</label>
+                                            <select type="" class="form-control input-sm" id="bankAccount" name="bankAccount"
+                                                    style="width:125px;">
+                                                <option value="">请选择</option>
+                                                <option th:each="bankAccount : ${bankAccountList }" th:value="${bankAccount.accountName}" th:text="${bankAccount.accountName}"></option>
+                                            </select>
+                                        </div>
+                                        <button type="button" id="save" class="btn btn-success ">保存</button>
+                                        <button type="button" id="cancel" class="btn btn-warning">返回</button>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="8">TOTAL:</th>
+                                            <th id="invoiceSum"></th>
+                                            <th id="invoiceGstSum"></th>
+                                            <th id="invoiceSumSum"></th>
+                                            <th colspan="2"></th>
+                                            <th id="actualAmountSum"></th>
+                                            <th id="accountGstSum"></th>
+                                            <th id="accountSumSum"></th>
+                                            <th id="bankFeeSum"></th>
+                                            <th id="accountMoneySum"></th>
+                                            <th></th>
+                                            <th id="balanceSum"></th>
+                                            <th colspan="3"></th>
+                                        </tr>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th class="center">
+                                                <input type="checkbox" class="checkall" onclick="checkAll(this)"/>
+                                            </th>
+                                            <!--<th>操作</th>-->
+                                            <th>澳际学号</th>
+                                            <th>拼音</th>
+                                            <th>出生日期</th>
+                                            <th>获签国家</th>
+                                            <th>学校学号</th>
+                                            <th>INV-币种</th>
+                                            <th>INV-金额</th>
+                                            <th>INV-GST</th>
+                                            <th>INV-税后金额</th>
+                                            <th>到账日期</th>
+                                            <th>银行账户</th>
+                                            <!--<th>到账币种</th>-->
+                                            <th>到账金额</th>
+                                            <th>到账GST</th>
+                                            <th>到账税后金额</th>
+                                            <th>银行手续费</th>
+                                            <th>账户金额</th>
+                                            <th>账户币种</th>
+                                            <th>差额</th>
+                                            <th>差额原因</th>
+                                            <th>结佣状态</th>
+                                            <th>结佣备注</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+    <form id="modify">
+        <input type="hidden" id="schoolId" name="schoolId" />
+        <input type="hidden" id="invoiceId" name="id" />
+        <input type="hidden" id="studentId" name="studentId" />
+        <input class="rowEdit" type="hidden" id="invoiceMoney" name="invoiceMoney" />
+        <input class="rowEdit" type="hidden" id="rate" name="schoolRate" />
+        <input class="rowEdit" type="hidden" id="schoolNo" name="schoolNo" />
+        <input class="rowEdit" type="hidden" id="startDate" name="startDate" />
+        <input class="rowEdit" type="hidden" id="returnDate1" name="returnDate" />
+        <input class="rowEdit" type="hidden" id="schoolRemark" name="schoolRemark" />
+        <input class="rowEdit" type="hidden" id="studyWeek" name="studyWeek" />
+        <input class="rowEdit" type="hidden" id="commissionBelong" name="commissionBelong" />
+        <input class="rowEdit" type="hidden" id="balanceType" name="balanceType" />
+        <input class="rowEdit" type="hidden" id="bankFee" name="bankFee" />
+        <input class="rowEdit" type="hidden" id="actualAmount" name="actualAmount" />
+        <input class="rowEdit" type="hidden" id="bankAccount2" name="bankAccount" />
+        <input class="rowEdit" type="hidden" id="accountCurrency2" name="accountCurrency" />
+        <input class="rowEdit" type="hidden" id="returnCurrency2" name="returnCurrency" />
+        <input type="hidden" name="type" value="3"/>
+    </form>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script src="/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script src="/business/invoice/acknowledge.js"></script>
+<!--图片查看器-->
+<script type="text/javascript">
+
+</script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

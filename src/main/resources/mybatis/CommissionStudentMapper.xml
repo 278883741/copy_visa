@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionStudentMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionStudent">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="spelling" jdbcType="VARCHAR" property="spelling" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="contract_type" jdbcType="VARCHAR" property="contractType" />
+    <result column="nation_id" jdbcType="INTEGER" property="nationId" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="branch" jdbcType="VARCHAR" property="branch" />
+    <result column="agent_type" jdbcType="VARCHAR" property="agentType" />
+    <result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+    <result column="student_source" jdbcType="VARCHAR" property="studentSource" />
+    <result column="visa_date" jdbcType="TIMESTAMP" property="visaDate" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="record_id" jdbcType="VARCHAR" property="recordId" />
+    <result column="record_date" jdbcType="TIMESTAMP" property="recordDate" />
+    <result column="isValidate" jdbcType="VARCHAR" property="isvalidate" />
+    <result column="aus_agent" jdbcType="VARCHAR" property="ausAgent" />
+    <result column="aus_agent_id" jdbcType="INTEGER" property="ausAgentId" />
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate" />
+  </resultMap>
+    <select id="getCommissionManageList" resultType="com.aoji.vo.CommissionManageVO">
+    select
+      commissionSchool.id,
+      commissionStudent.id as studentId,
+      commissionStudent.student_no as studentNo,
+      commissionStudent.student_name as studentName,
+      commissionStudent.spelling as pinyin,
+      commissionStudent.birthday as birthday,
+      commissionStudent.nation_name as nationName,
+      commissionStudent.visa_date as visaDate,
+      commissionStudent.birthday as birthday,
+      commissionStudent.coe_date AS coeDate,
+      commissionSchool.consulter as consulter,
+      commissionSchool.school_name as schoolName,
+      commissionSchool.start_date as startDate,
+      commissionSchool.college_type as collegeType,
+      commissionSchool.course_name as courseName,
+      commissionSchool.school_area as schoolArea,
+      commissionSchool.commission_belong as comissionBelong,
+      commissionSchool.status as status,
+      commissionStudent.student_remark as remarkOne,
+      commissionSchool.course_remark as remarkTwo,
+      commissionSchool.agency_no as agencyNo,
+      commissionSchool.agency_name as agencyName
+    from commission_school commissionSchool,commission_student commissionStudent where
+    commissionStudent.id = commissionSchool.student_id
+    <if test="agentType !=null and agentType !=''">
+      and commissionStudent.agent_type != #{agentType}
+    </if>
+    <if test="commissionManageVO.studentNo !=null and commissionManageVO.studentNo !=''">
+      and commissionStudent.student_no = #{commissionManageVO.studentNo}
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        AND commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+    <if test="commissionManageVO.contractType !=null and commissionManageVO.contractType !=''">
+      and commissionStudent.contract_type = #{commissionManageVO.contractType}
+    </if>
+    <if test="roleStatus == 1">
+      and commissionSchool.consulter in (select consultant from commission_permission)
+    </if>
+    <if test="commissionManageVO.nationName !=null and commissionManageVO.nationName !=''">
+      <if test="commissionManageVO.nationName == 100">
+        and commissionStudent.nation_id not in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 99">
+        and commissionStudent.nation_id in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 4">
+        and commissionStudent.nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+
+      <if test="commissionManageVO.nationName != 99 and commissionManageVO.nationName != 100 and commissionManageVO.nationName != 4">
+        and commissionStudent.nation_id = #{commissionManageVO.nationName}
+      </if>
+
+    </if>
+    <if test="commissionManageVO.comissionBelong !=null and commissionManageVO.comissionBelong !=''">
+      and commissionSchool.commission_belong = #{commissionManageVO.comissionBelong}
+    </if><if test="commissionManageVO.status !=null and commissionManageVO.status !=''">
+    and commissionSchool.status = #{commissionManageVO.status}
+  </if>
+    <if test="commissionManageVO.schoolName !=null and commissionManageVO.schoolName !=''">
+      and commissionSchool.school_name = #{commissionManageVO.schoolName}
+    </if>
+    <if test="commissionManageVO.collegeType !=null and commissionManageVO.collegeType !=''">
+      and commissionSchool.college_type = #{commissionManageVO.collegeType}
+    </if>
+    <if test="commissionManageVO.startDate_string !=null and commissionManageVO.startDate_string !=''">
+      and   commissionSchool.start_date >=   DATE_FORMAT(#{commissionManageVO.startDate_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.endDate_string !=null and commissionManageVO.endDate_string !=''">
+      and  DATE_FORMAT(#{commissionManageVO.endDate_string},'%Y-%m-%d') >= commissionSchool.start_date
+    </if>
+    <if test="commissionManageVO.createTime_string !=null and commissionManageVO.createTime_string !=''">
+      and commissionStudent.visa_date >= DATE_FORMAT(#{commissionManageVO.createTime_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.createTimeEnd_string !=null and commissionManageVO.createTimeEnd_string !=''">
+      and DATE_FORMAT(#{commissionManageVO.createTimeEnd_string},'%Y-%m-%d') >= commissionStudent.visa_date
+    </if>
+    <if test="commissionManageVO.coeDateStartString !=null and commissionManageVO.coeDateStartString !=''">
+      and commissionStudent.coe_date >= DATE_FORMAT(#{commissionManageVO.coeDateStartString},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.coeDateEndString !=null and commissionManageVO.coeDateEndString !=''">
+      and DATE_FORMAT(#{commissionManageVO.coeDateEndString},'%Y-%m-%d') >= commissionStudent.coe_date
+    </if>
+    <if test="commissionManageVO.birthday_string !=null and commissionManageVO.birthday_string !=''">
+      and commissionStudent.birthday = DATE_FORMAT(#{commissionManageVO.birthday_string},'%Y-%m-%d')
+    </if>
+    and commissionStudent.delete_status = 0 and commissionSchool.delete_status = 0 order by commissionStudent.visa_date desc
+  </select>
+    <select id="getCommissionManageVOList" resultType="com.aoji.vo.CommissionManageSaveVO">
+      SELECT
+
+	student.student_no AS studentNo,
+	student.student_name AS studentName,
+	student.pinyin AS pinyin,
+	student.birthday AS birthday,
+	student.contract_type AS contractType,
+	student.nation_id AS nationId,
+	student.nation_name AS nationName,
+	student.channel_status AS agentType,
+	student.agent_name as agentName,
+	visaRecord.create_time AS visaCreateTime,
+	student.create_time AS studentCreateTime,
+	student. STATUS AS STATUS,
+	visaRecord.id AS visaId,
+	visaResultRecord.education_section as educationSection,
+	visaResultRecord.id as visaRecordResultId,
+	visaResultRecord.college_name AS collegeName,
+	visaResultRecord.college_id AS collegeId,
+	visaResultRecord.school_area AS schoolArea,
+	visaResultRecord.course_start_time AS courseStartTime,
+	visaResultRecord.course_end_time AS courseEndTime,
+	visaResultRecord.course_length AS studyWeek,
+	visaResultRecord.course_id AS courseId,
+	visaResultRecord.course_type AS collegeType,
+	visaResultRecord.course_name AS courseName,
+	visaResultRecord.major_name AS majorName,
+	visaResultRecord.major_id AS majorId,
+	visaResultRecord.tuition AS tuition,
+	visaResultRecord.currency AS currency,
+	visaResultRecord.create_time AS schoolCreateTime,
+	student.copy_operator AS copyOperator,
+	student.sales_consultant AS salesConsultant,
+	student.branch_name AS branchName,
+	student.branch_id AS branchId,
+	visaRecord.visa_comment AS visaRemark,
+	visaResultRecord.prepaid_tuition AS prepaidTuition,
+	visaResultRecord.student_no AS schoolNo,
+	visaResultRecord.course_length AS courseLength,
+	visaResultRecord.cooperation_id as cooperationId,
+	visaResultRecord.cooperation_name as cooperationName,
+	student.sign_date AS signDate
+
+FROM
+	visa_record_info visaRecord,
+	visa_result_record_info visaResultRecord,
+	student_info student
+WHERE
+	visaRecord.student_no = student.student_no
+AND visaResultRecord.visa_record_id = visaRecord.id
+AND student.delete_status = 0
+AND visaResultRecord.delete_status = 0
+AND visaRecord.delete_status = 0
+AND visaRecord.audit_status = 3
+AND visaRecord.student_no = #{studentNo} and visaResultRecord.college_id != '-1' and visaRecord.send_commission_status = 0
+    </select>
+  <select id="getOfferFiles" resultType="java.lang.String">
+    SELECT result.offer_attachment AS offerAttachment
+FROM apply_info apply,apply_result_info result
+WHERE apply.id = result.apply_id AND apply.delete_status = 0 AND result.delete_status = 0 AND apply.student_no = #{studentNo} and result.offer_attachment  is not null and result.offer_attachment != ''
+
+  </select>
+  <select id="getCoeFiles" resultType="java.lang.String">
+    select attachment from  coe_apply_info where student_no = #{studentNo} and delete_status = 0 and attachment is not null and attachment != ''
+  </select>
+  <select id="getSendOperator" resultType="java.lang.String">
+    select operator_name from transfer_send where student_no = #{studentNo} and delete_status = 0
+  </select>
+  <select id="getStudentNo" resultType="java.lang.String">
+    select student_no from commission_student where delete_status = 0  group by student_no
+  </select>
+  <select id="getCommissionManageExcelList" resultType="com.aoji.vo.CommissionManageVO">
+    select * from (
+    select
+      commissionSchool.id as schoolId,
+      commissionStudent.id as studentId,
+      commissionStudent.student_no as studentNo,
+      commissionStudent.student_name as studentName,
+      commissionStudent.spelling as pinyin,
+      commissionStudent.birthday as birthday,
+      commissionStudent.nation_name as nationName,
+      commissionStudent.visa_date as visaDate,
+      commissionStudent.sign_date as signDate,
+      commissionStudent.student_source as studentSource,
+      commissionStudent.agent_type as agentType,
+      commissionStudent.contract_type as contractType,
+      commissionStudent.student_remark as remarkOne,
+      commissionStudent.coe_date as coeDate,
+
+      commissionSchool.branch as branch,
+      commissionSchool.consulter as consulter,
+      commissionSchool.transfer_consulter as transferConsulter,
+      commissionSchool.copy_operator as copyOperator,
+      commissionSchool.course_property as courseProperty,
+      commissionSchool.course_remark as remarkTwo,
+      commissionSchool.commission_belong as comissionBelong,
+      commissionSchool.school_remark as remarkThree,
+      commissionSchool.school_name as schoolName,
+      commissionSchool.school_area as schoolArea,
+      commissionSchool.school_no as schoolNo,
+      commissionSchool.college_type as collegeType,
+      commissionSchool.course_name as courseName,
+      commissionSchool.major_name as majorName,
+      commissionSchool.study_week as studyWeek,
+      commissionSchool.start_date as startDate,
+      commissionSchool.end_date as endDate,
+      commissionSchool.paid_fee as paidFee,
+      commissionSchool.tuition as tuition,
+      commissionSchool.status as status,
+      commissionSchool.agency_no as agencyNo,
+      commissionSchool.agency_name as agencyName
+    from commission_school commissionSchool,commission_student commissionStudent where
+    commissionStudent.id = commissionSchool.student_id
+    <if test="commissionManageVO.studentNo !=null and commissionManageVO.studentNo !=''">
+      and commissionStudent.student_no = #{commissionManageVO.studentNo}
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+    <if test="commissionManageVO.contractType !=null and commissionManageVO.contractType !=''">
+      and commissionStudent.contract_type = #{commissionManageVO.contractType}
+    </if>
+    <if test="roleStatus == 1 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+      and commissionSchool.consulter in (select consultant from commission_permission)
+    </if>
+    <if test="roleStatus == 2 or roleStatus == 3 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+    <if test="commissionManageVO.nationName !=null and commissionManageVO.nationName !=''">
+      <if test="commissionManageVO.nationName == 100">
+        and commissionStudent.nation_id not in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 99">
+        and commissionStudent.nation_id in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 4">
+        and commissionStudent.nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+
+      <if test="commissionManageVO.nationName != 99 and commissionManageVO.nationName != 100 and commissionManageVO.nationName != 4">
+        and commissionStudent.nation_id = #{commissionManageVO.nationName}
+      </if>
+
+    </if>
+    <if test="commissionManageVO.comissionBelong !=null and commissionManageVO.comissionBelong !=''">
+      and commissionSchool.commission_belong = #{commissionManageVO.comissionBelong}
+    </if><if test="commissionManageVO.status !=null and commissionManageVO.status !=''">
+    and commissionSchool.status = #{commissionManageVO.status}
+  </if>
+    <if test="commissionManageVO.schoolName !=null and commissionManageVO.schoolName !=''">
+      and commissionSchool.school_name = #{commissionManageVO.schoolName}
+    </if>
+    <if test="commissionManageVO.collegeType !=null and commissionManageVO.collegeType !=''">
+      and commissionSchool.college_type = #{commissionManageVO.collegeType}
+    </if>
+    <if test="commissionManageVO.startDate_string !=null and commissionManageVO.startDate_string !=''">
+      and   commissionSchool.start_date >=   DATE_FORMAT(#{commissionManageVO.startDate_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.endDate_string !=null and commissionManageVO.endDate_string !=''">
+      and  DATE_FORMAT(#{commissionManageVO.endDate_string},'%Y-%m-%d') >= commissionSchool.start_date
+    </if>
+    <if test="commissionManageVO.createTime_string !=null and commissionManageVO.createTime_string !=''">
+      and commissionStudent.visa_date >= DATE_FORMAT(#{commissionManageVO.createTime_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.createTimeEnd_string !=null and commissionManageVO.createTimeEnd_string !=''">
+      and DATE_FORMAT(#{commissionManageVO.createTimeEnd_string},'%Y-%m-%d') >= commissionStudent.visa_date
+    </if>
+    <if test="commissionManageVO.coeDateStartString !=null and commissionManageVO.coeDateStartString !=''">
+      and commissionStudent.coe_date >= DATE_FORMAT(#{commissionManageVO.coeDateStartString},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.coeDateEndString !=null and commissionManageVO.coeDateEndString !=''">
+      and DATE_FORMAT(#{commissionManageVO.coeDateEndString},'%Y-%m-%d') >= commissionStudent.coe_date
+    </if>
+    <if test="commissionManageVO.birthday_string !=null and commissionManageVO.birthday_string !=''">
+      and commissionStudent.birthday = DATE_FORMAT(#{commissionManageVO.birthday_string},'%Y-%m-%d')
+    </if>
+    and commissionStudent.delete_status = 0 and commissionSchool.delete_status = 0 ) b left join
+    (select
+    commissionInvoice.school_id as schoolId,
+    commissionInvoice.rate as rate,
+    commissionInvoice.invoice_no as invoiceNo,
+    commissionInvoice.send_date as sendDate,
+    commissionInvoice.invoice_money as invoiceMoney,
+    commissionInvoice.invoice_gst as invoiceGst,
+    commissionInvoice.invoice_sum as invoiceSum,
+    commissionInvoice.return_date as returnDate,
+    commissionInvoice.bank_account as bankAccount,
+    commissionInvoice.return_currency as returnCurrency,
+    commissionInvoice.currency as currency,
+    commissionInvoice.actual_amount as actualAmount,
+    commissionInvoice.account_gst as accountGst,
+    commissionInvoice.account_sum as accountSum,
+    commissionInvoice.bank_fee as bankFee,
+    commissionInvoice.account_money as accountMoney,
+    commissionInvoice.balance as balance,
+    commissionInvoice.balance_type as balanceType,
+    commissionInvoice.delete_status  as invoiceDelete_status,
+    commissionInvoice.account_currency as accountCurrency
+    from commission_invoice commissionInvoice where delete_status = 0) c on b.schoolId = c.schoolId
+    order by b.visaDate desc
+    <if test="pageStart != null and pageEnd != null">
+      limit #{pageStart}, #{pageEnd}
+    </if>
+  </select>
+    <select id="getCountCommissionManageExcelList" resultType="java.lang.Integer">
+      select count(*) from (
+      select
+      commissionSchool.id as schoolId,
+      commissionStudent.id as studentId,
+      commissionStudent.student_no as studentNo,
+      commissionStudent.student_name as studentName,
+      commissionStudent.spelling as pinyin,
+      commissionStudent.birthday as birthday,
+      commissionStudent.nation_name as nationName,
+      commissionStudent.visa_date as visaDate,
+      commissionStudent.sign_date as signDate,
+      commissionStudent.student_source as studentSource,
+      commissionStudent.agent_type as agentType,
+      commissionStudent.contract_type as contractType,
+      commissionStudent.student_remark as remarkOne,
+      commissionStudent.coe_date as coeDate,
+
+      commissionSchool.branch as branch,
+      commissionSchool.consulter as consulter,
+      commissionSchool.transfer_consulter as transferConsulter,
+      commissionSchool.copy_operator as copyOperator,
+      commissionSchool.course_property as courseProperty,
+      commissionSchool.course_remark as remarkTwo,
+      commissionSchool.commission_belong as comissionBelong,
+      commissionSchool.school_remark as remarkThree,
+      commissionSchool.school_name as schoolName,
+      commissionSchool.school_area as schoolArea,
+      commissionSchool.school_no as schoolNo,
+      commissionSchool.college_type as collegeType,
+      commissionSchool.course_name as courseName,
+      commissionSchool.major_name as majorName,
+      commissionSchool.study_week as studyWeek,
+      commissionSchool.start_date as startDate,
+      commissionSchool.end_date as endDate,
+      commissionSchool.paid_fee as paidFee,
+      commissionSchool.tuition as tuition,
+      commissionSchool.status as status,
+      commissionSchool.agency_no as agencyNo,
+      commissionSchool.agency_name as agencyName
+      from commission_school commissionSchool,commission_student commissionStudent where
+      commissionStudent.id = commissionSchool.student_id
+      <if test="commissionManageVO.studentNo !=null and commissionManageVO.studentNo !=''">
+        and commissionStudent.student_no = #{commissionManageVO.studentNo}
+      </if>
+      <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+        AND (commissionStudent.student_name LIKE
+        CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+      </if>
+      <if test="commissionManageVO.contractType !=null and commissionManageVO.contractType !=''">
+        and commissionStudent.contract_type = #{commissionManageVO.contractType}
+      </if>
+      <if test="roleStatus == 1 ">
+        <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+          and commissionSchool.consulter LIKE
+          CONCAT('%',#{commissionManageVO.consulter},'%' )
+        </if>
+        and commissionSchool.consulter in (select consultant from commission_permission)
+      </if>
+      <if test="roleStatus == 2 or roleStatus == 3 ">
+        <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+          and commissionSchool.consulter LIKE
+          CONCAT('%',#{commissionManageVO.consulter},'%' )
+        </if>
+      </if>
+      <if test="commissionManageVO.nationName !=null and commissionManageVO.nationName !=''">
+        <if test="commissionManageVO.nationName == 100">
+          and commissionStudent.nation_id not in
+          <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+            #{ausNationIds}
+          </foreach>
+        </if>
+        <if test="commissionManageVO.nationName == 99">
+          and commissionStudent.nation_id in
+          <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+            #{ausNationIds}
+          </foreach>
+        </if>
+        <if test="commissionManageVO.nationName == 4">
+          and commissionStudent.nation_id in
+          <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+            #{usaNationIds}
+          </foreach>
+        </if>
+
+        <if test="commissionManageVO.nationName != 99 and commissionManageVO.nationName != 100 and commissionManageVO.nationName != 4">
+          and commissionStudent.nation_id = #{commissionManageVO.nationName}
+        </if>
+
+      </if>
+      <if test="commissionManageVO.comissionBelong !=null and commissionManageVO.comissionBelong !=''">
+        and commissionSchool.commission_belong = #{commissionManageVO.comissionBelong}
+      </if><if test="commissionManageVO.status !=null and commissionManageVO.status !=''">
+      and commissionSchool.status = #{commissionManageVO.status}
+    </if>
+      <if test="commissionManageVO.schoolName !=null and commissionManageVO.schoolName !=''">
+        and commissionSchool.school_name = #{commissionManageVO.schoolName}
+      </if>
+      <if test="commissionManageVO.collegeType !=null and commissionManageVO.collegeType !=''">
+        and commissionSchool.college_type = #{commissionManageVO.collegeType}
+      </if>
+      <if test="commissionManageVO.startDate_string !=null and commissionManageVO.startDate_string !=''">
+        and   commissionSchool.start_date >=   DATE_FORMAT(#{commissionManageVO.startDate_string},'%Y-%m-%d')
+      </if>
+      <if test="commissionManageVO.endDate_string !=null and commissionManageVO.endDate_string !=''">
+        and  DATE_FORMAT(#{commissionManageVO.endDate_string},'%Y-%m-%d') >= commissionSchool.start_date
+      </if>
+      <if test="commissionManageVO.createTime_string !=null and commissionManageVO.createTime_string !=''">
+        and commissionStudent.visa_date >= DATE_FORMAT(#{commissionManageVO.createTime_string},'%Y-%m-%d')
+      </if>
+      <if test="commissionManageVO.createTimeEnd_string !=null and commissionManageVO.createTimeEnd_string !=''">
+        and DATE_FORMAT(#{commissionManageVO.createTimeEnd_string},'%Y-%m-%d') >= commissionStudent.visa_date
+      </if>
+      <if test="commissionManageVO.coeDateStartString !=null and commissionManageVO.coeDateStartString !=''">
+        and commissionStudent.coe_date >= DATE_FORMAT(#{commissionManageVO.coeDateStartString},'%Y-%m-%d')
+      </if>
+      <if test="commissionManageVO.coeDateEndString !=null and commissionManageVO.coeDateEndString !=''">
+        and DATE_FORMAT(#{commissionManageVO.coeDateEndString},'%Y-%m-%d') >= commissionStudent.coe_date
+      </if>
+      <if test="commissionManageVO.birthday_string !=null and commissionManageVO.birthday_string !=''">
+        and commissionStudent.birthday = DATE_FORMAT(#{commissionManageVO.birthday_string},'%Y-%m-%d')
+      </if>
+      and commissionStudent.delete_status = 0 and commissionSchool.delete_status = 0 ) b left join
+      (select
+      commissionInvoice.school_id as schoolId,
+      commissionInvoice.rate as rate,
+      commissionInvoice.invoice_no as invoiceNo,
+      commissionInvoice.send_date as sendDate,
+      commissionInvoice.invoice_money as invoiceMoney,
+      commissionInvoice.invoice_gst as invoiceGst,
+      commissionInvoice.invoice_sum as invoiceSum,
+      commissionInvoice.return_date as returnDate,
+      commissionInvoice.bank_account as bankAccount,
+      commissionInvoice.return_currency as returnCurrency,
+      commissionInvoice.currency as currency,
+      commissionInvoice.actual_amount as actualAmount,
+      commissionInvoice.account_gst as accountGst,
+      commissionInvoice.account_sum as accountSum,
+      commissionInvoice.bank_fee as bankFee,
+      commissionInvoice.account_money as accountMoney,
+      commissionInvoice.balance as balance,
+      commissionInvoice.balance_type as balanceType,
+      commissionInvoice.delete_status  as invoiceDelete_status,
+      commissionInvoice.account_currency as accountCurrency
+      from commission_invoice commissionInvoice where delete_status = 0) c on b.schoolId = c.schoolId
+      order by b.visaDate desc
+
+    </select>
+  <select id="getCountCommissionOverseasExcelList" resultType="java.lang.Integer">
+    select count(*) from (
+    select
+    commissionSchool.id as schoolId,
+    commissionStudent.id as studentId,
+    commissionStudent.student_no as studentNo,
+    commissionStudent.student_name as studentName,
+    commissionStudent.spelling as pinyin,
+    commissionStudent.birthday as birthday,
+    commissionStudent.nation_name as nationName,
+    commissionStudent.visa_date as visaDate,
+    commissionStudent.sign_date as signDate,
+    commissionStudent.student_source as studentSource,
+    commissionStudent.agent_type as agentType,
+    commissionStudent.contract_type as contractType,
+    commissionStudent.student_remark as remarkOne,
+    commissionStudent.coe_date as coeDate,
+    commissionSchool.branch as branch,
+    commissionSchool.consulter as consulter,
+    commissionSchool.transfer_consulter as transferConsulter,
+    commissionSchool.copy_operator as copyOperator,
+    commissionSchool.course_property as courseProperty,
+    commissionSchool.course_remark as remarkTwo,
+    commissionSchool.commission_belong as comissionBelong,
+    commissionSchool.school_remark as remarkThree,
+    commissionSchool.school_name as schoolName,
+    commissionSchool.school_area as schoolArea,
+    commissionSchool.school_no as schoolNo,
+    commissionSchool.college_type as collegeType,
+    commissionSchool.course_name as courseName,
+    commissionSchool.major_name as majorName,
+    commissionSchool.study_week as studyWeek,
+    commissionSchool.start_date as startDate,
+    commissionSchool.end_date as endDate,
+    commissionSchool.paid_fee as paidFee,
+    commissionSchool.tuition as tuition,
+    commissionSchool.status as status,
+    commissionSchool.agency_no as agencyNo,
+    commissionSchool.agency_name as agencyName
+    from commission_school commissionSchool,commission_student commissionStudent where
+    commissionStudent.id = commissionSchool.student_id
+    <if test="agentType !=null and agentType !=''">
+      and commissionStudent.agent_type != #{agentType}
+    </if>
+    <if test="commissionManageVO.studentNo !=null and commissionManageVO.studentNo !=''">
+      and commissionStudent.student_no = #{commissionManageVO.studentNo}
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+    <if test="commissionManageVO.contractType !=null and commissionManageVO.contractType !=''">
+      and commissionStudent.contract_type = #{commissionManageVO.contractType}
+    </if>
+    <if test="roleStatus == 1 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+      and commissionSchool.consulter in (select consultant from commission_permission)
+    </if>
+    <if test="roleStatus == 2 or roleStatus == 3 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+    </if>
+    <if test="commissionManageVO.nationName !=null and commissionManageVO.nationName !=''">
+      <if test="commissionManageVO.nationName == 100">
+        and commissionStudent.nation_id not in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 99">
+        and commissionStudent.nation_id in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 4">
+        and commissionStudent.nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+
+      <if test="commissionManageVO.nationName != 99 and commissionManageVO.nationName != 100 and commissionManageVO.nationName != 4">
+        and commissionStudent.nation_id = #{commissionManageVO.nationName}
+      </if>
+    </if>
+    <if test="commissionManageVO.comissionBelong !=null and commissionManageVO.comissionBelong !=''">
+      and commissionSchool.commission_belong = #{commissionManageVO.comissionBelong}
+    </if><if test="commissionManageVO.status !=null and commissionManageVO.status !=''">
+    and commissionSchool.status = #{commissionManageVO.status}
+  </if>
+    <if test="commissionManageVO.schoolName !=null and commissionManageVO.schoolName !=''">
+      and commissionSchool.school_name = #{commissionManageVO.schoolName}
+    </if>
+    <if test="commissionManageVO.collegeType !=null and commissionManageVO.collegeType !=''">
+      and commissionSchool.college_type = #{commissionManageVO.collegeType}
+    </if>
+    <if test="commissionManageVO.startDate_string !=null and commissionManageVO.startDate_string !=''">
+      and   commissionSchool.start_date >=   DATE_FORMAT(#{commissionManageVO.startDate_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.endDate_string !=null and commissionManageVO.endDate_string !=''">
+      and  DATE_FORMAT(#{commissionManageVO.endDate_string},'%Y-%m-%d') >= commissionSchool.start_date
+    </if>
+    <if test="commissionManageVO.createTime_string !=null and commissionManageVO.createTime_string !=''">
+      and commissionStudent.visa_date >= DATE_FORMAT(#{commissionManageVO.createTime_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.createTimeEnd_string !=null and commissionManageVO.createTimeEnd_string !=''">
+      and DATE_FORMAT(#{commissionManageVO.createTimeEnd_string},'%Y-%m-%d') >= commissionStudent.visa_date
+    </if>
+    <if test="commissionManageVO.coeDateStartString !=null and commissionManageVO.coeDateStartString !=''">
+      and commissionStudent.coe_date >= DATE_FORMAT(#{commissionManageVO.coeDateStartString},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.coeDateEndString !=null and commissionManageVO.coeDateEndString !=''">
+      and DATE_FORMAT(#{commissionManageVO.coeDateEndString},'%Y-%m-%d') >= commissionStudent.coe_date
+    </if>
+    <if test="commissionManageVO.birthday_string !=null and commissionManageVO.birthday_string !=''">
+      and commissionStudent.birthday = DATE_FORMAT(#{commissionManageVO.birthday_string},'%Y-%m-%d')
+    </if>
+    and commissionStudent.delete_status = 0 and commissionSchool.delete_status = 0 ) b
+    order by b.visaDate desc
+  </select>
+  <select id="getCommissionOverseasExcelList" resultType="com.aoji.vo.CommissionManageVO">
+    select * from (
+    select
+    commissionSchool.id as schoolId,
+    commissionStudent.id as studentId,
+    commissionStudent.student_no as studentNo,
+    commissionStudent.student_name as studentName,
+    commissionStudent.spelling as pinyin,
+    commissionStudent.birthday as birthday,
+    commissionStudent.nation_name as nationName,
+    commissionStudent.visa_date as visaDate,
+    commissionStudent.sign_date as signDate,
+    commissionStudent.student_source as studentSource,
+    commissionStudent.agent_type as agentType,
+    commissionStudent.contract_type as contractType,
+    commissionStudent.student_remark as remarkOne,
+    commissionStudent.coe_date as coeDate,
+    commissionSchool.branch as branch,
+    commissionSchool.consulter as consulter,
+    commissionSchool.transfer_consulter as transferConsulter,
+    commissionSchool.copy_operator as copyOperator,
+    commissionSchool.course_property as courseProperty,
+    commissionSchool.course_remark as remarkTwo,
+    commissionSchool.commission_belong as comissionBelong,
+    commissionSchool.school_remark as remarkThree,
+    commissionSchool.school_name as schoolName,
+    commissionSchool.school_area as schoolArea,
+    commissionSchool.school_no as schoolNo,
+    commissionSchool.college_type as collegeType,
+    commissionSchool.course_name as courseName,
+    commissionSchool.major_name as majorName,
+    commissionSchool.study_week as studyWeek,
+    commissionSchool.start_date as startDate,
+    commissionSchool.end_date as endDate,
+    commissionSchool.paid_fee as paidFee,
+    commissionSchool.tuition as tuition,
+    commissionSchool.status as status,
+    commissionSchool.agency_no as agencyNo,
+    commissionSchool.agency_name as agencyName
+    from commission_school commissionSchool,commission_student commissionStudent where
+    commissionStudent.id = commissionSchool.student_id
+    <if test="agentType !=null and agentType !=''">
+      and commissionStudent.agent_type != #{agentType}
+    </if>
+    <if test="commissionManageVO.studentNo !=null and commissionManageVO.studentNo !=''">
+      and commissionStudent.student_no = #{commissionManageVO.studentNo}
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+    <if test="commissionManageVO.contractType !=null and commissionManageVO.contractType !=''">
+      and commissionStudent.contract_type = #{commissionManageVO.contractType}
+    </if>
+    <if test="roleStatus == 1 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+      and commissionSchool.consulter in (select consultant from commission_permission)
+    </if>
+    <if test="roleStatus == 2 or roleStatus == 3 ">
+      <if test="commissionManageVO.consulter !=null and commissionManageVO.consulter !=''">
+        and commissionSchool.consulter LIKE
+        CONCAT('%',#{commissionManageVO.consulter},'%' )
+      </if>
+    </if>
+    <if test="commissionManageVO.studentName !=null and commissionManageVO.studentName !=''">
+      AND (commissionStudent.student_name LIKE
+      CONCAT('%',#{commissionManageVO.studentName},'%' ) OR commissionStudent.spelling Like CONCAT('%',#{commissionManageVO.studentName},'%' ))
+    </if>
+    <if test="commissionManageVO.nationName !=null and commissionManageVO.nationName !=''">
+      <if test="commissionManageVO.nationName == 100">
+        and commissionStudent.nation_id not in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 99">
+        and commissionStudent.nation_id in
+        <foreach collection="ausNationId" item="ausNationIds" open="(" close=")" separator=",">
+          #{ausNationIds}
+        </foreach>
+      </if>
+      <if test="commissionManageVO.nationName == 4">
+        and commissionStudent.nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+
+      <if test="commissionManageVO.nationName != 99 and commissionManageVO.nationName != 100 and commissionManageVO.nationName != 4">
+        and commissionStudent.nation_id = #{commissionManageVO.nationName}
+      </if>
+    </if>
+    <if test="commissionManageVO.comissionBelong !=null and commissionManageVO.comissionBelong !=''">
+      and commissionSchool.commission_belong = #{commissionManageVO.comissionBelong}
+    </if><if test="commissionManageVO.status !=null and commissionManageVO.status !=''">
+    and commissionSchool.status = #{commissionManageVO.status}
+  </if>
+    <if test="commissionManageVO.schoolName !=null and commissionManageVO.schoolName !=''">
+      and commissionSchool.school_name = #{commissionManageVO.schoolName}
+    </if>
+    <if test="commissionManageVO.collegeType !=null and commissionManageVO.collegeType !=''">
+      and commissionSchool.college_type = #{commissionManageVO.collegeType}
+    </if>
+    <if test="commissionManageVO.startDate_string !=null and commissionManageVO.startDate_string !=''">
+      and   commissionSchool.start_date >=   DATE_FORMAT(#{commissionManageVO.startDate_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.endDate_string !=null and commissionManageVO.endDate_string !=''">
+      and  DATE_FORMAT(#{commissionManageVO.endDate_string},'%Y-%m-%d') >= commissionSchool.start_date
+    </if>
+    <if test="commissionManageVO.createTime_string !=null and commissionManageVO.createTime_string !=''">
+      and commissionStudent.visa_date >= DATE_FORMAT(#{commissionManageVO.createTime_string},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.createTimeEnd_string !=null and commissionManageVO.createTimeEnd_string !=''">
+      and DATE_FORMAT(#{commissionManageVO.createTimeEnd_string},'%Y-%m-%d') >= commissionStudent.visa_date
+    </if>
+    <if test="commissionManageVO.coeDateStartString !=null and commissionManageVO.coeDateStartString !=''">
+      and commissionStudent.coe_date >= DATE_FORMAT(#{commissionManageVO.coeDateStartString},'%Y-%m-%d')
+    </if>
+    <if test="commissionManageVO.coeDateEndString !=null and commissionManageVO.coeDateEndString !=''">
+      and DATE_FORMAT(#{commissionManageVO.coeDateEndString},'%Y-%m-%d') >= commissionStudent.coe_date
+    </if>
+    <if test="commissionManageVO.birthday_string !=null and commissionManageVO.birthday_string !=''">
+      and commissionStudent.birthday = DATE_FORMAT(#{commissionManageVO.birthday_string},'%Y-%m-%d')
+    </if>
+    and commissionStudent.delete_status = 0 and commissionSchool.delete_status = 0 ) b
+    order by b.visaDate desc
+    <if test="pageStart != null and pageEnd != null">
+      limit #{pageStart}, #{pageEnd}
+    </if>
+  </select>
+
+  <update id="updateByStudentNoSelective" parameterType="com.aoji.model.CommissionStudent">
+    update commission_student
+    <set>
+      <if test="nationId != null">
+        nation_id = #{nationId},
+      </if>
+      <if test="nationName != null and nationName != ''">
+        nation_name = #{nationName},
+      </if>
+    </set>
+    where student_no = #{studentNo}
+  </update>
+</mapper>

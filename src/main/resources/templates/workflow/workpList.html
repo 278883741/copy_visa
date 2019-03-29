@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="fragments/head::head"/>
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+</style>
+<body style='overflow:visible ! important;'>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">审批人员列表</h3>
+
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                        </div>
+
+                                        <a id="addWorkflowNodeInfo" onclick="addWorkflowNodeInfo()"
+                                           class="btn btn-info">添加审批人</a>
+
+                                        <button type="button" class="btn btn-success pull-right"
+                                                onclick="window.history.back(-1);">返回
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="workflowListTable" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th>审批人员名称</th>
+                                            <th>审批顺序</th>
+                                            <th>是否为最后一个审批人</th>
+                                            <th>操作人名称</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script charset="UTF-8" th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/pagination.input.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/temp.js}"></script>
+<!--图片查看器-->
+<script charset="UTF-8" th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script charset="UTF-8" th:src="@{/layer/layer.js}"></script>
+<script charset="UTF-8" th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/date-time/bootstrap-datepicker.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/date-time/bootstrap-timepicker.min.js}"></script>
+<script charset="UTF-8" th:src="@{/business/student/studentList.js}"></script>
+</body>
+</html>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    var workflowListTable;
+
+    var id = [[${id}]];
+
+    $(function () {
+        workflowListTable = $('#workflowListTable').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bStateSave": true,//是否保留现场
+            "bServerSide": true,//是否以后台分页
+            "sAjaxSource": "/workflow/workpList",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "flowId", "value": id}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},
+                {"sClass": "center", "bSortable": false, "mData": "userName"},
+                {"sClass": "center", "bSortable": false, "mData": "auditSequence"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        if (data.lastStatus == 0) {
+                            return "否"
+                        } else {
+                            return "是"
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var workp = '<a href="#"  onclick="del(' + data.id + ')" >删除</a>&nbsp;&nbsp;';
+                        return workp
+                    }
+                },
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+
+        function changeTable() {
+            workflowListTable.fnDraw()
+        }
+    });
+
+    function del(id) {
+        layer.confirm('确认将当前审批人从审批流程中删除？', {
+            btn: ['确认', '取消'] //按钮
+        }, function () {
+            $.ajax({
+                url: "/workflow/delete/workflowNodeInfo",
+                type: "post",
+                data: {
+                    "id": id
+                },
+                success: function (data) {
+                    if (!data) {
+                        layer.msg("删除失败，请确认是否已删除", {
+                            icon: 2
+                        })
+                    } else {
+
+                        layer.msg("删除成功！", {
+                            icon: 1
+                        })
+
+                        layer.close();
+                        workflowListTable.fnDraw()
+                    }
+
+                }
+            })
+        }, function () {
+            layer.close();
+        });
+    };
+
+    function addWorkflowNodeInfo() {
+        var url = "/workflow/addWorkFlowNodeInfo/" + id;
+        $("#addWorkflowNodeInfo").attr("href", url);
+    }
+
+    /*]]>*/
+</script>
+

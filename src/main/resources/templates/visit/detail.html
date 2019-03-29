@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">回访记录信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <div  class="tab-pane fade in active">
+                    <input id="attachment" th:value ="${visitInfo!=null}? ${visitInfo.attachment}" style="display: none"/>
+                    <input id="input_studentNo" th:value ="${visitInfo!=null}? ${visitInfo.studentNo}" style="display: none"/>
+                    <input id="input_businessId" th:value ="${visitInfo!=null}? ${visitInfo.businessId}" style="display: none"/>
+                    <div class="container">
+                        <div class="form-horizontal">
+                            <input type="hidden" id="input_visitCase" th:value="${visitInfo!=null}? ${visitInfo.visitCase}"/>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-1 control-label no-padding-right blue"> 内网学号：</label>
+                                <input readonly="readonly" class="col-sm-2" id="studentNo" th:value="${visitInfo!=null}? ${visitInfo.studentNo}"/>
+                                <label class="col-sm-2 control-label no-padding-right blue"> 回访人：</label>
+                                <input class="col-sm-2" id="visitNo" readonly="readonly" th:value="${visitInfo!=null}? ${visitInfo.visitName}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-1 control-label no-padding-right blue"> 回访日期：</label>
+                                <input class="Wdate col-sm-2" th:value="${visitInfo!=null}? ${#dates.format(visitInfo.createTime, 'yyyy-MM-dd')}" readonly="readonly" style="width: 190px" required="required"/>
+                                <label class="col-sm-2 control-label no-padding-right blue">下次回访：</label>
+                                <input class="col-sm-3" readonly="readonly" style="width:190px" id="input_nextDate" th:value="${visitInfo!=null and visitInfo.nextDate != null}?${#dates.format(visitInfo.nextDate, 'yyyy-MM-dd')}" />
+                            </div>
+                            <div id="div_senderType" class="form-group" style="height:29px">
+                                <label class="col-sm-1 control-label no-padding-right blue"> 发送方：</label>
+                                <select class="col-sm-3 form-control input-sm" name="senderType" style="width:190px;height:25px;" disabled="disabled">
+                                    <option value="1" th:selected="${visitInfo!=null}? ${visitInfo.senderType==1}">公司</option>
+                                    <option value="2" th:selected="${visitInfo!=null}? ${visitInfo.senderType==2}">学校</option>
+                                </select>
+                                <label class="col-sm-2 control-label no-padding-right blue"> 回访途径：</label>
+                                <select class="col-sm-3 form-control input-sm" name="visitWay" style="width:190px;height:25px;" disabled="disabled">
+                                    <option value="1" th:selected="${visitInfo!=null}? ${visitInfo.visitWay==1}">传真</option>
+                                    <option value="2" th:selected="${visitInfo!=null}? ${visitInfo.visitWay==2}">邮件</option>
+                                    <option value="3" th:selected="${visitInfo!=null}? ${visitInfo.visitWay==3}">电话</option>
+                                </select>
+                            </div>
+                            <div id="div_visitType" class="form-group"  style="height:29px">
+                                <label class="col-sm-1 control-label no-padding-right blue">回访类型：</label>
+                                <select type="" class="col-sm-3 form-control input-sm" name="visitType" style="width:190px;height:25px;" disabled="disabled">
+                                    <option value="1" th:selected="${visitInfo!=null}? ${visitInfo.visitType==1}">收材料</option>
+                                    <option value="2" th:selected="${visitInfo!=null}? ${visitInfo.visitType==2}">要求补件</option>
+                                    <option value="3" th:selected="${visitInfo!=null}? ${visitInfo.visitType==3}">确认补件</option>
+                                    <option value="4" th:selected="${visitInfo!=null}? ${visitInfo.visitType==4}">跟催</option>
+                                    <option value="5" th:selected="${visitInfo!=null}? ${visitInfo.visitType==5}">其他</option>
+                                </select>
+                                <div id="div_deadline" style="display: none;">
+                                    <label class="col-sm-2 control-label no-padding-right blue">补件截止日：</label>
+                                    <input class="Wdate" th:value="${visitInfo.deadline!=null}? ${#dates.format(visitInfo.deadline, 'yyyy-MM-dd')}" readonly="readonly" style="width: 190px" name="deadline" required="required"/>
+                                </div>
+                            </div>
+                            <div id="div_isPublic" class="form-group" style="display: none;">
+                                <label class="col-sm-1 control-label no-padding-right blue">是否公开：</label>
+                                <input type="checkbox" th:checked="${visitInfo!=null}? ${visitInfo.isPublic}" readonly="readonly"/>
+                            </div>
+                            <div class="form-group" id="div_file" style="margin-top: 20px;">
+                                <label class="col-sm-1 control-label no-padding-right no-padding-left blue">已上传附件：</label>
+                                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" >
+                                    <div  class="tab-pane fade in active">
+                                        <div class="container">
+                                            <div class="form-horizontal">
+                                                <div class="form-group">
+                                                    <div class="col-sm-6" style="padding-left: 0px;" >
+                                                        <div class="widget-header">
+                                                            <h4>文件上传</h4>
+                                                        </div>
+                                                        <div class="widget-body">
+                                                            <div class="widget-main">
+                                                                <span id = "offer_attachment" style="display: none">
+                                                                    <span id = "offerAttachment_show" th:text="${visitInfo!=null}? ${visitInfo.attachment}"></span>
+                                                                    <span class="btn btn-sm btn-primary" style="left:9%" id = "offer_show">预览</span>
+                                                                    <!--<a th:href="${visitInfo!=null}? ${visitInfo.attachment}" download="文件下载" ><span class="btn btn-sm btn-primary" style="left:15%" id = "offer_upload">下载</span></a>-->
+                                                                </span>
+                                                                <input name ="fileInput"  type="file" id="id-input-file-3" />
+                                                                <label>
+                                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                                </label>
+                                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <span id = "span_content"  th:text="${visitInfo!=null}? ${visitInfo.content}" style="display: none;"></span>
+                                <label class="col-sm-1 control-label no-padding-right no-padding-left blue" for="content"> 回访内容：</label>
+                                <!--ueditor-->
+                                <div class="table-responsive col-sm-9">
+                                    <!-- 加载编辑器的容器 -->
+                                    <script id="content" name="content" type="text/plain"></script>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                </div>
+            </div>
+        </div>
+        <br/><br/><br/><br/><br/><br/><br/><br/>
+    </div>
+</div>
+<div th:include="fragments/bottom::bottom"></div>
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/assets/fileinput/js/fileinput.js}"></script>
+<script th:src="@{/assets/fileinput/themes/explorer/theme.min.js}"></script>
+<script th:src="@{/assets/fileinput/js/locales/zh.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function () {
+            this.ueEditor;
+            this.visitCase;
+            this.studentNo;
+            this.businessId;
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+                },
+                getQueryData:function(){
+                    this.visitCase = $("#input_visitCase").val();
+                    this.studentNo = $("#input_studentNo").val();
+                    this.businessId = $("#input_businessId").val();
+                },
+                handelQueryData:function(){
+
+                },
+                render:function(){
+                    var _self = this;
+                    if ($("#input_visitCase").val() == "1"|| $("#input_visitCase").val() == "3") {
+                        $("#div_senderType").hide();
+                        $("#div_visitType").hide();
+                        $("#div_file").hide();
+                    }else if(_self.visitCase == "2"){
+                        $("#div_isPublic").show();
+                    }
+                    if($("select[name='visitType']").children("option:selected").val() == "2"){
+                        $("#div_deadline").show();
+                        $("#div_deadlineSchool").show();
+                    }
+
+                    var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                    _self.ueEditor = UE.getEditor('content', {
+                        toolbars: [
+                            [//'anchor', //锚点
+                                //'undo', //撤销
+                                //'redo', //重做
+                                'bold', //加粗
+                                'indent', //首行缩进
+                                //'snapscreen', //截图
+                                'italic', //斜体
+                                'underline', //下划线
+                                'strikethrough', //删除线
+                                'subscript', //下标
+                                'fontborder', //字符边框
+                                'superscript', //上标
+                                'formatmatch', //格式刷
+                                'source', //源代码
+                                //'blockquote', //引用
+                                'pasteplain', //纯文本粘贴模式
+                                //'selectall', //全选
+                                //'print', //打印
+                                'preview', //预览
+                                'horizontal', //分隔线
+                                //'removeformat', //清除格式
+                                'time', //时间
+                                'date', //日期
+                                //'unlink', //取消链接
+                                'insertrow', //前插入行
+                                'insertcol', //前插入列
+                                //'mergeright', //右合并单元格
+                                //'mergedown', //下合并单元格
+                                'deleterow', //删除行
+                                'deletecol', //删除列
+                                //'splittorows', //拆分成行
+                                //'splittocols', //拆分成列
+                                //'splittocells', //完全拆分单元格
+                                //'deletecaption', //删除表格标题
+                                //'inserttitle', //插入标题
+                                //'mergecells', //合并多个单元格
+                                //'deletetable', //删除表格
+                                'cleardoc', //清空文档
+                                //'insertparagraphbeforetable', //"表格前插入行"
+                                //'insertcode', //代码语言
+                                'fontfamily', //字体
+                                'fontsize', //字号
+                                'paragraph', //段落格式
+                                'simpleupload', //单图上传
+                                //'insertimage', //多图上传
+                                //'edittable', //表格属性
+                                //'edittd', //单元格属性
+                                'link', //超链接
+                                'emotion', //表情
+                                'spechars', //特殊字符
+                                'searchreplace', //查询替换
+                                //'map', //Baidu地图
+                                //'gmap', //Google地图
+                                //'insertvideo', //视频
+                                //'help', //帮助
+                                'justifyleft', //居左对齐
+                                'justifyright', //居右对齐
+                                'justifycenter', //居中对齐
+                                'justifyjustify', //两端对齐
+                                'forecolor', //字体颜色
+                                'backcolor', //背景色
+                                //'insertorderedlist', //有序列表
+                                //'insertunorderedlist', //无序列表
+                                //'fullscreen', //全屏
+                                //'directionalityltr', //从左向右输入
+                                //'directionalityrtl', //从右向左输入
+                                'rowspacingtop', //段前距
+                                'rowspacingbottom', //段后距
+                                //'pagebreak', //分页
+                                //'insertframe', //插入Iframe
+                                'imagenone', //默认
+                                'imageleft', //左浮动
+                                'imageright', //右浮动
+                                //'attachment', //附件
+                                'imagecenter', //居中
+                                'wordimage', //图片转存
+                                'lineheight', //行间距
+                                //'edittip ', //编辑提示
+                                //'customstyle', //自定义标题
+                                'autotypeset', //自动排版
+                                //'webapp', //百度应用
+                                'touppercase', //字母大写
+                                'tolowercase', //字母小写
+                                //'background', //背景
+                                //'template', //模板
+                                //'scrawl', //涂鸦
+                                //'music', //音乐
+                                //'inserttable', //插入表格
+                                //'drafts', // 从草稿箱加载
+                                //'charts' // 图表
+                            ]
+                        ],
+                        initialFrameHeight: 500,
+                        'enterTag': 'p'
+                    });
+                    _self.ueEditor.ready(function() {
+                        _self.ueEditor.setContent($("#span_content").text());
+                        _self.ueEditor.setDisabled();
+                        $(".edui-editor-bottomContainer").remove();
+                        layer.close(loadIndex);
+                    });
+
+                    if($("#offerAttachment_show").text().length > 0) {
+                        $("#offer_attachment").show();
+                        if( $("#offerAttachment_show").text().length > 50)
+                            $("#offerAttachment_show").text($("#offerAttachment_show").text().substring(0,50)+"...");
+                    }
+                    $("input").attr("disabled", "disabled");
+                    $('#id-input-file-3').ace_file_input({
+                        style:'well',
+                        btn_choose:'Drop files here or click to choose',
+                        btn_change:null,
+                        no_icon:'icon-cloud-upload',
+                        droppable:true,
+                        thumbnail:'small',//large | fit
+                        before_change:function(files, dropped) {
+                            return true;
+                        },
+                        before_remove : function() {
+                            return true;
+                        },
+                        preview_error : function(filename, error_code) {
+                        }
+                    }).on('change', function(){
+                        $("#form_file").ajaxSubmit(function(message) {
+                            var fileName = message.obj;
+                            if(code == "1"){
+                                layer.msg("请上传正确的文件格式!")
+                            }else {
+                                $("#attachment").val(fileName);
+                                layer.msg("上传成功!");
+                            }
+                        });
+                    });
+                    $("#offer_show").click(function(){
+                        $.post("/getPrivateUrl",{"fileUrl":$("#attachment").val()},function (data,status) {
+                            window.open(data);
+                        });
+                    })
+                },
+                addEvent:function(){
+                    var _self = this;
+                    $("#returnPage").click(function(){
+                        if(_self.visitCase == "1" ){
+                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase;
+                        }
+                        else if(_self.visitCase == "2" || _self.visitCase == "3"){
+                            window.location.href = "/visit?studentNo="+ _self.studentNo+"&visitCase=" + _self.visitCase + "&businessId=" + _self.businessId;
+                        }
+                    })
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+    -->
+</script>
+</body>
+</html>

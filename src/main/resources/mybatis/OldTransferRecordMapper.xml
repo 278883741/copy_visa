@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.OldTransferRecordMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.OldTransferRecord">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="send_no" jdbcType="VARCHAR" property="sendNo" />
+    <result column="send_name" jdbcType="VARCHAR" property="sendName" />
+    <result column="send_time" jdbcType="VARCHAR" property="sendTime" />
+    <result column="receive_no" jdbcType="VARCHAR" property="receiveNo" />
+    <result column="receive_name" jdbcType="VARCHAR" property="receiveName" />
+    <result column="receive_time" jdbcType="VARCHAR" property="receiveTime" />
+    <result column="operator_type" jdbcType="VARCHAR" property="operatorType" />
+  </resultMap>
+  
+  <select id="selectByStudentAndOperatorType" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from old_transfer_record where student_no = #{studentNo} and operator_type = #{operatorType} order by id desc
+  </select>
+</mapper>

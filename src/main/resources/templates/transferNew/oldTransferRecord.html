@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="col-sm-6">
+    <div class="table-responsive">
+        <table id="sample-table-3" class="table table-striped table-bordered table-hover">
+            <thead>
+            <tr>
+                <td align="center">学号</td>
+                <td align="center">学生姓名</td>
+                <td align="center">转案时间</td>
+                <td align="center">接收人</td>
+                <td align="center">接受时间</td>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="record : ${transferRecord}">
+                <td align="center" th:text="${record != null}? ${record.studentNo}"></td>
+                <td align="center" th:text="${record != null}? ${record.studentName}"></td>
+                <td align="center" th:text="${record != null}? ${record.sendTime}"></td>
+                <td align="center" th:text="${record != null}? ${record.receiveName}"></td>
+                <td align="center" th:text="${record != null}? ${record.receiveTime}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

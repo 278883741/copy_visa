@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SupplementInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SupplementInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="supplement_type" jdbcType="INTEGER" property="supplementType" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="send_date" jdbcType="TIMESTAMP" property="sendDate" />
+    <result column="express_company_code" jdbcType="VARCHAR" property="expressCompanyCode" />
+    <result column="express_company_name" jdbcType="VARCHAR" property="expressCompanyName" />
+    <result column="express_no" jdbcType="VARCHAR" property="expressNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+  </resultMap>
+    <update id="updateAttachment">
+      update supplement_info set supplement_attachment = #{copyUrl} where apply_id = #{applyId} and supplement_type = '1'
+    </update>
+  <select id="getSupplementInfoByApplyId" resultType="com.aoji.model.SupplementInfo">
+    select * from supplement_info where apply_id = #{applyId} and supplement_type = 1
+  </select>
+</mapper>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/chosen.css}" />
+<head th:include="fragments/head::header" />
+<style>
+    .input-unit{
+        width: 65px;
+        height: 25px;
+        display: block;
+        float: left;
+        background-color: #abbac3;
+        line-height: 25px;
+        text-align: center;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">获签信息</h3>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" id="input_nation" th:value="${studentInfo.nationId}" style="display: none"/>
+                    <input type="hidden" id ="input_nationStatus" th:value="${nationStatus != null}?${nationStatus}"/>
+                    <input id="input_isAmerica" type="hidden" th:value="${isAmerica != null}?${isAmerica}" />
+
+                    <input id="input_stuNo" th:value="${stuNo}" type="text" name="stuNo" style="display: none"/>
+                    <input id = "input_fileName" th:value="${visaRecordInfo!=null}? ${visaRecordInfo.evusAttachment}" style="display: none"/>
+
+                    <input type="hidden" name="businessUpdateTime" th:value="${visaRecordInfo!=null and visaRecordInfo.updateTime !=null}? ${#dates.format(visaRecordInfo.updateTime, 'yyyy-MM-dd HH:mm:ss')}" />
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 获签日期：</label>
+                                    <input class="col-sm-3" style="width: 190px;height:25px;" disabled="disabled"
+                                           th:value="${visaRecordInfo.resultTime != null}?${#dates.format(visaRecordInfo.resultTime, 'yyyy-MM-dd')}"/>
+                                    <label class="col-sm-2 control-label no-padding-right blue"> 监护人费用：</label>
+                                    <input class="col-sm-3" style="width: 190px;height:25px;" disabled="disabled"
+                                           th:value="${guardianFee!=null}? ${guardianFee}"/>
+                                </div>
+                                <div class="form-group" style="height:29px;margin-top: 20px;display: none;" id="div_studentNation_visaRecord">
+                                    <label class="col-sm-3 control-label no-padding-right blue">学生留学国家：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="visaRecordInfo.studentNation" style="width:190px;height:25px;" disabled="disabled">
+                                        <option th:each="item: ${doubleSignCountry}" th:attr="nationId=${item.nationId}" th:value="${item.id}" th:text="${item.nationName}"></option>
+                                    </select>
+                                </div>
+                                <div th:each="course : ${list}" >
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-1 control-label no-padding-right blue"> </label>
+                                    </div>
+                                    <div class="form-group" style="height:29px;margin-top: 20px;">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 院校名称：</label>
+                                        <input  class=" col-sm-3" style="width: 570px; height:25px;" readonly="readonly" th:value="${course!=null}?${course.collegeName}"/>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 专业类型：</label>
+                                        <select class="col-sm-2" style="" disabled="disabled">
+                                            <option value="-1">请选择</option>
+                                            <option value="1" th:selected="${course!=null}? ${course.courseType==1}">语言</option>
+                                            <option value="2" th:selected="${course!=null}? ${course.courseType==2}">预科</option>
+                                            <option value="3" th:selected="${course!=null}? ${course.courseType==3}">主课</option>
+                                            <option value="4" th:selected="${course!=null}? ${course.courseType==4}">快捷</option>
+                                            <option value="5" th:selected="${course!=null}? ${course.courseType==5}">夏校</option>
+                                            <option value="6" th:selected="${course!=null}? ${course.courseType==6}">桥梁</option>
+                                            <option value="7" th:selected="${course!=null}? ${course.courseType==7}">top up</option>
+                                        </select>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 目标学历：</label>
+                                        <select class="col-sm-1" data-placeholder="Choose a Country..." style="width:190px;" disabled="disabled">
+                                            <option value="-1">请选择</option>
+                                            <option value="2" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 2}">中小学</option>
+                                            <option value="3" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 3}">本科</option>
+                                            <option value="4" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 4}">硕士</option>
+                                            <option value="5" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 5}">博士</option>
+                                            <option value="9" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 9}">专科</option>
+                                            <option value="10" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 10}">非学历</option>
+                                            <option value="11" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 11}">证书</option>
+                                            <option value="12" th:selected="${course!=null and course.educationSection != null}? ${course.educationSection == 12}">副学士</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 专业名称：</label>
+                                        <input class=" col-sm-3" style="width: 190px; height:25px;" readonly="readonly" th:value="${course!=null}?${course.majorName}"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 学位名称：</label>
+                                        <input  class=" col-sm-3" style="width: 190px; height:25px;" readonly="readonly" th:value="${course!=null}?${course.courseName}"/>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 开课日期：</label>
+                                        <input class="Wdate col-sm-3" style="width: 190px; height:25px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly="readonly" disabled="disabled"
+                                               th:value="${course!=null and course.courseStartTime!=null}?${#dates.format(course.courseStartTime, 'yyyy-MM-dd')}"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 学费金额：</label>
+                                        <input class="col-sm-2" type="text" style="width:125px;height:25px;" readonly="readonly" th:value="${course}!=null?${course.tuition}"/>
+                                        <select id="select_currency1" class="col-sm-1 form-control input-sm" style="height: 25px;width:65px;" disabled="disabled">
+                                            <option th:each="item: ${list_currencyInfo}" th:value="${item.id}" th:text="${item.enName}" th:selected="${course!=null}? ${course.currency == item.id}"></option>
+                                        </select>
+
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 学制：</label>
+                                        <input class="col-sm-3" type="text" style="width:195px;height:25px;" readonly="readonly" th:value="${course}!=null?${course.schoolLength}"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 上课周数：</label>
+                                        <input class=" col-sm-3" style="width: 125px;height:25px" type="number" readonly="readonly" th:value="${course!=null}?${course.courseLength}"/>
+                                        <span class="input-unit">周</span>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 结课日期：</label>
+                                        <input class="Wdate col-sm-3" style="width: 190px; height:25px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly="readonly" disabled="disabled"
+                                               th:value="${course!=null and course.courseEndTimeDate!=null}?${#dates.format(course.courseEndTimeDate, 'yyyy-MM-dd')}"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 所在校区：</label>
+                                        <input class=" col-sm-3" style="width: 190px; height:25px;" readonly="readonly" th:value="${course!=null}?${course.schoolArea}"/>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 已付学费：</label>
+                                        <input class="col-sm-2" type="text" style="height:25px;" readonly="readonly" th:value="${course}!=null?${course.prepaidTuition}"/>
+                                        <label class="col-sm-2 control-label no-padding-right blue"> 院校学生号：</label>
+                                        <input class=" col-sm-3" style="width: 190px; height:25px" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" th:value="${course!=null}?${course.studentNo}" readonly="readonly"/>
+                                    </div>
+                                    <div class="form-group" style="height:29px">
+                                        <label class="col-sm-3 control-label no-padding-right blue"> 合作机构：</label>
+                                        <input class="col-sm-3" style="width: 190px; height:25px;" readonly="readonly" th:value="${course!=null}?${course.cooperationName}"/>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="height:130px">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> 备注：</label>
+                                    <textarea rows="10" cols="40" readonly="readonly"  name="comment" class="col-sm-3" style="width:560px;height:100px;" id="textarea_comment" th:text="${visaRecordInfo!=null}? ${visaRecordInfo.visaComment}"></textarea>
+                                </div>
+                                <div class="form-group" style="height:80px">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> 操作人：</label>
+                                    <input  class=" col-sm-3" style="width: 190px; height:25px;" readonly="readonly"
+                                            th:value="${visaRecordInfo!=null}?${visaRecordInfo.operatorName}"/>
+                                </div>
+
+                                <div class="form-group" style="height:29px;display: none;" id="div_evus">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> EVUS登记完成日期：</label>
+                                    <input id = "input_EVUSDate" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 190px; height:25px" readonly="readonly"
+                                           required="required" th:value="${visaRecordInfo!=null and visaRecordInfo.evusCompleteDate != nul}? ${#dates.format(visaRecordInfo.evusCompleteDate, 'yyyy-MM-dd')}"/>
+                                </div>
+                                <div class="form-group" style="display: none;" id="div_file">
+                                    <label class="col-sm-3 control-label no-padding-right blue">EVUS已上传附件：</label>
+                                    <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" >
+                                        <div  class="tab-pane fade in active">
+                                            <div class="container">
+                                                <div class="form-horizontal">
+                                                    <div class="form-group">
+                                                        <div class="col-sm-6" style="padding-left: 0px;" >
+                                                            <div class="widget-header">
+                                                                <h4>文件上传</h4>
+                                                            </div>
+                                                            <div class="widget-body">
+                                                                <div class="widget-main">
+                                                                <span id = "offer_attachment" style="display: none">
+                                                                    <span id = "offerAttachment_show" th:text="${visaRecordInfo!=null}? ${visaRecordInfo.evusAttachment}"></span>
+                                                                    <span class="btn btn-sm btn-primary" style="left:9%" id = "offer_show">预览</span>
+                                                                    <!--<a th:href="${visaRecordInfo!=null}? ${visaRecordInfo.evusAttachment}" download="文件下载" ><span class="btn btn-sm btn-primary" style="left:15%" id = "offer_upload">下载</span></a>-->
+                                                                </span>
+                                                                    <input name ="fileInput"  type="file" id="id-input-file-3" readonly="readonly"/>
+                                                                    <label>
+                                                                        <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                                    </label>
+                                                                    <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- 审批内容 -->
+                                <div th:each="item : ${list_auditResult}" class="form-group" style="height:29px;margin-top: 20px;">
+                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                        审批结果：<span th:text="${item.applyStatus_string}"></span>
+                                    </label>
+                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                        审批人：<span th:text="${item.operatorName}"></span>
+                                    </label>
+                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                        审批时间：<span th:text="${item.createTime!=null}? ${#dates.format(item.createTime, 'yyyy-MM-dd')}"></span>
+                                    </label>
+                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                        审批意见：<span th:text="${item.reason}"></span>
+                                    </label>
+                                </div>
+                                <div class="form-group" style="height:29px;margin-top: 20px;">
+                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                        待审批人OA：<span th:text="${toAudit!=null}? ${toAudit_oaId + '-' + toAudit_name}:当前审批流程已结束"></span>
+                                    </label>
+                                </div>
+
+                                <input type="text" id="input_auditStatus" style="display: none" th:value="${visaRecordInfo!=null}? ${visaRecordInfo.auditStatus}"/>
+                                <input type="text" id = "input_isAuditUser" style="display: none;" th:value="${isAuditUser}"/>
+                                <input type="text" id="input_businessId" style="display: none;"  th:value="${visaRecordInfo!=null}? ${visaRecordInfo.id}"/>
+                                <input type="hidden" id="input_toAudit" th:value="${toAudit!=null}? ${toAudit.id}"/>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <span id="alertText"></span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btn_audit">审批</button>
+                    <button type="button" id="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>
+                    <shiro:hasPermission name="visaRecord:edit">
+                        <button type="button" id="editPage" class="btn btn-primary" style="display: none;">编辑</button>
+                    </shiro:hasPermission>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/bottom::bottom"></div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script  th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script type="text/javascript">
+    <!--
+    jQuery(function($) {
+        var pageHelper = (function(){
+            this.studentNo;
+            return{
+                init:function(){
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.render();
+                    this.addEvent();
+                },
+                getQueryData:function(){
+                    this.studentNo = GetQueryString("studentNo");
+                    this.nationId = $("#input_nation").val();
+                    this.nationStatus = $("#input_nationStatus").val();
+                },
+                handelQueryData:function(){
+
+                },
+                render:function(){
+                    var _self = this;
+                    var nationId = $("#input_nation").val();
+                    /*  根据当前登陆用户是不是表单的审批人,及当前审批状态是否为2,3而控制两个审批按钮的显示隐藏 */
+                    var auditStatus = $("#input_auditStatus").val();
+
+                    if ($("#input_isAuditUser").val() == "false" || $("#input_isAuditUser").val() == "") {
+                        $("#btn_audit").hide();
+                    }
+                    if ( auditStatus == "3" || auditStatus == "4")
+                        $("#btn_audit").hide();
+
+                    if(_self.nationStatus == "1" || _self.nationStatus == "2" || _self.nationStatus == "3"){
+                        $("#div_studentNation_visaRecord").show();
+                    }
+
+
+                    if($("#input_isAmerica").val() == "1") {
+                        /* 学生留学国家为美国时显示登记完成日期,EVUS附件 */
+                        $("#div_evus").show();
+                        $("#form_file").show();
+                        $("#div_file").show();
+                    }
+                    $("#submits").hide();
+                    $("#form_file").hide();
+                    if($("#offerAttachment_show").text().length > 0) {
+                        $("#offer_attachment").show();
+                        if( $("#offerAttachment_show").text().length > 50)
+                            $("#offerAttachment_show").text($("#offerAttachment_show").text().substring(0,50)+"...");
+                    }
+                    if(auditStatus == "1" || auditStatus == "4"){
+                        $("#editPage").show();
+                    }
+                    $(".chosen-select").chosen();
+                },
+                addEvent:function(){
+                    var _self = this;
+                    $('#id-input-file-3').ace_file_input({
+                        style:'well',
+                        btn_choose:'Drop files here or click to choose',
+                        btn_change:null,
+                        no_icon:'icon-cloud-upload',
+                        droppable:true,
+                        thumbnail:'small',//large | fit
+                        before_change:function(files, dropped) {
+                            return true;
+                        },
+                        before_remove : function() {
+                            return true;
+                        },
+                        preview_error : function(filename, error_code) {
+
+                        }
+                    }).on('change', function(){
+
+                    }).attr("disabled", "disabled");
+                    $("#offer_show").click(function(){
+                        $.post("/getPrivateUrl",{"fileUrl":$("#input_fileName").val()},function (data,status) {
+                            window.open(data);
+                        });
+                    });
+                    $("#returnPage").click(function(){
+                        window.location.href="/visaApply?studentNo="+_self.studentNo;
+                    });
+                    $("#editPage").click(function(){
+                        var studentNo = $("#input_stuNo").val();
+                        window.open("/visaRecord/editPage?studentNo="+studentNo,target="_self");
+                    });
+                    $("#btn_audit").click(function(){
+                        var businessId = $("#input_businessId").val();
+                        var caseId = 7;
+                        var applyId = $("#input_toAudit").val();
+                        var studentNo = $("#input_stuNo").val();
+                        layer.prompt({
+                            formType: 2,
+                            title: '请添加备注',
+                            btn: ['通过', '拒绝'],
+                            yes: function (index, layero) {
+                                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                                var reason = layero.find('.layui-layer-input').val();
+                                $.ajax({
+                                    url: "/auditApply/audit",
+                                    type: "post",
+                                    data: {
+                                        businessId: businessId,
+                                        caseId: caseId,
+                                        reason: reason,
+                                        applyId: applyId,
+                                        applyStatus: 2,
+                                        studentNo: studentNo,
+                                        businessUpdateTime:$("input[name='businessUpdateTime']").val()
+                                    },
+                                    success: function (data) {
+                                        layer.close(loadIndex);
+                                        var data = JSON.parse(data);
+                                        if(data.code == 0){
+                                            parent.layer.confirm("待审批内容已修改,请重新审批",{
+                                                icon:7,
+                                                btn:['确定']
+                                            },function () {
+                                                window.location.reload();
+                                            });
+                                        }
+                                        else if(data.code == "-1"){
+                                            layer.alert('在审批获签信息之前您必须先审批签证申请');
+                                        }
+                                        else if(data.code == "-2"){
+                                            layer.alert('在审批获签信息之前您必须先添加签证申请');
+                                        }
+                                        else{
+                                            layer.close(index);
+                                            if(data.code == 1) {
+                                                layer.msg('操作成功', {time: 1000});
+                                                window.location.reload();
+                                            }
+                                            else
+                                                layer.msg('操作失败,请刷新页面重试!', {time: 1000});
+                                        }
+                                    }
+                                })
+                            },
+                            btn2: function (index, layero) {
+                                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                                var reason = layero.find('.layui-layer-input').val();
+                                $.ajax({
+                                    url: "/auditApply/audit",
+                                    type: "post",
+                                    data: {
+                                        businessId: businessId,
+                                        caseId: caseId,
+                                        reason: reason,
+                                        applyId: applyId,
+                                        applyStatus: 1,
+                                        studentNo: studentNo,
+                                        businessUpdateTime:$("input[name='businessUpdateTime']").val()
+                                    },
+                                    success: function (data) {
+                                        layer.close(loadIndex);
+                                        var data = JSON.parse(data);
+                                        if(data.code == 0){
+                                            parent.layer.confirm("待审批内容已修改,请重新审批",{
+                                                icon:7,
+                                                btn:['确定']
+                                            },function () {
+                                                window.location.reload();
+                                            });
+                                        }
+                                        else if(data.code == "-1"){
+                                            layer.alert('在审批获签信息之前您必须先审批签证申请');
+                                        }
+                                        else if(data.code == "-2"){
+                                            layer.alert('在审批获签信息之前您必须先添加签证申请');
+                                        }
+                                        else{
+                                            layer.close(index);
+                                            if(data.code == 1) {
+                                                layer.msg('操作成功', {time: 1000});
+                                                window.location.reload();
+                                            }
+                                            else
+                                                layer.msg('操作失败,请刷新页面重试!', {time: 1000});
+                                        }
+                                    }
+                                })
+                            }
+                        });
+                    });
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+    -->
+</script>
+</body>
+</html>

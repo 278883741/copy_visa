@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CurrencyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CurrencyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="en_name" jdbcType="VARCHAR" property="enName" />
+    <result column="cn_name" jdbcType="VARCHAR" property="cnName" />
+    <result column="order_id" jdbcType="INTEGER" property="orderId" />
+    <result column="exchange_rate" jdbcType="DECIMAL" property="exchangeRate"/>
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo"/>
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+
+	<resultMap id="toAccountListVOMap" type="com.aoji.vo.ToAccountListVO" extends="BaseResultMap">
+		<result column="studentId" jdbcType="INTEGER" property="studentId" />
+		<result column="channelCommId" jdbcType="INTEGER" property="channelCommId" />
+		<result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+		<result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+		<result column="spelling" jdbcType="VARCHAR" property="spelling" />
+		<result column="student_name" jdbcType="VARCHAR" property="studentName" />
+		<result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+		<result column="visa_date" jdbcType="TIMESTAMP" property="visaDate" />
+		<result column="agent_id" jdbcType="INTEGER" property="agentId" />
+		<result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+		<result column="course_name" jdbcType="VARCHAR" property="courseName" />
+		<result column="major_name" jdbcType="VARCHAR" property="majorName" />
+		<result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+		<result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+		<result column="result_comment" jdbcType="VARCHAR" property="resultComment" />
+		<result column="delete_status" jdbcType="BIT" property="deleteStatus"/>
+		<result column="payment_date" jdbcType="TIMESTAMP" property="paymentDate"/>
+	</resultMap>
+
+
+	<update id="updateChannelReturnStatusBychannCommId">
+		UPDATE channel_commission channelCommission,
+		 commission_invoice commissionInvoice
+		SET channelCommission.result_comment = #{resultComment} ,commissionInvoice.channel_return_status=#{channelReturnStatus},channelCommission.payment_date = now()
+		WHERE
+			channelCommission.delete_status = 0
+		AND channelCommission.id = #{channelCommId}
+		AND commissionInvoice.delete_status = 0
+		AND channelCommission.invoice_id = commissionInvoice.id
+
+	</update>
+	<select id="getFinanceReturnCommissionList" resultType="com.aoji.vo.ToAccountListVO">
+		SELECT
+		channelCommission.id AS channelCommId,
+		channelCommission.student_id AS studentId,
+		channelCommission.invoice_id AS invoiceId,
+		channelCommission.get_visa_sum AS getVisaSum,
+		channelCommission.channel_return_rate AS channelReturnRate,
+		channelCommission.return_money AS returnMoney,
+		channelCommission.exchange_rate AS exchangeRate,
+		channelCommission.return_money_cny AS returnMoneyCny,
+		channelCommission.payment_date AS paymentDate,
+		channelCommission.this_return_money AS thisReturnMoney,
+		commissionStudent.student_no AS studentNo,
+		commissionStudent.student_name AS studentName,
+		commissionStudent.spelling AS spelling,
+		commissionStudent.birthday AS birthday,
+		commissionStudent.sign_date as signDate,
+		studentInfo.agent_name AS agentName,
+		studentInfo.agent_id  AS agentId,
+		commissionInvoice.account_currency as accountCurrency,
+		commissionInvoice.channel_return_status as channelReturnStatus,
+		commissionInvoice.account_money as accountMoney,
+		channelCommission.result_comment as resultComment
+		FROM
+		(
+		SELECT
+		id ,
+		student_id,
+		invoice_id,
+		get_visa_sum,
+		channel_return_rate,
+		return_money,
+		exchange_rate,
+		return_money_cny,
+		payment_date,
+		this_return_money,
+		result_comment
+		FROM
+		channel_commission
+		WHERE
+		delete_status = 0
+		) channelCommission,
+		(
+		SELECT
+		id AS commStuId,
+		student_no,
+		student_name,
+		spelling,
+		birthday,
+		sign_date
+
+		FROM
+		commission_student
+		WHERE
+		delete_status = 0
+
+		) commissionStudent,
+		(
+		SELECT
+		id AS commInvId,
+		channel_return_status,
+		account_currency,
+		account_money
+		FROM
+		commission_invoice
+		WHERE
+		delete_status = 0
+
+		) commissionInvoice,
+		(
+		SELECT
+		student_no,
+		agent_id,
+		agent_name
+		FROM
+		student_info
+		WHERE
+		delete_status = 0
+		and agent_id !=''
+
+		) studentInfo
+		WHERE
+		channelCommission.student_id = commissionStudent.commStuId
+		AND channelCommission.invoice_id = commissionInvoice.commInvId
+		and commissionStudent.student_no = studentInfo.student_no
+		<if test="toAccountListVO.studentNo!=null and toAccountListVO.studentNo!='' ">
+			and  commissionStudent.student_no = #{toAccountListVO.studentNo}
+		</if>
+		<if test="toAccountListVO.studentName!=null and toAccountListVO.studentName!='' ">
+			and  commissionStudent.student_name  LIKE CONCAT('%',#{toAccountListVO.studentName},'%')
+		</if>
+		<if test="toAccountListVO.agentName!=null and toAccountListVO.agentName!='' ">
+			and  studentInfo.agent_name  LIKE CONCAT('%',#{toAccountListVO.agentName},'%')
+		</if>
+		<if test="toAccountListVO.accountCurrency!=null and toAccountListVO.accountCurrency!='' ">
+			and  commissionInvoice.account_currency = #{toAccountListVO.accountCurrency}
+		</if>
+		<if test="toAccountListVO.channelReturnStatus!=null and toAccountListVO.channelReturnStatus!='' ">
+			and  commissionInvoice.channel_return_status = #{toAccountListVO.channelReturnStatus}
+		</if>
+		<if test="toAccountListVO.paymentDateStart!=null and toAccountListVO.paymentDateStart!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{toAccountListVO.paymentDateStart}, '%Y-%m-%d')
+		</if>
+		<if test="toAccountListVO.paymentDateEnd!=null and toAccountListVO.paymentDateEnd!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{toAccountListVO.paymentDateEnd}, '%Y-%m-%d')
+		</if>
+		ORDER BY
+		channelCommission.payment_date DESC
+	</select>
+
+
+
+	<select id="getReturnCommissionFrequencyListByStudentNo" resultType="com.aoji.vo.ToAccountListVO">
+			SELECT
+		channelCommission.id AS channelCommId,
+		channelCommission.student_id AS studentId,
+		channelCommission.invoice_id AS invoiceId,
+		channelCommission.get_visa_sum AS getVisaSum,
+		channelCommission.channel_return_rate AS channelReturnRate,
+		channelCommission.return_money AS returnMoney,
+		channelCommission.exchange_rate AS exchangeRate,
+		channelCommission.return_money_cny AS returnMoneyCny,
+		channelCommission.payment_date AS paymentDate,
+		commissionStudent.student_no AS studentNo,
+		commissionStudent.student_name AS studentName,
+		commissionStudent.spelling AS spelling,
+		commissionStudent.birthday AS birthday,
+		studentInfo.agent_name AS agentName,
+		studentInfo.agent_id  AS agentId,
+		commissionInvoice.account_currency as accountCurrency,
+		commissionInvoice.channel_return_status as channelReturnStatus,
+		commissionInvoice.account_money as accountMoney,
+		channelCommission.result_comment as resultComment
+		FROM
+		(
+		SELECT
+		id ,
+		student_id,
+		invoice_id,
+		get_visa_sum,
+		channel_return_rate,
+		return_money,
+		exchange_rate,
+		return_money_cny,
+		payment_date,
+		result_comment
+		FROM
+		channel_commission
+		WHERE
+		delete_status = 0
+		) channelCommission,
+		(
+		SELECT
+		id AS commStuId,
+		student_no,
+		student_name,
+		spelling,
+		birthday
+
+		FROM
+		commission_student
+		WHERE
+		delete_status = 0
+
+		) commissionStudent,
+		(
+		SELECT
+		id AS commInvId,
+		channel_return_status,
+		account_currency,
+		account_money
+		FROM
+		commission_invoice
+		WHERE
+		delete_status = 0
+		AND channel_return_status =#{name}
+
+		) commissionInvoice,
+		(
+		SELECT
+		student_no,
+		agent_id,
+		agent_name
+		FROM
+		student_info
+		WHERE
+		delete_status = 0
+		and agent_id !=''
+
+		) studentInfo
+		WHERE
+		channelCommission.student_id = commissionStudent.commStuId
+		AND channelCommission.invoice_id = commissionInvoice.commInvId
+		and commissionStudent.student_no = studentInfo.student_no
+		 and commissionStudent.student_no = #{studentNo}
+		ORDER BY
+		channelCommission.payment_date DESC
+	</select>
+
+	<!--此方法用于财务返佣的列表数据导出查询总条数-->
+	<select id="getCountFinanceReturnCommissionListForExcel" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		FROM
+		(
+		SELECT
+		id ,
+		student_id,
+		invoice_id,
+		get_visa_sum,
+		channel_return_rate,
+		return_money,
+		this_return_money,
+		exchange_rate,
+		return_money_cny,
+		payment_date,
+		result_comment
+		FROM
+		channel_commission
+		WHERE
+		delete_status = 0
+		) channelCommission,
+		(
+		SELECT
+		id AS commStuId,
+		student_no,
+		student_name,
+		spelling,
+		birthday,
+		sign_date
+
+		FROM
+		commission_student
+		WHERE
+		delete_status = 0
+
+		) commissionStudent,
+		(
+		SELECT
+		id AS commInvId,
+		channel_return_status,
+		account_currency,
+		account_money
+		FROM
+		commission_invoice
+		WHERE
+		delete_status = 0
+
+		) commissionInvoice,
+		(
+		SELECT
+		student_no,
+		agent_id,
+		agent_name
+		FROM
+		student_info
+		WHERE
+		delete_status = 0
+		and agent_id !=''
+
+		) studentInfo
+		WHERE
+		channelCommission.student_id = commissionStudent.commStuId
+		AND channelCommission.invoice_id = commissionInvoice.commInvId
+		and commissionStudent.student_no = studentInfo.student_no
+		<if test="toAccountListVO.studentNo!=null and toAccountListVO.studentNo!='' ">
+			and  commissionStudent.student_no = #{toAccountListVO.studentNo}
+		</if>
+		<if test="toAccountListVO.studentName!=null and toAccountListVO.studentName!='' ">
+			and  commissionStudent.student_name  LIKE CONCAT('%',#{toAccountListVO.studentName},'%')
+		</if>
+		<if test="toAccountListVO.agentName!=null and toAccountListVO.agentName!='' ">
+			and  studentInfo.agent_name  LIKE CONCAT('%',#{toAccountListVO.agentName},'%')
+		</if>
+		<if test="toAccountListVO.accountCurrency!=null and toAccountListVO.accountCurrency!='' ">
+			and  commissionInvoice.account_currency = #{toAccountListVO.accountCurrency}
+		</if>
+		<if test="toAccountListVO.channelReturnStatus!=null and toAccountListVO.channelReturnStatus!='' ">
+			and  commissionInvoice.channel_return_status = #{toAccountListVO.channelReturnStatus}
+		</if>
+		<if test="toAccountListVO.paymentDateStart!=null and toAccountListVO.paymentDateStart!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{toAccountListVO.paymentDateStart}, '%Y-%m-%d')
+		</if>
+		<if test="toAccountListVO.paymentDateEnd!=null and toAccountListVO.paymentDateEnd!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{toAccountListVO.paymentDateEnd}, '%Y-%m-%d')
+		</if>
+		ORDER BY
+		channelCommission.payment_date DESC
+	</select>
+	<!--此方法用于财务返佣分页导出数据-->
+	<select id="getFinanceReturnCommissionListForExcel" resultType="com.aoji.config.util.FinanceModel">
+		SELECT
+		channelCommission.id AS channelCommId,
+		channelCommission.student_id AS studentId,
+		channelCommission.invoice_id AS invoiceId,
+		channelCommission.get_visa_sum AS getVisaSum,
+		channelCommission.channel_return_rate AS channelReturnRate,
+		channelCommission.return_money AS returnMoney,
+		channelCommission.exchange_rate AS exchangeRate,
+		channelCommission.return_money_cny AS returnMoneyCny,
+		channelCommission.this_return_money AS thisReturnMoney,
+		DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') AS paymentDate,
+		commissionStudent.student_no AS studentNo,
+		commissionStudent.student_name AS studentName,
+		commissionStudent.spelling AS spelling,
+		commissionStudent.birthday AS birthday,
+		commissionStudent.sign_date as signDate,
+		studentInfo.agent_name AS agentName,
+		studentInfo.agent_id  AS agentId,
+		commissionInvoice.account_currency as accountCurrency,
+		commissionInvoice.channel_return_status as channelReturnStatus,
+		commissionInvoice.account_money as accountMoney,
+		channelCommission.result_comment as resultComment
+		FROM
+		(
+		SELECT
+		id ,
+		student_id,
+		invoice_id,
+		get_visa_sum,
+		channel_return_rate,
+		return_money,
+		this_return_money,
+		exchange_rate,
+		return_money_cny,
+		payment_date,
+		result_comment
+		FROM
+		channel_commission
+		WHERE
+		delete_status = 0
+		) channelCommission,
+		(
+		SELECT
+		id AS commStuId,
+		student_no,
+		student_name,
+		spelling,
+		birthday,
+		sign_date
+
+		FROM
+		commission_student
+		WHERE
+		delete_status = 0
+
+		) commissionStudent,
+		(
+		SELECT
+		id AS commInvId,
+		channel_return_status,
+		account_currency,
+		account_money
+		FROM
+		commission_invoice
+		WHERE
+		delete_status = 0
+
+		) commissionInvoice,
+		(
+		SELECT
+		student_no,
+		agent_id,
+		agent_name
+		FROM
+		student_info
+		WHERE
+		delete_status = 0
+		and agent_id !=''
+
+		) studentInfo
+		WHERE
+		channelCommission.student_id = commissionStudent.commStuId
+		AND channelCommission.invoice_id = commissionInvoice.commInvId
+		and commissionStudent.student_no = studentInfo.student_no
+		<if test="toAccountListVO.studentNo!=null and toAccountListVO.studentNo!='' ">
+			and  commissionStudent.student_no = #{toAccountListVO.studentNo}
+		</if>
+		<if test="toAccountListVO.studentName!=null and toAccountListVO.studentName!='' ">
+			and  commissionStudent.student_name  LIKE CONCAT('%',#{toAccountListVO.studentName},'%')
+		</if>
+		<if test="toAccountListVO.agentName!=null and toAccountListVO.agentName!='' ">
+			and  studentInfo.agent_name  LIKE CONCAT('%',#{toAccountListVO.agentName},'%')
+		</if>
+		<if test="toAccountListVO.accountCurrency!=null and toAccountListVO.accountCurrency!='' ">
+			and  commissionInvoice.account_currency = #{toAccountListVO.accountCurrency}
+		</if>
+		<if test="toAccountListVO.channelReturnStatus!=null and toAccountListVO.channelReturnStatus!='' ">
+			and  commissionInvoice.channel_return_status = #{toAccountListVO.channelReturnStatus}
+		</if>
+		<if test="toAccountListVO.paymentDateStart!=null and toAccountListVO.paymentDateStart!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{toAccountListVO.paymentDateStart}, '%Y-%m-%d')
+		</if>
+		<if test="toAccountListVO.paymentDateEnd!=null and toAccountListVO.paymentDateEnd!='' ">
+			and  DATE_FORMAT(channelCommission.payment_date, '%Y-%m-%d') &lt;= DATE_FORMAT(#{toAccountListVO.paymentDateEnd}, '%Y-%m-%d')
+		</if>
+		ORDER BY
+		channelCommission.payment_date DESC
+		<if test="pageStart != null and pageEnd != null">
+			limit #{pageStart}, #{pageEnd}
+		</if>
+	</select>
+
+
+</mapper>

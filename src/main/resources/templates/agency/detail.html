@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/ztree/css/zTreeStyle.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<!--<div th:include="fragments/top::top"></div>-->
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li>合作机构</li>
+                    <li>合作机构信息</li>
+                </ul>
+            </div>
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">合作机构信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <div  class="tab-pane fade in active">
+                    <div class="container">
+                        <div class="form-horizontal">
+                            <input type="text" id="input_nationId_hasChecked" style="display: none" th:value="${agencyInfo!=null}?  ${agencyInfo.nationId}"/>
+                            <div class="form-group" id="div_senderType"  style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">机构类型：</label>
+                                <select type="" class="col-sm-3 form-control input-sm" name="agencyType" style="width:190px;height:25px;" disabled="disabled">
+                                    <option value="1" th:selected="${agencyInfo!=null}? ${agencyInfo.agencyType==1}">接机</option>
+                                    <option value="2" th:selected="${agencyInfo!=null}? ${agencyInfo.agencyType==2}">保险</option>
+                                    <option value="3" th:selected="${agencyInfo!=null}? ${agencyInfo.agencyType==3}">监护</option>
+                                    <option value="4" th:selected="${agencyInfo!=null}? ${agencyInfo.agencyType==4}">住宿</option>
+                                    <option value="5" th:selected="${agencyInfo!=null}? ${agencyInfo.agencyType==5}">院校</option>
+                                </select>
+                                <label class="col-sm-3 control-label no-padding-right blue">机构名称：</label>
+                                <input class="col-sm-2" name="agencyName" th:value="${agencyInfo!=null}?  ${agencyInfo.agencyName}" readonly="readonly"/>
+                            </div>
+                            <div class="form-group" style="height: 29px;">
+                                <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> 所属国家：</label>
+                                <input class="col-sm-2" id="input_nationId" name="nationId" value="-显示已选择国家-" onclick="chooseCountry()"/>
+                            </div>
+                            <div id="div_countryTree" style="display: none;">
+                                <div class="form-group">
+                                    <div data-options="region:'west',split:true"  class="col-sm-3">
+                                        <ul id="roleTree" class="ztree" style="margin-top: 30px;"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label no-padding-right blue">备注：</label>
+                                <textarea class="col-sm-5" name="content" th:text="${agencyInfo!=null}?  ${agencyInfo.content}" readonly="readonly"></textarea>
+                            </div>
+                            <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <span id="alertText"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="returnPage" class="btn btn-default" data-dismiss="modal">返回</button>
+                </div>
+            </div>
+        </div>
+        <br/><br/><br/><br/><br/><br/><br/><br/>
+    </div>
+</div>
+<div th:include="fragments/bottom::bottom"></div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script type="text/javascript">
+    var tree;
+    var index;
+    $(function () {
+        var setting =
+            {
+                check:
+                    {
+                        enable: true,
+                        chkStyle: "checkbox",
+                        chkboxType: { "Y": "", "N": "" }
+                    },
+                data:
+                    {
+                        simpleData:{enable: true} ,
+                        keep:{parent: true}
+                    },
+                callback: {
+
+                }
+            };
+
+        //首次进入加载level为1的
+        $(function()
+        {
+            var checkdCountry = $("#input_nationId_hasChecked").val();
+            $.post(
+                '/agency/getCountry_edit',
+                {"checkdCountry":checkdCountry,"action":"detail"},
+                function(data){
+                    if (data.success) {
+                        var dbDate = eval(data.msg);
+                        tree = $.fn.zTree.init($("#roleTree"), setting, dbDate);
+                    }
+
+                }
+            );
+        });
+
+        $("#submits").click(function () {
+            $("#input_nationId").val($("#input_nationId").val().substring(0,$("#input_nationId").val().length - 1));
+            $.ajax({
+                url: "/agency/add",
+                type: "post",
+                data: $("#edit").serialize(),
+                success: function (data) {
+                    if (data) {
+                        $(".alert-success").text("操作成功").show();
+                        $('#alert').attr('class', 'alert alert-success').show();
+                        setTimeout("$('#alert').hide()", 2000);
+                        $("#myModal").modal("hide");
+                    } else {
+                        $('#alertText').text('操作失败');
+                        $('#alert').attr('class', 'alert alert-danger').show();
+                        setTimeout("$('#alert').hide()", 2000);
+                        $("#myModal").modal("hide");
+                    }
+                }
+            });
+            //监听modal关闭事件，清除整个页面的缓存数据
+            $("#myModal").on("hidden.bs.modal", function () {
+                $(this).removeData("bs.modal");
+            });
+        });
+
+        $("#returnPage").click(function(){
+            window.history.back(-1);
+        })
+    });
+
+    function chooseCountry() {
+        index = layer.open({
+            type: 1,
+            title:"已选择国家",
+            area: ['20%', '60%'],
+            content: $('#div_countryTree')
+        });
+    }
+    function saveCountry() {
+        layer.close(index);
+    }
+</script>
+</body>
+</html>

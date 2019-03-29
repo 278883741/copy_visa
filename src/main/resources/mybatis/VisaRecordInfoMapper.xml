@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.VisaRecordInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.VisaRecordInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="visa_comment" jdbcType="VARCHAR" property="visaComment" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="evus_complete_date" jdbcType="TIMESTAMP" property="evusCompleteDate" />
+    <result column="evus_attachment" jdbcType="VARCHAR" property="evusAttachment" />
+    <result column="audit_status" jdbcType="INTEGER" property="auditStatus" />
+    <result column="FGV_ID" jdbcType="INTEGER" property="fgvId" />
+    <result column="result_time" jdbcType="TIMESTAMP" property="resultTime" />
+    <result column="student_nation" jdbcType="INTEGER" property="studentNation" />
+  </resultMap>
+
+  <select id="selectToAuditGetVisaList" resultMap="BaseResultMap" parameterType="java.lang.String">
+
+      SELECT visaRecord.* from
+      (
+        SELECT * from visa_record_info where student_no in
+        (
+          SELECT student_no from student_info where nation_id in
+          (
+            SELECT id from country_info where country_group in
+            (
+              SELECT nation from user_group where id in
+              (
+                SELECT group_id from user_group_relation where oaid = #{oaid} and delete_status = 0
+              ) and delete_status = 0
+            )
+          )
+        )
+      ) as visaRecord INNER JOIN (SELECT DISTINCT(business_id) FROM audit_apply_info where delete_status = 0 and case_id = 7) as audit
+      on visaRecord.id = audit.business_id
+  </select>
+  
+  <select id="getCountByAgentId" parameterType="java.util.Map" resultType="java.lang.Integer" >
+    SELECT count(DISTINCT(student_no)) as studentCount from visa_record_info where delete_status = 0 and audit_status = 3 and student_no in
+    (
+      SELECT student_no from student_info where delete_status = 0 and agent_id = #{agentId} and  sign_date BETWEEN #{startDate} and #{endDate}
+    )
+  </select>
+  <select id="getUnPassVisaRecordList" resultType="java.util.Map" parameterType="java.lang.String">
+    SELECT visaRecord.*,studentInfo.student_name,visaApply.id as 'visaApplyId' from
+    (
+    (SELECT id,student_no,operator_name,create_time from visa_record_info where audit_status = 4 and operator_no = #{oaId} and delete_status = 0) as visaRecord
+    LEFT JOIN
+    (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+    ON visaRecord.student_no = studentInfo.student_no
+    LEFT JOIN
+    (SELECT id,student_no from visa_apply_info where delete_status = 0) as visaApply
+    ON visaRecord.student_no = visaApply.student_no
+    )
+  </select>
+</mapper>

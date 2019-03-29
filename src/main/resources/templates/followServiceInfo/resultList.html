@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li>学生列表</li>
+                    <li>后续管理</li>
+                    <li>offer结果列表</li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <input id="studentNo" th:value="${studentNo}" type="text" name="stu_id" style="display: none"/>
+                <input id="oaid" th:value="${session.user.oaid}" type="text" name="oaid" style="display: none"/>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div th:include="fragments/student_info::student_info"
+                                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                                <h3 class="header smaller lighter blue">后续申请结果列表</h3>
+                                <div class="table-header">
+                                    <form class="form-inline" style="height: 42px">
+
+                                        <div class="form-group">
+                                        </div>
+                                        <shiro:hasPermission name="后续结果_添加">
+                                            <a data-toggle="modal" data-target="#myModal" href="javascript:void(0);"
+                                               id="toAddMessage_id"
+                                               class="btn btn-info pull-right">添加申请结果</a>
+                                        </shiro:hasPermission>
+                                        <a data-toggle="modal" data-target="#myModal" href="javascript:void(0);"
+                                           onclick="toReturnUrl();"
+                                           class="btn btn-info pull-right">后续申请列表</a>
+                                        <a data-toggle="modal" data-target="#myModal" href="javascript:void(0);"
+                                           onclick="toStudentListUrl();"
+                                           class="btn btn-info pull-right">学生列表</a>
+                                    </form>
+                                </div>
+                                <shiro:hasPermission name="后续结果_查看">
+                                    <input type="hidden" name="permission_select" id="permission_select" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="后续结果_修改">
+                                    <input type="hidden" name="permission_update" id="permission_update" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="后续结果_学生确认">
+                                    <input type="hidden" name="permission_student" id="permission_student" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="后续结果_学校确认">
+                                    <input type="hidden" name="permission_school" id="permission_school" value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="后续结果_offer下载">
+                                    <input type="hidden" name="permission_upload" id="permission_upload" value="1"/>
+                                </shiro:hasPermission>
+                                <div class="table-responsive">
+                                    <input id="stu_id" th:value="${applyId}" type="text" name="stu_id"
+                                           style="display: none"/>
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th width="15%">申请结果</th>
+                                            <th width="15%">offer信息</th>
+                                            <th width="15%">申请结果到达日期</th>
+                                            <th width="15%">操作人</th>
+                                            <th width="15%">操作日期</th>
+                                            <th width="25%" class="hidden-480">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    var oTable1;
+    var applyId = $("#stu_id").val();
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "fnRowCallback": function (nRow, aData, iDisplayIndex) {
+//                if (aData.offerAttachment.length > 10) {
+//                    $('td:eq(1)', nRow).html( aData.offerAttachment.substr(0, 23)+"……");
+//                }
+            },
+            "sAjaxSource": "/followService/resultList/data",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": $("#stu_id").val() != "" ? $("#stu_id").val() : null}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.resultType == 1) return "录取";
+                            if (data.resultType == 2) return "拒绝";
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            // if (data.offerAttachment != "") {
+                            //     return '<a href="javascript:void(0);"  onclick="toOfferAttachment(\'' + data.offerAttachment + '\')">点击查看</a>';
+                            // } else {
+                            //     return "";
+                            // }
+
+                            var offerAttachmentShow;
+                            if (data.offerAttachment == null || data.offerAttachment == "") {
+                                offerAttachmentShow = "无";
+                            }
+                            else {
+                                offerAttachmentShow = '<a href="javascript:void(0);" onclick="toOfferAttachment(\'' + data.offerAttachment + '\')" >查看</a>';
+                            }
+                            return offerAttachmentShow;
+
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.resultDate != null) {
+                                return getTimeString_day(new Date(data.resultDate));
+                            } else {
+                                return "";
+                            }
+
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.createTime != null) {
+                                return getTimeString_day(new Date(data.createTime));
+                            } else {
+                                return "";
+                            }
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            var offerComent = data.offerAttachment;
+                            var edit_select = '';
+                            var edit_update = '';
+                            var studentTime = '';
+                            var schoolTime = '';
+//                        if($("#permission_student").val()==1){
+//                            studentTime = '<a href="javascript:void(0);" onclick="toStudentConfirm_follow(' + data.id + ')" >学生确认</a>&nbsp;&nbsp;&nbsp;';
+//						}
+//                        if($("#permission_school").val()==1){
+//                            schoolTime =  '<a href="javascript:void(0);" onclick="toSchoolConfirm_follow(' + data.id + ')" >学校确认</a>&nbsp;&nbsp;&nbsp;';
+//						}
+                            if (data.studentReplyDate != null) {
+                                studentTime = '';
+                            }
+                            if (data.schoolReplyDate != null) {
+                                schoolTime = '';
+                            }
+
+                            if (data.auditStatus == 2) {
+                                if ($("#permission_select").val() == 1) {
+                                    edit_select = '<a href="javascript:void(0);" onclick="toMessage(' + data.id + ',' + applyId + ')" >查看</a>&nbsp;&nbsp;&nbsp;'
+                                }
+                            } else {
+                                if ($("#permission_select").val() == 1) {
+                                    edit_select = '<a href="javascript:void(0);" onclick="toMessage(' + data.id + ',' + applyId + ')" >查看</a>&nbsp;&nbsp;&nbsp;';
+                                }
+                                if ($("#permission_update").val() == 1) {
+                                    if (data.auditStatus != 3) {
+                                        if (data.operatorNo == $("#oaid").val()) {
+                                            edit_update = '<a href="javascript:void(0);" onclick="toUpdatePage(' + data.id + ',' + applyId + ')" >修改</a>&nbsp;&nbsp;&nbsp;';
+                                        }
+
+                                    }
+                                }
+                            }
+                            var offer_upload = '';
+//						if($("#permission_upload").val()==1){
+//                            offer_upload = '<a href="'+offerComent+'" download="offer信息下载" >下载offer信息</a>';
+//						}
+                            return edit_select + edit_update + offer_upload + studentTime + schoolTime;
+                            ;
+                        }
+                }
+
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+
+        var applyId = $("#stu_id").val();
+
+
+    })
+
+    function toStudentListUrl() {
+        location.href = "/studentInfo";
+    }
+
+    function toOfferAttachment(offerAttachment) {
+        window.open(offerAttachment);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/showLoading/css/showLoading.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div th:include="fragments/student_info::student_info"
+                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                <h3 class="header smaller lighter blue">同业学生详情</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <div class="tab-pane fade in active">
+                        <shiro:hasRole name="同业顾问">
+                            <input type="hidden" id="input_counselor" value="1"/>
+                        </shiro:hasRole>
+                        <shiro:hasRole name="机构">
+                            <input type="hidden" id="input_agent" value="1"/>
+                        </shiro:hasRole>
+                        <shiro:hasRole name="同业经理">
+                            <input type="hidden" id="input_manager" value="1"/>
+                        </shiro:hasRole>
+                        <shiro:hasRole name="海外办公室">
+                            <input type="hidden" id="aboardOffice" value="1"/>
+                        </shiro:hasRole>
+
+                        <input type="hidden" name="entrance" id="entrance" th:value="${#httpServletRequest.getParameter('entrance')}"/>
+                        <input type="hidden" name="studentStatus" id="studentStatus" th:value="${studentInfo != null}? ${studentInfo.studentStatus}"/>
+                        <input type="hidden" name="id" th:value="${channelStudentInfo!=null}? ${channelStudentInfo.id}"/>
+                        <input type="hidden" id="input_nationName" name="nationName"/>
+                        <input type="hidden" id="input_auditStatus" name="auditStatus" th:value="${channelStudentInfo!=null}?${channelStudentInfo.auditStatus}"/>
+
+                        <input type="hidden" id="input_agentConfirm" th:value="${channelStudentInfo!=null}?${channelStudentInfo.agentConfirm}"/>
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px;">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue">姓<span style="color: white;">站位</span>名：</label>
+                                    <input class="col-sm-2" name="studentName"  th:value="${channelStudentInfo!=null}? ${channelStudentInfo.studentName}" readonly="readonly"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">拼<span style="color: white;">站位</span>音：</label>
+                                    <input class="col-sm-2" name="pinyin" th:value="${channelStudentInfo!=null}? ${channelStudentInfo.pinyin}" readonly="readonly"/>
+                                </div>
+
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">出生日期：</label>
+                                    <input class="Wdate col-sm-3" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 190px" name="birthday" required="required" th:value="${channelStudentInfo!=null and channelStudentInfo.birthday != null}? ${#dates.format(channelStudentInfo.birthday,'yyyy-MM-dd')}" disabled="disabled"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">性<span style="color: white;">站位</span>别：</label>
+                                    <div class="col-sm-3 input-sm">
+                                        <input type="radio" name="gender" value="1" th:checked="${channelStudentInfo!=null}? ${channelStudentInfo.gender==1}" disabled="disabled"/>男
+                                        <input type="radio" name="gender" value="0" th:checked="${channelStudentInfo!=null}? ${channelStudentInfo.gender==0}" disabled="disabled"/>女
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="height:29px">
+
+                                    <label class="col-sm-3 control-label no-padding-right blue">留学国家：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="select_nation" name="nationId" style="width:190px;height:25px;" disabled="disabled">
+                                        <option value="-1">请选择</option>
+                                        <option th:each="item: ${list_country}" th:value="${item.id}" th:text="${item.countryName}" th:selected="${channelStudentInfo!=null}? ${channelStudentInfo.nationId==item.id}"></option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">类<span style="color: white;">站位</span>型：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="contractType" style="width:190px;height:25px;" disabled="disabled">
+                                        <option value="-1">请选择</option>
+                                        <option value="1" th:selected="${channelStudentInfo!=null}? ${channelStudentInfo.contractType==1}">全程</option>
+                                        <option value="4" th:selected="${channelStudentInfo!=null}? ${channelStudentInfo.contractType==4}">单签证</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue">签约日期：</label>
+                                    <input class="col-sm-2" th:value="${channelStudentInfo!=null and channelStudentInfo.signDate != null}? ${#dates.format(channelStudentInfo.signDate,'yyyy-MM-dd HH:mm:ss')}" readonly="readonly"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">代理QQ：</label>
+                                    <input class="col-sm-2" name="agentQq" th:value="${channelStudentInfo!=null}? ${channelStudentInfo.agentQq}" readonly="readonly"/>
+                                </div>
+                                <div class="form-group" style="height:29px;">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue">代理类型：</label>
+                                    <input class="col-sm-2" readonly="readonly" value="与代理直接签约"/>
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue">代理名称：</label>
+                                    <input class="col-sm-2" readonly="readonly" th:value="${channelStudentInfo!=null}? ${channelStudentInfo.agentName}"/>
+                                </div>
+                                <div class="form-group" style="height:29px;">
+                                    <label class="col-sm-3 control-label no-padding-right blue">学<span style="color: white;">站位</span>号：</label>
+                                    <input class="col-sm-2" id="input_studentNo" th:value="${channelStudentInfo!=null}? ${channelStudentInfo.studentNo}" readonly="readonly"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue">分支机构：</label>
+                                    <input class="col-sm-2" readonly="readonly" value="澳际同业"/>
+                                </div>
+                                <div class="form-group" style="height:29px;">
+                                    <label class="col-sm-3 control-label no-padding-right blue">对接邮箱：</label>
+                                    <textarea class="col-sm-7" name="email" th:text="${channelStudentInfo!=null}? ${channelStudentInfo.email}" readonly="readonly"></textarea>
+                                </div>
+                                <div class="form-group" style="height:29px;margin-top: 30px;">
+                                    <label class="col-sm-3 control-label no-padding-right no-padding-left blue">转案备注：</label>
+                                    <textarea class="col-sm-7" name="transferRemark" readonly="readonly" th:text="${channelStudentInfo!=null}? ${channelStudentInfo.transferRemark}" rows="10"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="tab-pane fade in active" id="operator_settle">
+                    <div class="form-group" style="height:29px">
+                        <label class="col-sm-3 control-label no-padding-right blue">结案原因：</label>
+                        <select type="" class="col-sm-3 form-control input-sm"
+                                id="reason" name="reason" style="width:150px;height:25px;">
+                            <option value="">请选择</option>
+                            <option value="1">
+                                单文书结案
+                            </option>
+                            <option value="2">
+                                单申请结案
+                            </option>
+                            <option value="3">
+                                其他
+                            </option>
+                            <option value="4">
+                                自动结案
+                            </option>
+                            <option value="5">
+                                退费结案
+                            </option>
+                            <option value="6">
+                                套磁结案
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="height:29px">
+                        <label class="col-sm-3 control-label no-padding-right blue">结案备注：</label>
+                        <textarea class="col-sm-2" style="width: 300px;height: 200px" name="remark" id="remark"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="margin-bottom: 5px;">
+                    <shiro:hasRole name="运营人员">
+                        <button type="button" class="btn btn-primary" id="operatorSettle">运营结案</button>
+                    </shiro:hasRole>
+                    <button type="button" class="btn btn-primary" id="settle">查看结案</button>
+                    <button type="button" class="btn btn-primary" id="check">查看停办</button>
+                    <button type="button" class="btn btn-primary" id="cancel">解除停办</button>
+                    <!--<button type="button" class="btn btn-primary" id="apply">申请停办</button>-->
+                    <shiro:hasRole name="运营人员-权限">
+                        <button type="button" id="disableStudent" class="btn btn-primary" onclick="disableStudent()">作废学生</button>
+                    </shiro:hasRole>
+                </div>
+
+                <span>
+                    <select type="" class="col-sm-3 form-control input-sm" id="select_papersType" style="width:190px;height:25px;" >
+                        <option value="1">申请材料</option>
+                        <option value="2">签证材料</option>
+                    </select>
+                    <div><button id="confirmFile" style="display: none;margin-left: 15px;">提交材料</button></div>
+                    <h3 class="header small lighter blue" style="margin-top: 2%;"></h3>
+                </span>
+
+                <div flag="template" style="display: none;">
+                    <div>
+                        <input type="hidden" flag="papersTypeId"/>
+                        <span style="margin-left: 10%;" flag="papersTypeName"></span>
+                        <button type="button" class="btn-primary1 pull-right" style="margin-right: 5%;width: 60px;height: 25px;" flag="btnUpload" >上传</button>
+                    </div>
+                    <div style="margin-left: 10%;" flag="div_file">
+
+                    </div>
+                    <h3 class="header smaller lighter black" style="margin-left: 10%;margin-right: 10%;"></h3>
+                </div>
+
+                <form method="post" action="/uploadFiles" id="form_file" style="display: none;margin-top: 29px;" enctype="multipart/form-data">
+                    <div class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label no-padding-right blue">文件上传：</label>
+                                    <div class="col-sm-6" style="padding-left: 0px;" id="div_attachment">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <input name="fileInput" multiple="" type="file" id="id-input-file-3"/>
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format"
+                                                           class="ace"/>
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <span id="alertText"></span>
+                </div>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<!--<script th:src="@{/assets/js/ace.min.js}"></script>-->
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/showLoading/js/jquery.showLoading.min.js}"></script>
+<!--<script th:src="@{/business/student/detail.js}"></script>-->
+<script type="text/javascript">
+    <!--
+    function disableStudent() {
+        layer.prompt({
+            formType: 2,
+            title: '作废理由',
+            btn: ['提交'],
+            yes: function (index, layero) {
+                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                var remark = layero.find('.layui-layer-input').val();
+                if(remark == ''){
+                    layer.msg('请填写作废理由', {time: 1000});
+                    window.location.reload();
+                    return;
+                }
+                var studentNo= $("#input_studentNo").val();
+                $.post("/student/disableStudent", {"studentNo": studentNo,"remark":remark}, function (data, status) {
+                    if (data) {
+                        location.href='/studentInfo';
+                    }
+                    else{
+                        layer.msg('操作失败,请刷新页面重新尝试', {time: 1000});
+                    }
+                });
+            }
+        });
+    }
+
+    var studentNo = $("#input_studentNo").val();
+    var studentStatus = $("#studentStatus").val();
+
+    jQuery(function ($) {
+        var pageHelper = (function () {
+            this.getPapersType = function(studentNo){
+                console.log(studentNo)
+                $(".main-container").showLoading();
+                $("div[flag='template']:visible").remove();
+                var nationId = $("#select_nation").children("option:selected").val();
+                var papersType = $("#select_papersType").children("option:selected").val();
+                $.post("/channelStudent/getPapersType",{"studentNo":studentNo,"nationId":nationId,"papersType":papersType},function (data,status) {
+                    if(data["code"] == 1){
+                        for (var i=0;i<data["data"].length;i++){
+                            var item = data["data"][i];
+                            var html = $("div[flag='template']:hidden").clone();
+
+                            if(papersType == "1" && $("#input_agent").val() == "1"){
+                                html.children("div").children("button").remove();
+                            }
+                            if($("#input_agent").val() != "1" && $("#input_manager").val() != "1"){
+                                html.children("div").children("button").remove();
+                            }
+                            if($("#input_agentConfirm").val()=="true" && papersType == 2){
+                                html.children("div").children("button").remove();
+                            }
+
+                            html.children("div").children("input").val(item["paperId"]);
+                            html.children("div").children("span").text(item["paperName"]);
+                            for(var j=0;j<item["fileList"].length;j++){
+                                var item_file = item["fileList"][j];
+                                $.ajax({
+                                    type : "post",
+                                    url : "/getPrivateUrl",
+                                    data : "fileUrl=" + item_file["fileUrl"],
+                                    async : false,
+                                    success : function(data){
+                                        var html_file = $("<div><a target='_blank' href='"+data+"'>"+item_file["fileName"]+"</a><span style='margin-left: 5px;'>"+item_file["fileCreateDate"]+ "</span><a class='red a_del' fileId='"+item_file["fileId"]+"'  style='margin-left: 10px;display:none;' href='javascript:void(0);'><i class='icon-trash icon-2x icon-only bigger-130'></i></a><a style='margin-left: 5px;' href='/download?filePath="+encodeURIComponent(data)+"&fileName="+item_file['fileName']+"' target='_blank'>下载</a></div>");
+                                        html.children("div:eq(1)").append(html_file);
+                                    }
+                                });
+                            }
+                            html.show();
+                            $("div[flag='template']:hidden").after(html);
+                        }
+                        var auditStatus = $("#input_auditStatus").val();
+                        if(auditStatus == "1" || auditStatus == "2"){
+                            if($("#input_manager").val() == "1"){
+                                $(".a_del").show();
+                            }
+                        }
+                    }
+                    $(".main-container").hideLoading();
+
+                    if(papersType == "2"){
+                        $("#confirmFile").show();
+                        if($("#input_agentConfirm").val() == "true"){
+                            $("#confirmFile").attr("disabled","disabled");
+                        }
+                    }
+                });
+
+            }
+            return {
+                init: function () {
+                    this.getQueryData();
+                    this.handelQueryData();
+                    this.addEvent();
+                },
+                getQueryData: function () {
+                    this.paperType = 1;
+                    this.paperId = -1;
+                    this.uploadComplete = true;
+                    this.layerIndex;
+                    this.studentNo = $("#input_studentNo").val();
+                    this.nationId;
+                },
+                handelQueryData: function () {
+
+                },
+                render:function () {
+
+                },
+                addEvent: function () {
+                    var _self = this;
+                    $("#save").click(function () {
+                        $("#input_auditStatus").val("1");
+                        $(this).attr("disabled", "disabled");
+                        editStudent(_self.uploadComplete);
+                    });
+                    $("#submits").click(function () {
+                        $("#input_auditStatus").val("2");
+                        $(this).attr("disabled", "disabled");
+                        editStudent(_self.uploadComplete);
+                    });
+
+                    $("#select_nation").change(function () {
+                        var nationName = $(this).children("option:selected").text();
+                        $("#input_nationName").val(nationName);
+                        _self.nationId = $(this).children("option:selected").val();
+                        console.log(_self.studentNo);
+                        getPapersType(_self.studentNo);
+                    });
+
+                    $("#select_papersType").change(function () {
+                        _self.paperType = $(this).children("option:selected").val();
+                        getPapersType(_self.studentNo);
+                    });
+
+                    $(document).on("click",'.btn-primary1',function(){
+                        _self.paperId = $(this).parent("div").children("input").val();
+                        _self.layerIndex = layer.open({
+                            type: 1,
+                            title:"上传文件",
+                            area: ['550px', '400px'],
+                            content: $('#form_file')
+                        });
+                    });
+                    $(document).on("click",'.a_del',function(){
+                        if(confirm("确定要删除吗?")){
+                            var html = $(this);
+                            var fileId = $(this).attr("fileId");
+                            $.post("/channelStudent/delPaper",{"studentNo":_self.studentNo,"fileId":fileId},function(data,status){
+                                if(data == 0){
+                                    html.parent().remove();
+                                }
+                            });
+                        }
+                    });
+
+                    $("#returnPage").click(function () {
+                        location.href = '/channelStudent/studentList';
+                    });
+                    $("#audit").click(function () {
+                        var id = $("input[name='id']").val();
+                        layer.open({
+                            title: '是否确认审批?',
+                            type: 2,
+                            area: ['450px', '238px'],
+                            fixed: false, //不固定
+                            content: "/channelStudent/toAuditPage?channelStudentId="+id,
+                        });
+                    });
+                    $('#id-input-file-3').ace_file_input({
+                        style: 'well',
+                        btn_choose: 'Drop files here or click to choose',
+                        btn_change: null,
+                        no_icon: 'icon-cloud-upload',
+                        droppable: true,
+                        thumbnail: 'small',//large | fit
+                        // .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf
+                        allowExt: ['jpg', 'png', 'gif', 'doc', 'docx', 'pdf'],    //该属性只是对文件后缀的控制
+                        before_change: function (files, dropped) {
+                            return true;
+                        },
+                        before_remove: function () {
+                            $("#input_attachment").val("");
+                            return true;
+                        },
+                        preview_error: function (filename, error_code) {
+
+                        }
+                    }).on('change', function () {
+                        //获取文件大小
+                        if (!checkUp(this)) {
+                            return false;
+                        }
+
+                        _self.uploadComplete = false;
+                        layer.msg('正在上传中...', {
+                            icon: 16,
+                            shade: 0.01,
+                            time: 5 * 10
+                        });
+                        $("#form_file").ajaxSubmit(function (message) {
+                            _self.uploadComplete = true;
+                            if (message) {
+                                var code = message.code;
+                                var files = message.objNew;
+                                var originalFiles = message.originalFiles;
+                                if (code == "1") {
+                                    layer.alert("请上传正确的文件格式!")
+                                } else if (message.success) {
+                                    console.log(_self.paperId)
+                                    console.log(_self.paperType);
+
+                                    var input = $("input[flag='papersTypeId'][value="+_self.paperId+"]");
+                                    var div = input.parent("div").next("div");
+                                    for(var i=0;i<files.length;i++){
+                                        var fileUrl = files[i];
+                                        var originalFilename = originalFiles[i];
+
+                                        $.ajax({
+                                            type : "post",
+                                            url : "/getPrivateUrl",
+                                            data : "fileUrl=" + fileUrl,
+                                            async : false,
+                                            success : function(data){
+                                                layer.close(_self.layerIndex);
+                                                $.ajax({
+                                                    type : "post",
+                                                    url : "/channelStudent/addPaper",
+                                                    data : {"studentNo":_self.studentNo,"countryId":_self.nationId,"contractNo": "0","paperType":_self.paperType,"paperId":_self.paperId,"fileName":originalFilename,"fileUrl":fileUrl},
+                                                    async : false,
+                                                    success : function(fileId){
+                                                        if(fileId > 0){
+                                                            div.append($("<div><a target='_blank' href='"+data+"'>"+originalFilename+"</a><a class='red a_del' fileId='"+fileId+"'  style='margin-left: 10px;display: none;' href='javascript:void(0);'><i class='icon-trash icon-2x icon-only bigger-130'></i></a></div>"));
+                                                        }
+                                                        else{
+                                                            layer.alert("上传失败,请尝试重新上传。");
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    var auditStatus = $("#input_auditStatus").val();
+                                    if(auditStatus == "1" || auditStatus == "2"){
+                                        if($("#input_manager").val() == "1"){
+                                            $(".a_del").show();
+                                        }
+                                    }
+                                }
+                            } else {
+                                layer.alert("上传失败,请尝试重新上传。")
+                            }
+                        });
+                    });
+                    $("#select_nation").trigger("change");
+                    $("#confirmFile").click(function () {
+                        if(confirm("您确定要提交材料吗?")){
+                            $.post("/channelStudent/confirmFile",{"studentNo":studentNo},function (data,status) {
+                                if(data == "1"){
+                                    window.location.reload();
+                                }else{
+                                    layer.alert("提交失败,请刷新页面重新尝试。")
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        })();
+        pageHelper.init();
+    });
+
+    $(function () {
+        $("#operator_settle").hide();
+
+    //运营操作结案
+    $("#operatorSettle").click(function () {
+        $("#operator_settle").show();
+        layer.open({
+            type: 1,
+            title: "请选择结案原因，并填写结案备注",
+            area: ['500px', '350px'],
+            fixed: false, //不固定
+            btn: ['确定'],
+            content: $("#operator_settle"),
+            yes: function (index) {
+                //获得选择的原因
+                var body = layer.getChildFrame('body', index);
+                var reason = $("#reason").val();
+                var remark = $("#remark").val();
+//                //加载框
+//                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                $.ajax({
+                    url: "/operator/settle",
+                    type: "post",
+                    data: {
+                        studentNo: studentNo,
+                        reason: reason,
+                        remark: remark
+                    },
+                    success: function (data) {
+//                        layer.close(loadIndex);
+                        layer.close(index);
+                        if (data) {
+                            location.reload(true);
+                        } else {
+                            layer.msg('操作失败', {time: 1000});
+                        }
+                    }
+                });
+            },
+        });
+    });
+
+    //审批结案
+    $("#settle").click(function () {
+        location.href="/student/settle?studentNo="+studentNo;
+    });
+    // 查看停办
+    $("#check").click(function () {
+        location.href="/studentDelay?studentNo="+studentNo;
+    });
+    // 申请停办
+    $("#apply").click(function () {
+        location.href="/student/delay?studentNo="+studentNo;
+    });
+    // 解除停办
+    $("#cancel").click(function () {
+        toCancelDelay(studentNo);
+    });
+    if(studentStatus == 1){
+        $("#apply").show();
+        $("#cancel").hide();
+    }
+    if(studentStatus == 2){
+        $("#cancel").show();
+        $("#apply").hide();
+    }
+    if($("#entrance").val() == "TY"){
+        $("#operatorSettle").hide();
+        $("#settle").hide();
+        $("#check").hide();
+        $("#cancel").hide();
+        $("#disableStudent").hide();
+    }
+    if($("#aboardOffice").val() == "1"){
+        $("#operatorSettle").hide();
+        $("#settle").hide();
+        $("#check").hide();
+        $("#cancel").hide();
+        $("#disableStudent").hide();
+    }
+
+    });
+
+    -->
+
+</script>
+</body>
+</html>

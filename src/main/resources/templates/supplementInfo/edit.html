@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/datepicker.css}" />
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li>首页</li>-->
+                    <!--<li>院校申请</li>-->
+                    <!--<li>编辑补件信息</li>-->
+                    <!--&lt;!&ndash;<li class="active">内容列表</li>&ndash;&gt;-->
+                <!--</ul>-->
+            <!--</div>-->
+
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">补件信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+
+                <form method="post" id="edit">
+
+                    <input type="hidden" name="applyId" id="applyId" th:value="${supplementInfo!=null}? ${supplementInfo.applyId}"/>
+
+                    <input type="hidden" name="id" id="id" th:value="${supplementInfo!=null}? ${supplementInfo.id}"/>
+
+                    <input type="hidden" name="studentNo" id="studentNo" th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+
+                    <input type="hidden" name="supplementAttachment" id = "input_fileName" th:value="${supplementInfo.supplementAttachment}"/>
+
+                    <input type="hidden" name="operatorNo" id = "operatorNo" th:value="${supplementInfo.operatorNo}"/>
+
+                    <input type="hidden" id = "resDomain" th:value="${resDomain}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">寄件类型：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" name="supplementType" id="supplementType" style="width:190px;height:25px;" disabled="disabled">
+                                        <option value="1" th:selected="${supplementInfo!=null}? ${supplementInfo.supplementType==1}">首次递交</option>
+                                        <option value="2" th:selected="${supplementInfo!=null}? ${supplementInfo.supplementType==2}">补件</option>
+                                        <option value="3" th:selected="${supplementInfo!=null}? ${supplementInfo.supplementType==3}">邮寄最终成绩单/疫苗表日期</option>
+                                        <option value="4" th:selected="${supplementInfo!=null}? ${supplementInfo.supplementType==4}">邮寄录取包裹</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">寄出日期：</label>
+                                    <input name="sendDate_string" id="sendDate" class="Wdate col-sm-3" style="width: 190px" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           th:value="${supplementInfo!=null}?  ${#dates.format(supplementInfo.sendDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">快递公司：</label>
+                                    <select type="" id="expressCompanyCode" class="col-sm-3 form-control input-sm" style="width:190px;height:25px;" name="expressCompanyCode" required="required">
+                                        <option  th:each="express:${expressCompanyList}" th:value="${express.companyCode}"
+                                                 th:selected="${supplementInfo}? ${express.companyCode==supplementInfo.expressCompanyCode}" th:text="${express.companyName}"></option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">快递单号：</label>
+                                    <input name="expressNo" id="expressNo" class="col-sm-2" onkeyup="value=value.replace(/[^\w\.\/]/ig,'')" maxlength="50" th:value="${supplementInfo!=null}? ${supplementInfo.expressNo}"/>
+
+                                    <input  class="col-sm-3" type="hidden" id="companyName" name="expressCompanyName" value="" />
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">寄件内容：</label>
+                                    <input name="content" id="content" class="col-sm-2" th:value="${supplementInfo!=null}? ${supplementInfo.content}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--
+                    th:selected="${supplementInfo!=null}? ${express.companyCode==supplementInfo.expressCompanyCode}"ss
+                    <div class="modal-footer">-->
+                        <!--<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
+                        <!--<button type="button" class="btn btn-primary" id="submits">保存</button>-->
+                    <!--</div>-->
+                    <!--<div id="alert" class="alert alert-success" style="display: none;" role="alert">-->
+                        <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close">-->
+                            <!--<span aria-hidden="true">&times;</span>-->
+                        <!--</button>-->
+                        <!--<span id="alertText"></span>-->
+                    <!--</div>-->
+                </form>
+                <input id="companyCode" type="hidden" name="expressCompanyCode" value=""/>
+                <input id="supplementAttachment" type="hidden" th:value="${supplementInfo!=null}? ${supplementInfo.supplementAttachment}"/>
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                    <div  class="tab-pane fade in active " >
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="row" style="margin-top: 25px;">
+                                    <div class="col-sm-12 offerInfo" >
+                                        <div class="form-group" style="height:29px">
+                                            <label class="col-sm-3 control-label no-padding-right no-padding-left blue"> 附件：</label>
+                                            <div class="col-sm-6" style="padding-left: 0px;">
+                                                <div class="widget-header">
+                                                    <h4>文件上传</h4>
+                                                </div>
+                                                <div class="widget-body">
+                                                    <div class="widget-main">
+                                                        <span id = "offer_attachment" style="display: none"><span id = "offerAttachment_show" th:text="${supplementInfo!=null}? ${supplementInfo.supplementAttachment}"></span><span class="btn btn-sm btn-primary" style="left:50px" id = "offer_show">预览</span><a th:href="${supplementInfo!=null}? ${supplementInfo.supplementAttachment}" download="offer信息下载" id="upload_office"></a></span>
+                                                        <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                        <label>
+                                                            <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                        </label>
+                                                        <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                        <input name="privateAccess" type="hidden" value="true"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="returnPage">返回</button>
+                                    <button type="button" class="btn btn-primary" id="submits">保存</button>
+                                </div>
+                                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <span id="alertText"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/uploadimg.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/ajaxfileupload.js}" charset="UTF-8"></script>
+<script th:src="@{/business/supplement/edit.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+
+<script th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script th:src="@{/assets/js/date-time/bootstrap-datepicker.min.js}"></script>
+<script th:src="@{/assets/js/date-time/bootstrap-timepicker.min.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var applyId = $("#applyId").val();
+    var studentNo = $("#studentNo").val();
+    var data_offer = $("#supplementAttachment").val();
+    var data_offer_remove = [[${supplementInfo.supplementAttachment}]];
+    var boolResult = true;
+    var uploadResult = true;
+    $('#form-field-select-3').addClass('tag-input-style');
+
+    $('.date-picker').datepicker({autoclose:true,format:"yyyy-mm-dd hh:ii",language:"cn",todayHighlight:true,todayBtn:true,startDate:new Date()}).next().on(ace.click_event, function(){
+        $(this).prev().focus();
+    });
+
+    function upLoadImg() {
+        $('#id-input-file-3').ace_file_input({
+            style: 'well',
+            btn_choose: 'Drop files here or click to choose',
+            btn_change: null,
+            no_icon: 'icon-cloud-upload',
+            droppable: true,
+            thumbnail: 'small',//large | fit
+            before_change: function (files, dropped) {
+                return true;
+            },
+            before_remove : function() {
+                $("#upload_offer").attr("style","height:270px");
+                $("#supplementAttachment").val(data_offer_remove);
+                $("#input_fileName").val(data_offer_remove);
+                return true;
+            },
+            preview_error: function (filename, error_code) {
+            }
+        }).on('change', function () {
+            uploadResult = false;
+            layer.msg('正在上传中...', {
+                icon: 16
+                ,shade: 0.01
+            });
+            $("#form_file").ajaxSubmit(function (message) {
+                uploadResult = true;
+                console.log(message);
+                var fileName = message.obj;
+                var code = message.code;
+                if(code == "1"){
+                    layer.msg("请上传正确的文件格式!")
+                }else if(message.success){
+                    $("#upload_offer").attr("style", "height:200px");
+                    $("#input_fileName").val(fileName);
+                    $("#supplementAttachment").val(fileName);
+                    layer.msg("上传成功!");
+                }
+            });
+        });
+    }
+    if(data_offer != null){
+        $("#offerAttachment_show").text(data_offer.substring(0,50)+"...");
+    }
+
+
+    $("#offer_show").click(function(){
+//        if($("#supplementAttachment").val().indexOf($("#resDomain").val()) ==-1){
+//            window.open($("#resDomain").val()+URLencode($("#supplementAttachment").val()));
+//        }else{
+//            window.open(URLencode($("#supplementAttachment").val()));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":$("#supplementAttachment").val()},function (data,status) {
+            window.open(data);
+        });
+    });
+    $("#offer_upload").click(function(){
+        if($("#supplementAttachment").val().indexOf($("#resDomain").val()) ==-1){
+            $("#upload_office").attr("href",$("#resDomain").val()+URLencode($("#supplementAttachment").val()));
+        }else{
+            $("#upload_office").attr("href",URLencode($("#supplementAttachment").val()));
+        }
+    })
+    $(function () {
+        if (data_offer != '') {
+            $("#upload_offer").attr("style", "height:270px");
+            $("#offer_attachment").show();
+            upLoadImg();
+        } else {
+            upLoadImg();
+        }
+    })
+
+    $("#submits").click(function () {
+        if($("#supplementType").val() == ""){
+            layer.alert('请选择寄件类型！', {icon: 0});
+            return;}
+        if($("input[name='sendDate_string']").val() == ""){
+            layer.alert('请填写寄出日期！', {icon: 0});
+            return;}
+//        if($("#companyCode").val() == ""){
+//            layer.alert('请选择快递公司！', {icon: 0});
+//            return;}
+//        if($("input[name='expressNo']").val() == ""){
+//            layer.alert('请填写快递单号！', {icon: 0});
+//            return;}
+        if(boolResult == true) {
+            if (uploadResult == false) {
+                layer.msg('正在上传中,请稍后保存!');
+            } else {
+                postData();
+            }
+        }
+    });
+
+    $("#returnPage").click(function(){
+        returnPage();
+    });
+
+    $("#expressCompanyCode").change(function(){
+        // alert($("#expressCompanyCode").find("option:selected").text());
+        $("#companyName").val($("#expressCompanyCode").find("option:selected").text());
+        $("#companyCode").val($("#expressCompanyCode").find("option:selected").val());
+    });
+
+    $("#companyName").val($("#expressCompanyCode").find("option:selected").text());
+    $("#companyCode").val($("#expressCompanyCode").find("option:selected").val());
+    /*]]>*/
+</script>
+</body>
+</html>

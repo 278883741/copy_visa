@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .left-title{
+        width:15%;
+        margin-left: 20px;
+        text-align:right;
+    }
+    .right-input{
+        width:55%;
+    }
+</style>
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <form id="modify">
+            <div class="page-content">
+                <input type="hidden" name="id" th:value="${invoice != null}? ${invoice.id}"/>
+                <input type="hidden" name="schoolId" th:value="${invoice != null}? ${invoice.schoolId}"/>
+                <input type="hidden" name="studentNo" th:value="${invoice != null}? ${invoice.studentNo}"/>
+                <input type="hidden" name="type" value="3"/>
+                <div class="form-group" style="height:12px"></div>
+                <!--<div class="form-group" style="height:29px">-->
+                    <!--<label class="left-title control-label no-padding-right blue">Invoice金额：</label>-->
+                    <!--<input class="col-sm-1" readonly="readonly" th:value="${invoice != null}? ${invoice.invoiceMoney }"/>-->
+                    <!--<label class="left-title control-label no-padding-right blue">账户金额：</label>-->
+                    <!--<input class="col-sm-1 capital" name="accountMoney"  th:value="${invoice != null}? ${invoice.accountMoney}"/>-->
+                <!--</div>-->
+                <!--<div class="form-group" style="height:29px">-->
+                    <!--<label class="left-title control-label no-padding-right blue">到账日期：</label>-->
+                    <!--<input class="col-sm-1" name="returnDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly="readonly"-->
+                           <!--th:value="${invoice != null and invoice.returnDate != null}? ${#dates.format(invoice.returnDate, 'yyyy-MM-dd')}"/>-->
+                    <!--<label class="left-title control-label no-padding-right blue">差额原因：</label>-->
+                    <!--<input class="col-sm-1" name="balanceType"  th:value="${invoice != null}? ${invoice.balanceType}"/>-->
+                <!--</div>-->
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">学校学号：</label>
+                    <input class="col-sm-1" name="schoolNo"  th:value="${invoice != null}? ${invoice.schoolNo}"/>
+                    <label class="left-title control-label no-padding-right blue">课程周数：</label>
+                    <input class="col-sm-1" name="studyWeek"  th:value="${invoice != null}? ${invoice.studyWeek}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">开学时间：</label>
+                    <input class="col-sm-1" name="startDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly="readonly"
+                           th:value="${invoice != null and invoice.startDate != null}? ${#dates.format(invoice.startDate, 'yyyy-MM-dd')}"/>
+                    <label class="left-title control-label no-padding-right blue">结佣归属：</label>
+                    <input class="col-sm-1" name="commissionBelong"  th:value="${invoice != null}? ${invoice.commissionBelong}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">学费：</label>
+                    <input class="col-sm-1 capital" name="tuition"  th:value="${invoice != null}? ${invoice.tuition}"/>
+                    <label class="left-title control-label no-padding-right blue">结佣比例：</label>
+                    <input class="col-sm-1" type="number" name="schoolRate"  th:value="${invoice != null}? ${invoice.rate}"/>
+                </div>
+                <!--<div class="form-group" style="height:29px">-->
+                    <!--<label class="left-title control-label no-padding-right blue">GST比例：</label>-->
+                    <!--<input class="col-sm-1 capital" name="invoiceGstRate"  th:value="${invoice != null}? ${invoice.invoiceGstRate}"/>-->
+                    <!--<label class="left-title control-label no-padding-right blue">银行手续费：</label>-->
+                    <!--<input class="col-sm-1 capital" name="bankFee"  th:value="${invoice != null}? ${invoice.bankFee}"/>-->
+                <!--</div>-->
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">获签国家：</label>
+                    <input type="hidden" class="col-sm-1" id="oldNationId"  th:value="${invoice != null}? ${invoice.nationId}"/>
+                    <input type="hidden" class="col-sm-1" id="nationName" name="nationName"/>
+                    <select type="" class="col-sm-1" id="nationId" name="nationId" style="height:25px; width:165px" onchange="changeCountry()">
+                        <option value="">请选择</option>
+                        <option th:each="country:${countryInfoList}" th:value="${country.id}" th:text="${country.countryName}"></option>
+                    </select>
+                    <label class="left-title control-label no-padding-right blue">结佣备注：</label>
+                    <input class="col-sm-1" name="schoolRemark"  th:value="${invoice != null}? ${invoice.schoolRemark}"/>
+                    <!--<label class="left-title control-label no-padding-right blue">INV-币种：</label>-->
+                    <!--<input type="hidden" class="col-sm-1" id="oldCurrency"  th:value="${invoice != null}? ${invoice.currency}"/>-->
+                    <!--<select type="" class="col-sm-1" id="currency" name="currency" style="height:25px; width:165px">-->
+                        <!--<option value="">请选择</option>-->
+                        <!--<option th:each="currency : ${currencyInfos }" th:value="${currency.enName}" th:text="${currency.enName}"></option>-->
+                    <!--</select>-->
+                </div>
+
+            </div>
+            </form>
+            <!-- /.page-content -->
+        </div>
+
+    </div>
+
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script type="text/javascript">
+$(function(){
+    var oldCurrency = $("#oldCurrency").val();
+    $("#currency option[value='" + oldCurrency + "']").attr("selected", true);
+
+    var oldNation = $("#oldNationId").val();
+    $("#nationId option[value='" + oldNation + "']").attr("selected", true);
+})
+
+/*<![CDATA[*/
+
+function changeCountry(){
+    var nationId = $("#nationId").val();
+    if(nationId != null && nationId != ''){
+        var nationName = $("#nationId option[value="+nationId+"]").text();
+        $("#nationName").val(nationName);
+    }
+}
+
+/*]]>*/
+</script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

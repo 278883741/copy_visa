@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li><a href="#">系统管理</a></li>
+                    <li><a href="/member/list">用户组列表</a></li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">用户组列表</h3>
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <label>小组名称：</label>
+                                            <input type="text" id="user_group" class="form-control input-sm" placeholder="" style="width:100px;"/>
+                                        </div>
+                                        <button type="button" id="query" class="btn btn-success ">查询</button>
+                                        <button type="reset" class="btn btn-warning">清空</button>
+                                        <a data-toggle="modal" data-target="" href="javascript:void(0);" onclick="toAddGroup();"
+                                           class="btn btn-info pull-right">添加用户组</a>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th>小组名称</th>
+                                            <th>所属国家组</th>
+                                            <th>操作人</th>
+                                            <th>操作时间</th>
+                                            <th class="hidden-480">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/userGroup/userGroup.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+<script type="text/javascript">
+    var oTable1;
+    jQuery(function($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "sScrollY": "380px",
+            "bFilter" : false,//是否使用搜索
+            "bProcessing" : true,
+            "bDeferRender" : true,//
+            "sPaginationType" : "bs_normal",//分页样式
+            "bRetrieve" : true,//是否调用后台
+            "bServerSide" : true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource" : "/userGroup/Data",//请求路径
+            "fnServerData" : function(sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name":"groupName","value":$("#user_group").val()!=""? $("#user_group").val():null}
+                )
+                $.ajax({
+                    "dataType" : 'json',
+                    "type" : "GET",
+                    "url" : sSource,
+                    "data" : aoData,
+                    "success" : fnCallback
+                });
+            },
+            "aaSorting" : [ [ 0, "desc" ] ],
+            "bSort":true,
+            "aoColumns" : [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {"sClass": "center", "bSortable": false, "mData":"groupName"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function(data){
+                        if(data.nation == 99){return"渠道组"}
+                        if(data.nation == 101){return"澳洲组"}
+                        if(data.nation == 102){return"英国组"}
+                        if(data.nation == 103){return"加拿大组"}
+                        if(data.nation == 104){return"美国组"}
+                        if(data.nation == 105){return"新西兰组"}
+                        if(data.nation == 106){return"亚洲组"}
+                        if(data.nation == 107){return"英港组"}
+                        if(data.nation == 108){return"欧洲组"}
+                        return "";
+                    }
+                },
+                {"sClass": "center", "bSortable": false,"mData":"operatorNo"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function(data){
+                        if(data.createTime != null){
+                            return getTimeString_day(new Date(data.createTime))
+                        }else{
+                            return "";
+                        }
+
+                    }},
+                {"sClass" : "center",  "bSortable" : false, "mData" : function (data) {
+                    var edit = '<a class="green" href="javascript:void(0);" onclick="toShowGroup('+data.id+')">\n' +
+                        '<i class="icon-pencil bigger-130"></i></a>&nbsp;&nbsp;&nbsp;'+'<a class="red" href="javascript:void(0);"  onclick="toGroupDeletePage('+data.id+')">\n' +
+                        '<i class="icon-trash bigger-130"></i></a>&nbsp;&nbsp;&nbsp;';
+                    if(data.enableStatus =="1"){
+                        edit = edit+'<a href="javascript:void(0);"  onclick="disableData('+data.id+')">禁用</a>';
+                    }else{
+                        edit = edit+'<a href="javascript:void(0);"  onclick="enableData('+data.id+')">启用</a>';
+                    }
+                    return edit;
+                }}
+            ],
+            "oLanguage" : {
+                "sLengthMenu" : "每页 _MENU_条 ",
+                "sZeroRecords" : "对不起，查询不到任何相关数据",
+                "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty" : "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered" : "数据表中共为 _MAX_ 条记录)",
+                "sProcessing" : "正在加载中...",
+                "sSearch" : "搜索",
+                "sUrl" : "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate" : {
+                    "sFirst" : "第一页",
+                    "sPrevious" : " 上一页 ",
+                    "sNext" : " 下一页 ",
+                    "sLast" : " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+        $("#query").click(function() {
+            oTable1.fnDraw();
+        })
+
+    })
+
+
+</script>
+</html>

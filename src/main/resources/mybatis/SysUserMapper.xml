@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysUserMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysUser">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="oaid" jdbcType="VARCHAR" property="oaid" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="enable_status" jdbcType="INTEGER" property="enableStatus"/>
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="agent_id" jdbcType="VARCHAR" property="agentId" />
+    <result column="is_inner" jdbcType="INTEGER" property="isInner" />
+  </resultMap>
+  <resultMap id="UserInfoDTOMap" type="com.aoji.model.dto.UserInfoDTO" extends="BaseResultMap">
+    <result column="group_name" jdbcType="VARCHAR" property="groupName" />
+    <result column="leader_status" jdbcType="BIT" property="leaderStatus" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+  </resultMap>
+
+  <!--根据国家，角色，是否为组领导人查询用户 (转案分配) -->
+  <select id="selectByCountryAndRole" resultMap="BaseResultMap" >
+    select su.id, su.oaid, su.username from
+    (select country_group from country_info where country_bussid = #{countryBussId}) ci,
+    (select id, nation from user_group where delete_status = 0) ug,
+    (select oaid, group_id from user_group_relation where delete_status = 0 and leader_status = #{leaderStatus}) ugr,
+    (select id, oaid, username from sys_user where delete_status = 0 and enable_status = 1) su,
+    (select user_id, role_id from sys_user_role where delete_status = 0) sur,
+    (select id from sys_role where delete_status = 0 and role_name = #{roleName}) sr
+    where ci.country_group = ug.nation
+    and ug.id = ugr.group_id
+    and ugr.oaid = su.oaid
+    and su.id = sur.user_id
+    and sur.role_id = sr.id
+  </select>
+
+  <!--根据工号查询角色，是否为组领导人-->
+  <select id="selectByOaid" parameterType="java.lang.String" resultMap="UserInfoDTOMap">
+    select ugr.leader_status, sr.role_name from
+    (select id from user_group where delete_status = 0) ug,
+    (select oaid, group_id, leader_status from user_group_relation where delete_status = 0) ugr,
+    (select id, oaid from sys_user where delete_status = 0 and enable_status = 1 and oaid = #{oaid}) su,
+    (select user_id, role_id from sys_user_role where delete_status = 0) sur,
+    (select id, role_name from sys_role where delete_status = 0) sr
+    where ug.id = ugr.group_id
+    and ugr.oaid = su.oaid
+    and su.id = sur.user_id
+    and sur.role_id = sr.id
+  </select>
+
+  <select id="getByRoleName" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select su.id, oaid, username from
+    (select id, oaid, username from sys_user where delete_status = 0 and enable_status = 1) su,
+    (select user_id, role_id from sys_user_role where delete_status = 0) sur,
+    (select id from sys_role where delete_status = 0 and role_name = #{roleName}) sr
+    where su.id = sur.user_id
+    and sur.role_id = sr.id
+  </select>
+
+  <!--根据用户组组长查询顾问-->
+  <select id="getByLeaderOaid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select y.* from (SELECT
+    oaid
+    FROM
+    user_group_relation
+    WHERE
+    delete_status = 0
+    AND leader_status = 0
+    AND group_id IN (
+    SELECT
+    group_id
+    FROM
+    user_group_relation
+    WHERE
+    delete_status = 0
+    AND leader_status = 1
+    AND oaid = #{oaid}
+    ) and oaid not in (
+    select oaid from
+    (select id from sys_role where delete_status = 0 and role_name = '文签总监') sr,
+    (select role_id, user_id from sys_user_role where delete_status = 0) sur,
+    (select id, oaid from sys_user where delete_status = 0 and enable_status = 1) su
+    where sr.id = sur.role_id and sur.user_id = su.id)) x,
+    (select * from sys_user where delete_status = 0 and enable_status = 1) y
+    where x.oaid = y.oaid
+  </select>
+
+  <select id="getOtherLeaders" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select distinct su.* from
+    (select * from sys_user where delete_status = 0 and enable_status = 1 and oaid != #{oaid}) su,
+    (select oaid, group_id from user_group_relation where delete_status = 0 and leader_status = 1) ugr,
+    (select id,nation from user_group where delete_status = 0) ug,
+    (select oaid from sys_user_role where delete_status = false and role_id in (19,20))sur
+    where su.oaid = ugr.oaid and ugr.group_id = ug.id and su.oaid = sur.oaid and ug.nation in
+    (select nation from user_group where id in
+    (select group_id from user_group_relation where delete_status = 0 and leader_status = 1 and oaid = #{oaid}))
+  </select>
+
+  <select id="getByUserGroupAndCountry" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select distinct su.* from
+    (select id from user_group where delete_status = 0
+    <if test="userGroup != null">
+      and id = #{userGroup}
+    </if>
+    <if test="countryGroup != null">
+      and nation = #{countryGroup}
+    </if>
+    ) ug,
+    (select oaid, group_id from user_group_relation where delete_status = 0
+    <if test="leaderStatus != null">
+      and leader_status = #{leaderStatus}
+    </if>
+    ) ugr,
+    (select oaid, username from sys_user where delete_status = 0 and enable_status = 1) su,
+    (select oaid, role_id from sys_user_role where delete_status = 0) sur
+    where ug.id = ugr.group_id and ugr.oaid = sur.oaid and su.oaid = sur.oaid and
+    sur.role_id in (select id from sys_role where delete_status = 0 and (role_name = '文案经理' or role_name = '文案顾问'))
+  </select>
+
+  <select id="getTransferUser" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select distinct su.oaid, su.username from
+    (select country_group from country_info where country_bussid = #{countryBussId}) ci,
+    (select nation, id from user_group where delete_status = 0) ug,
+    (select group_id, oaid from user_group_relation where delete_status = 0) ugr,
+    (select oaid, username from sys_user where delete_status = 0 and enable_status = 1) su,
+    (select oaid, role_id from sys_user_role where delete_status = 0) sur,
+    (select permission_id, role_id from sys_role_permission where delete_status = 0) srp,
+    (select id from sys_permission where delete_status = 0 and permission_name = 'TRAN:ASSIGN') sp
+    where ci.country_group = ug.nation and ug.id = ugr.group_id and ugr.oaid = su.oaid and su.oaid = sur.oaid
+    and sur.role_id = srp.role_id and srp.permission_id = sp.id
+  </select>
+
+  <select id="getTransferUserByCountryGroup" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select su.oaid, su.username from
+    (select nation, id from user_group where delete_status = 0 and nation = #{countryGroup}) ug,
+    (select group_id, oaid from user_group_relation where delete_status = 0) ugr,
+    (select oaid, username from sys_user where delete_status = 0 and enable_status = 1) su,
+    (select oaid, role_id from sys_user_role where delete_status = 0) sur,
+    (select permission_id, role_id from sys_role_permission where delete_status = 0) srp,
+    (select id from sys_permission where delete_status = 0 and permission_name = 'TRAN:ASSIGN') sp
+    where ug.id = ugr.group_id and ugr.oaid = su.oaid and su.oaid = sur.oaid
+    and sur.role_id = srp.role_id and srp.permission_id = sp.id
+  </select>
+
+    <select id="getSysUsersByRoleName" resultType="com.aoji.model.SysUser">
+        select user.oaid,user.username from sys_user_role userRole,sys_user user where userRole.role_id = (select id from sys_role where role_name = #{roleName} and delete_status = 0 )
+        and userRole.oaid = user.oaid and userRole.delete_status = 0 and user.delete_status = 0 and user.enable_status = 1
+    </select>
+  <select id="getOaidsByRoleName" resultType="java.lang.String">
+    select user.oaid from sys_user_role userRole,sys_user user where userRole.role_id = (select id from sys_role where role_name = #{roleName} and delete_status = 0 )
+        and userRole.oaid = user.oaid and userRole.delete_status = 0 and user.delete_status = 0 and user.enable_status = 1
+  </select>
+
+  <select id="getCopyManager" parameterType="java.util.Map" resultType="java.lang.String">
+    select distinct ugr.oaid from
+    (select nation_id from student_info where delete_status = 0 and student_no = #{studentNo}) student,
+    (select id, country_group from country_info) country,
+    (select id, nation from user_group where delete_status = 0) ug,
+    (select oaid, group_id from user_group_relation where delete_status and group_id in (
+    select group_id from user_group_relation where delete_status = 0 and oaid = #{oaid}
+    )) ugr,
+    (select oaid, role_id from sys_user_role where delete_status = 0) sur,
+    (select id from sys_role where delete_status = 0 and role_name in ('文案经理', '文签总监')) sr
+    where student.nation_id = country.id and country.country_group = ug.nation and ug.id = ugr.group_id
+    and ugr.oaid = sur.oaid and sur.role_id = sr.id
+  </select>
+</mapper>

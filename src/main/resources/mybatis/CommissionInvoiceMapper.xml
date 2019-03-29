@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionInvoiceMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionInvoice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="school_id" jdbcType="INTEGER" property="schoolId" />
+    <!--<result column="student_no" jdbcType="VARCHAR" property="studentNo" />-->
+    <result column="invoice_no" jdbcType="VARCHAR" property="invoiceNo" />
+    <result column="send_date" jdbcType="TIMESTAMP" property="sendDate" />
+    <result column="return_date" jdbcType="TIMESTAMP" property="returnDate" />
+    <result column="currency" jdbcType="VARCHAR" property="currency" />
+    <result column="invoice_money" jdbcType="DECIMAL" property="invoiceMoney" />
+    <result column="invoice_gst" jdbcType="DECIMAL" property="invoiceGst" />
+    <result column="invoice_sum" jdbcType="DECIMAL" property="invoiceSum" />
+    <result column="invoice_remark" jdbcType="VARCHAR" property="invoiceRemark" />
+    <result column="pay_method" jdbcType="VARCHAR" property="payMethod" />
+    <result column="actual_amount" jdbcType="DECIMAL" property="actualAmount" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="account_money" jdbcType="DECIMAL" property="accountMoney" />
+    <result column="account_gst" jdbcType="DECIMAL" property="accountGst" />
+    <result column="account_sum" jdbcType="DECIMAL" property="accountSum" />
+    <result column="account_currency" jdbcType="VARCHAR" property="accountCurrency" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+    <result column="balance_type" jdbcType="VARCHAR" property="balanceType" />
+    <result column="bank_fee" jdbcType="DECIMAL" property="bankFee" />
+    <result column="bank_fee_currency" jdbcType="VARCHAR" property="bankFeeCurrency" />
+    <result column="exchange_rate" jdbcType="DECIMAL" property="exchangeRate" />
+    <result column="line_num" jdbcType="VARCHAR" property="lineNum" />
+    <result column="invoice_data" jdbcType="VARCHAR" property="invoiceData" />
+    <result column="data_source" jdbcType="VARCHAR" property="dataSource" />
+    <result column="invoice_status" jdbcType="VARCHAR" property="invoiceStatus" />
+    <result column="is_state" jdbcType="INTEGER" property="isState" />
+    <result column="percent_num" jdbcType="INTEGER" property="percentNum" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="state_time" jdbcType="TIMESTAMP" property="stateTime" />
+    <result column="curr_rate" jdbcType="DECIMAL" property="currRate" />
+    <result column="update_id" jdbcType="INTEGER" property="updateId" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="bank_serial_num" jdbcType="VARCHAR" property="bankSerialNum" />
+    <result column="bank_account" jdbcType="VARCHAR" property="bankAccount" />
+    <result column="return_currency" jdbcType="VARCHAR" property="returnCurrency" />
+    <result column="tuition" jdbcType="DECIMAL" property="tuition" />
+    <result column="rate" jdbcType="DECIMAL" property="rate" />
+    <result column="invoice_gst_rate" jdbcType="DECIMAL" property="invoiceGstRate" />
+    <result column="reference_no" jdbcType="VARCHAR" property="referenceNo" />
+    <result column="state_time_two" jdbcType="TIMESTAMP" property="stateTimeTwo" />
+    <result column="channel_return_status" jdbcType="VARCHAR" property="channelReturnStatus" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="InvoiceListResultMap" type="com.aoji.vo.InvoiceListVO">
+    <result column="studentId" jdbcType="INTEGER" property="studentId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="spelling" jdbcType="VARCHAR" property="spelling" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="nation_id" jdbcType="VARCHAR" property="nationId" />
+    <result column="school_tuition" jdbcType="DECIMAL" property="schoolTuition" />
+    <result column="tuition_currency" jdbcType="VARCHAR" property="tuitionCurrency" />
+    <result column="school_no" jdbcType="VARCHAR" property="schoolNo" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="study_week" jdbcType="DECIMAL" property="studyWeek" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="commission_belong" jdbcType="VARCHAR" property="commissionBelong" />
+    <result column="school_rate" jdbcType="DECIMAL" property="schoolRate" />
+    <result column="gst_rate" jdbcType="DECIMAL" property="gstRate" />
+    <result column="college_type" jdbcType="VARCHAR" property="collegeType" />
+    <result column="school_remark" jdbcType="VARCHAR" property="schoolRemark" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="CommissionReportResultMap" type="com.aoji.vo.CommissionReportVO">
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="spelling" jdbcType="VARCHAR" property="spelling" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="visa_date" jdbcType="TIMESTAMP" property="visaDate" />
+    <result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+    <result column="tuition" jdbcType="DECIMAL" property="tuition" />
+    <result column="tuition_currency" jdbcType="VARCHAR" property="tuitionCurrency" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="school_no" jdbcType="VARCHAR" property="schoolNo" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="study_week" jdbcType="DECIMAL" property="studyWeek" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="school_area" jdbcType="VARCHAR" property="schoolArea" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="commission_belong" jdbcType="VARCHAR" property="commissionBelong" />
+    <result column="school_rate" jdbcType="DECIMAL" property="schoolRate" />
+    <result column="gst_rate" jdbcType="DECIMAL" property="gstRate" />
+    <result column="school_remark" jdbcType="VARCHAR" property="schoolRemark" />
+    <result column="college_type" jdbcType="VARCHAR" property="collegeType" />
+    <result column="consulter" jdbcType="VARCHAR" property="consulter" />
+    <result column="transfer_consulter" jdbcType="VARCHAR" property="transferConsulter" />
+    <result column="student_property" jdbcType="VARCHAR" property="studentProperty" />
+    <result column="commission_belong" jdbcType="VARCHAR" property="commissionBelong" />
+    <result column="contract_type" jdbcType="VARCHAR" property="contractType" />
+    <result column="branch" jdbcType="VARCHAR" property="branch" />
+    <result column="agent_type" jdbcType="VARCHAR" property="agentType" />
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate" />
+    <result column="student_source" jdbcType="VARCHAR" property="studentSource" />
+    <result column="coe_date" jdbcType="TIMESTAMP" property="coeDate" />
+  </resultMap>
+
+  <resultMap id="toAccountListVOMap" type="com.aoji.vo.ToAccountListVO" extends="BaseResultMap">
+    <result column="studentId" jdbcType="INTEGER" property="studentId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="nation_name" jdbcType="VARCHAR" property="nationName" />
+    <result column="spelling" jdbcType="VARCHAR" property="spelling" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="visa_date" jdbcType="TIMESTAMP" property="visaDate" />
+    <result column="agent_id" jdbcType="INTEGER" property="agentId" />
+    <result column="agent_name" jdbcType="VARCHAR" property="agentName" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="start_date" jdbcType="TIMESTAMP" property="startDate" />
+    <result column="sign_date" jdbcType="TIMESTAMP" property="signDate" />
+    <result column="lastCreatTime" jdbcType="TIMESTAMP" property="lastCreatTime" />
+    <result column="get_visa_sum" jdbcType="INTEGER" property="getVisaSum" />
+    <result column="channel_return_rate" jdbcType="INTEGER" property="channelReturnRate" />
+    <result column="return_money" jdbcType="DECIMAL" property="returnMoney" />
+    <result column="return_money_cny" jdbcType="DECIMAL" property="returnMoneyCny" />
+  </resultMap>
+
+  <!--查询列表某些项的总金额-->
+  <select id="getListSum" parameterType="com.aoji.model.InvoiceListCondition" resultMap="InvoiceListResultMap">
+    select
+      sum(invoice_money) as invoice_money,
+      sum(invoice_gst) as invoice_gst,
+      sum(invoice_sum) as invoice_sum,
+      sum(account_money) as account_money,
+      sum(account_gst) as account_gst,
+      sum(account_sum) as account_sum,
+      sum(actual_amount) as actual_amount,
+      sum(bank_fee) as bank_fee,
+      sum(balance) as balance
+    from
+    (select * from
+    (select id as studentId, student_no, student_name, nation_name, nation_id, spelling, birthday from commission_student where delete_status = 0
+    <!--非澳-->
+    <if test="nationId == 0">
+      and nation_id not in (1)
+    </if>
+    <if test="nationId != null and nationId != '-1' and nationId != 0">
+      and nation_id = #{nationId}
+    </if>
+    ) student,
+    (select id as comm_school_id, student_id, student_no as sNo, college_type, course_name, major_name, tuition as school_tuition, tuition_currency, school_no,
+    commission_belong, start_date, school_rate, gst_rate, study_week, status, school_remark from commission_school where delete_status = 0
+    <if test="schoolIds != null">
+      and id in
+      <foreach close=")" collection="schoolIds" item="schoolId" open="(" separator=",">
+        #{schoolId}
+      </foreach>
+    </if>
+    ) school,
+    (select * from commission_invoice where delete_status = 0 and invoice_no is not null
+    <if test="invoiceNo != null and invoiceNo != ''">
+      and invoice_no = #{invoiceNo}
+    </if>
+    <if test="invoiceId != null">
+      and id = #{invoiceId}
+    </if>
+    <if test="sendDateBegin != null">
+      and send_date &gt; #{sendDateBegin}
+    </if>
+    <if test="sendDateEnd != null">
+      and send_date &lt; #{sendDateEnd}
+    </if>
+    <if test="invoiceIds != null">
+      and id in
+      <foreach close=")" collection="invoiceIds" item="invoiceId" open="(" separator=",">
+        #{invoiceId}
+      </foreach>
+    </if>
+    ) invoice where student.studentId = school.student_id and school.comm_school_id = invoice.school_id
+    ) x
+  </select>
+
+  <select id="getList" parameterType="com.aoji.model.InvoiceListCondition" resultMap="InvoiceListResultMap">
+    select x.* from
+    (select * from
+    (select id as studentId, student_no, student_name, nation_name, nation_id, spelling, birthday from commission_student where delete_status = 0
+    <!--非澳-->
+    <if test="nationId == 0">
+      and nation_id not in (1)
+    </if>
+    <if test="nationId != null and nationId != '-1' and nationId != 0">
+      and nation_id = #{nationId}
+    </if>
+    ) student,
+    (select id as comm_school_id, student_id, student_no as sNo, college_type, course_name, major_name, tuition as school_tuition, tuition_currency, school_no,
+    commission_belong, start_date, school_rate, gst_rate, study_week, status, school_remark from commission_school where delete_status = 0
+    <if test="schoolIds != null">
+      and id in
+      <foreach close=")" collection="schoolIds" item="schoolId" open="(" separator=",">
+        #{schoolId}
+      </foreach>
+    </if>
+    ) school,
+    (select * from commission_invoice where delete_status = 0 and invoice_no is not null
+    <if test="invoiceNo != null and invoiceNo != ''">
+      and invoice_no = #{invoiceNo}
+    </if>
+    <if test="invoiceId != null">
+      and id = #{invoiceId}
+    </if>
+    <if test="sendDateBegin != null">
+      and send_date &gt; #{sendDateBegin}
+    </if>
+    <if test="sendDateEnd != null">
+      and send_date &lt; #{sendDateEnd}
+    </if>
+    <if test="invoiceIds != null">
+      and id in
+      <foreach close=")" collection="invoiceIds" item="invoiceId" open="(" separator=",">
+        #{invoiceId}
+      </foreach>
+    </if>
+    ) invoice where student.studentId = school.student_id and school.comm_school_id = invoice.school_id
+    ) x
+    <!--编辑，认账-->
+    <if test="operatorType != 1">
+    left join (select school_id, invoice_no, number, max(create_time) as ct from commission_invoice_seq group by invoice_no, school_id) seq
+    on x.school_id = seq.school_id and x.invoice_no = seq.invoice_no order by seq.ct, seq.number
+    </if>
+    <!--invoice列表-->
+    <if test="operatorType == 1">
+    order by x.create_time desc
+    </if>
+  </select>
+
+  <select id="getListByAddInvoice" parameterType="com.aoji.model.InvoiceListCondition" resultMap="InvoiceListResultMap">
+    select * from
+    (select * from
+    (select id as studentId, student_no, student_name, nation_name, nation_id, spelling, birthday from commission_student where delete_status = 0) student,
+    (select id as school_id, student_id, student_no as sNo, college_type, course_name, major_name, tuition as school_tuition, tuition_currency, school_no,
+    commission_belong, start_date, school_rate, gst_rate, study_week, status, school_remark from commission_school where delete_status = 0
+    <if test="schoolIds != null">
+      and id in
+      <foreach close=")" collection="schoolIds" item="schoolId" open="(" separator=",">
+        #{schoolId}
+      </foreach>
+    </if>
+    ) school
+    where student.studentId = school.student_id) x
+    <if test="tempKey != null">
+      left join (select school_id, invoice_no, number from commission_invoice_seq where temp_key = #{tempKey}) seq
+      on x.school_id = seq.school_id order by seq.number
+    </if>
+  </select>
+
+  <update id="updateBySchoolId" parameterType="com.aoji.model.CommissionInvoice">
+    update commission_invoice
+    <set>
+      <if test="bankAccount != null and bankAccount != ''">
+        bank_account = #{bankAccount},
+      </if>
+      <if test="invoiceMoney != null">
+        invoice_money = #{invoiceMoney},
+      </if>
+      <if test="invoiceGst != null">
+        invoice_gst = #{invoiceGst},
+      </if>
+      <if test="invoiceSum != null">
+        invoice_sum = #{invoiceSum},
+      </if>
+      <if test="returnDate != null">
+        return_date = #{returnDate},
+      </if>
+      <if test="accountCurrency != null and accountCurrency != ''">
+        account_currency = #{accountCurrency},
+      </if>
+      <if test="sendDate != null">
+        send_date = #{sendDate},
+      </if>
+      <if test="rate != null">
+        rate = #{rate},
+      </if>
+      <if test="deleteStatus != null">
+        delete_status = #{deleteStatus},
+      </if>
+    </set>
+    where school_id = #{schoolId}
+  </update>
+
+  <select id="commissionReportMap" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+      student.student_name as studentName,
+      student.spelling,
+      student.student_no as studentNo,
+      student.agent_type as agentType,
+      student.birthday,
+      student.nation_name as nationName,
+      student.visa_date as visaDate,
+      student.sign_date as signDate,
+      student.coe_date as coeDate,
+      school.branch,
+      student.student_source as studentSource,
+      student.contract_type as contractType,
+      student.agent_name as agentName,
+      school.consulter,
+      school.transfer_consulter as transferConsulter,
+      school.copy_operator copyOperator,
+      school.school_remark2 as schoolRemark2,
+      school.commission_belong as commissionBelong,
+      school.school_remark as schoolRemark,
+      school.school_name as schoolName,
+      school.school_area as schoolArea,
+      school.school_no as schoolNo,
+      school.college_type as collegeType,
+      school.course_name as courseName,
+      school.major_name as majorName,
+      school.study_week as studyWeek,
+      school.start_date as startDate,
+      invoice.tuition,
+      invoice.rate,
+      invoice.invoice_no as invoiceNo,
+      invoice.send_date as sendDate,
+      invoice.currency,
+      invoice.invoice_money as invoiceMoney,
+      invoice.invoice_gst as invoiceGst,
+      invoice.invoice_sum as invoiceSum,
+      invoice.bank_account as bankAccount,
+      invoice.return_date as returnDate,
+      invoice.return_currency as returnCurrency,
+      invoice.actual_amount as actualAmount,
+      invoice.account_gst as accountGst,
+      invoice.account_sum as accountSum,
+      invoice.bank_fee as bankFee,
+      invoice.bank_fee_currency as bankFeeCurrency,
+      invoice.account_currency as accountCurrency,
+      invoice.account_money as accountMoney,
+      invoice.balance,
+      invoice.balance_type as balanceType,
+      school.student_property as studentProperty
+    from
+    (select id, student_no, student_name, spelling, birthday, coe_date, visa_date, agent_name, nation_name, agent_type, student_source, contract_type, sign_date
+    from commission_student where delete_status = 0
+    <if test="invoiceListCondition.nationId == 0">
+      and nation_id not in (1)
+    </if>
+    <if test="invoiceListCondition.nationId != null and invoiceListCondition.nationId != '-1' and invoiceListCondition.nationId != 0">
+      and nation_id = #{invoiceListCondition.nationId}
+    </if>
+    <if test="invoiceListCondition.visaDateStart != null and invoiceListCondition.visaDateStart != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.visaDateStart}
+    </if>
+    <if test="invoiceListCondition.visaDateEnd != null and invoiceListCondition.visaDateEnd != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.visaDateEnd}
+    </if>
+    ) student,
+    (select id as schoolId, student_id, student_no, school_no,start_date, study_week, college_type, school_area,consulter,
+    branch, transfer_consulter, copy_operator, school_remark2, student_property, commission_belong,
+    school_name, course_name, major_name, `status`, school_remark from commission_school where delete_status = 0) school,
+    (select * from commission_invoice where delete_status = 0
+    <if test="invoiceListCondition.sendDateBegin != null">
+      and send_date &gt;= #{invoiceListCondition.sendDateBegin}
+    </if>
+    <if test="invoiceListCondition.sendDateEnd != null">
+      and send_date &lt;= #{invoiceListCondition.sendDateEnd}
+    </if>
+    <if test="invoiceListCondition.returnDateStart != null and invoiceListCondition.returnDateStart != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.returnDateStart}
+    </if>
+    <if test="invoiceListCondition.returnDateEnd != null and invoiceListCondition.returnDateEnd != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.returnDateEnd}
+    </if>
+    ) invoice
+    where student.id = school.student_id and school.schoolId = invoice.school_id order by student.visa_date desc
+  </select>
+
+  <select id="commissionReport" parameterType="java.util.Map" resultMap="CommissionReportResultMap">
+    select * from
+    (select id, student_no, student_name, spelling, birthday, coe_date, visa_date, agent_name, nation_name, agent_type, student_source, contract_type, sign_date
+    from commission_student where delete_status = 0
+    <if test="invoiceListCondition.nationId == 0">
+      and nation_id not in (1)
+    </if>
+    <if test="invoiceListCondition.nationId != null and invoiceListCondition.nationId != '-1' and invoiceListCondition.nationId != 0">
+      <if test="invoiceListCondition.nationId == 4">
+        and nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+      <if test="invoiceListCondition.nationId != 4">
+        and nation_id = #{invoiceListCondition.nationId}
+      </if>
+
+    </if>
+    <if test="invoiceListCondition.visaDateStart != null and invoiceListCondition.visaDateStart != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.visaDateStart}
+    </if>
+    <if test="invoiceListCondition.visaDateEnd != null and invoiceListCondition.visaDateEnd != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.visaDateEnd}
+    </if>
+    ) student,
+    (select id as schoolId, student_id, student_no, school_no,start_date, study_week, college_type, school_area,consulter,
+    branch, transfer_consulter, copy_operator, school_remark2, student_property, commission_belong,
+    school_name, course_name, major_name, `status`, school_remark from commission_school where delete_status = 0) school,
+    (select * from commission_invoice where delete_status = 0
+    <if test="invoiceListCondition.sendDateBegin != null">
+      and send_date &gt;= #{invoiceListCondition.sendDateBegin}
+    </if>
+    <if test="invoiceListCondition.sendDateEnd != null">
+      and send_date &lt;= #{invoiceListCondition.sendDateEnd}
+    </if>
+    <if test="invoiceListCondition.returnDateStart != null and invoiceListCondition.returnDateStart != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.returnDateStart}
+    </if>
+    <if test="invoiceListCondition.returnDateEnd != null and invoiceListCondition.returnDateEnd != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.returnDateEnd}
+    </if>
+    ) invoice
+    where student.id = school.student_id and school.schoolId = invoice.school_id order by student.visa_date desc
+    <if test="pageStart != null and pageEnd != null">
+      limit #{pageStart}, #{pageEnd}
+    </if>
+  </select>
+
+  <select id="commissionReportCount" parameterType="com.aoji.model.InvoiceListCondition" resultType="java.lang.Integer">
+    select count(*) from
+    (select id, student_no, student_name, spelling, branch, birthday, coe_date, visa_date, agent_name, nation_name, agent_type, student_source, contract_type, sign_date
+    from commission_student where delete_status = 0
+    <if test="invoiceListCondition.nationId == 0">
+      and nation_id not in (1)
+    </if>
+    <if test="invoiceListCondition.nationId != null and invoiceListCondition.nationId != '-1' and invoiceListCondition.nationId != 0">
+      <if test="invoiceListCondition.nationId == 4">
+        and nation_id in
+        <foreach collection="usaNationId" item="usaNationIds" open="(" close=")" separator=",">
+          #{usaNationIds}
+        </foreach>
+      </if>
+      <if test="invoiceListCondition.nationId != 4">
+        and nation_id = #{invoiceListCondition.nationId}
+      </if>
+    </if>
+
+    <if test="invoiceListCondition.visaDateStart != null and invoiceListCondition.visaDateStart != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.visaDateStart}
+    </if>
+    <if test="invoiceListCondition.visaDateEnd != null and invoiceListCondition.visaDateEnd != ''">
+      and DATE_FORMAT(visa_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.visaDateEnd}
+    </if>
+    ) student,
+    (select id as schoolId, student_id, student_no, school_no,start_date, study_week, college_type, school_area,consulter,
+    branch, transfer_consulter, copy_operator, school_remark2, student_property, commission_belong,
+    school_name, course_name, major_name, `status`, school_remark from commission_school where delete_status = 0) school,
+    (select * from commission_invoice where delete_status = 0
+    <if test="invoiceListCondition.sendDateBegin != null">
+      and send_date &gt;= #{invoiceListCondition.sendDateBegin}
+    </if>
+    <if test="invoiceListCondition.sendDateEnd != null">
+      and send_date &lt;= #{invoiceListCondition.sendDateEnd}
+    </if>
+    <if test="invoiceListCondition.returnDateStart != null and invoiceListCondition.returnDateStart != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &gt;= #{invoiceListCondition.returnDateStart}
+    </if>
+    <if test="invoiceListCondition.returnDateEnd != null and invoiceListCondition.returnDateEnd != ''">
+      and DATE_FORMAT(return_date,'%Y-%m-%d') &lt;= #{invoiceListCondition.returnDateEnd}
+    </if>
+    ) invoice
+    where student.id = school.student_id and school.schoolId = invoice.school_id
+  </select>
+
+  <select id="getBySchoolId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select * from commission_invoice where delete_status = 0 and school_id = #{schoolId}
+  </select>
+
+  <select id="checkSchool" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select * from commission_invoice where delete_status = 0
+    <if test="schoolIds != null">
+      and school_id in
+      <foreach collection="schoolIds" item="schoolId" open="(" close=")" separator=",">
+        #{schoolId}
+      </foreach>
+    </if>
+    <if test="invoiceNo != null">
+      and invoice_no = #{invoiceNo}
+    </if>
+  </select>
+
+  <!--佣金到账列表 - 渠道-->
+  <select id="getToAccountList" resultMap="toAccountListVOMap">
+    select * from
+    (select student_no, agent_id, agent_name, sign_date from student_info where agent_id is not null
+    <if test="agentName != null and agentName != ''">
+      and agent_name like concat('%', #{agentName}, '%')
+    </if>
+    <if test="agentId != null">
+      and agent_id = #{agentId}
+    </if>
+    ) visa_student,
+    (select id as studentId, student_no, student_name, spelling, nation_name, birthday, visa_date
+    from commission_student where 1 = 1 and agent_type in (1)
+    <if test="studentName != null and spelling != null">
+      and (student_name like concat('%', #{studentName}, '%') or spelling like concat('%', #{spelling}, '%'))
+    </if>
+    <if test="studentNo != null">
+      and student_no = #{studentNo}
+    </if>
+    <if test="agentName != null">
+      and (agent_name like concat('%', #{agentName}, '%') or aus_agent like concat('%', #{agentName}, '%'))
+    </if>
+    ) student,
+    (select id as schoolId, student_id, school_name, major_name, course_name, start_date
+    from commission_school where 1 = 1) school,
+    (select * from commission_invoice where delete_status = 0 and return_date is not null
+    <if test="accountCurrency != null and accountCurrency != ''">
+      and account_currency = #{accountCurrency}
+    </if>
+    <if test="channelReturnStatusIdentified != null">
+      and channel_return_status in
+      <foreach close=")" collection="channelReturnStatusIdentified" item="channelStatus" open="(" separator=",">
+        #{channelStatus}
+      </foreach>
+    </if>
+    <if test="channelReturnStatusIdentified == null ">
+      and channel_return_status is null
+    </if>
+    <if test="returnDate != null">
+      and DATE_FORMAT(return_date,'%Y-%m') = DATE_FORMAT(#{returnDate}, '%Y-%m')
+    </if>
+    ) invoice
+    LEFT JOIN (select t1.invoice_id,t1.get_visa_sum,t1.channel_return_rate,t1.return_money,t1.exchange_rate,t1.return_money_cny,t1.create_time as lastCreatTime ,t1.payment_date,t1.result_comment from channel_commission t1,
+    (
+    SELECT
+    max(create_time) create_time,invoice_id
+    FROM
+    (
+    SELECT
+    create_time,invoice_id
+    FROM
+    channel_commission
+    WHERE
+    delete_status = 0
+    ORDER BY
+    create_time DESC
+    ) channel
+    GROUP BY
+    channel.invoice_id
+    ) t2 where t1.invoice_id = t2.invoice_id and t1.create_time = t2.create_time
+    ) channel on channel.invoice_id = invoice.id
+    where visa_student.student_no = student.student_no and student.studentId = school.student_id and school.schoolId = invoice.school_id  ORDER BY channel.lastCreatTime asc , student.visa_date  DESC
+  </select>
+</mapper>

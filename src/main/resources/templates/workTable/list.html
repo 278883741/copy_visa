@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"><!--xmlns:th="http://www.w3.org/1999/xhtml"-->
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/assets/css/chosen.css}" />
+<head th:include="fragments/head::header" />
+<style>
+	.error {
+		color: #F00
+	}
+	.rowStyle{margin-top:2%;}
+	.h300{height:380px;overflow-y:scroll;}
+	.Pline{border-bottom:1px solid #ccc;}
+	.pStyle{height:38px;line-height:38px;margin:0;padding:0;}
+	.tipStyle_1{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:red;color:#fff;line-height:15px;text-align:center;}
+	.tipStyle_2{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:lime;color:#fff;line-height:15px;text-align:center;}
+	.tipStyle_3{display:inline-block;margin-left:6px;width:26px;height:15px;background-color:gold;color:#fff;line-height:15px;text-align:center;}
+	/*ul列表项目符号*/
+	ul li{list-style: none;}
+	/*显示红色*/
+	ul li.LiRed::before{content:"●";color:red;padding-right: 6px;}
+	/*显示黑色*/
+	ul li.LiBlack::before{content:"●";color:#333333;padding-right: 6px;}
+	/*显色黄色*/
+	ul li.LiYellow::before{content:"●";color:#EEEE00;padding-right: 6px;}
+	/*显色lv色*/
+	ul li.LiGreen::before{content:"●";color:#66DD00;padding-right: 6px;}
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+	<div class="main-container-inner">
+		<!--<div th:include="fragments/left::left " class="sidebar" id="sidebar"></div>-->
+		<div class="main-content" style="margin-left: 0px">
+			<!--<div class="breadcrumbs" id="breadcrumbs">
+				<ul class="breadcrumb">
+					<li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+					<li><a href="#">系统管理</a></li>
+					<li><a href="/member/list">工作台</a></li>
+				</ul>
+			</div>-->
+
+			<div class="page-content">
+				<div class = "page-header">
+					<h3 class="header smaller lighter blue">工作台</h3>
+					<div class="col-sm-6">
+						<shiro:hasPermission name="学生列表">
+							<input type="hidden" name="permission" id="permission" value="1"/>
+							<a href="/studentInfo" id="id-btn-dialog2" class="btn btn-info btn-sm">学生列表</a>&nbsp;&nbsp;
+						</shiro:hasPermission>
+						<shiro:hasPermission name="佣金系统">
+							<input type="hidden" name="permission" />
+							<a href="/commissionManage/list" id="id-btn-dialog3" class="btn btn-info btn-sm">佣金信息</a>&nbsp;&nbsp;
+						</shiro:hasPermission>
+						<shiro:hasPermission name="预科学生列表">
+							<input type="hidden" name="permission" id="permission_allot" value="1"/>
+							<a href="/preStudentInfo" id="permission_allot_id" class="btn btn-info btn-sm">预科系统</a>&nbsp;&nbsp;
+						</shiro:hasPermission>
+						<shiro:hasAnyRoles name="同业经理,同业顾问">
+							<input type="hidden" name="permission" id="permission_channel" value="1"/>
+							<a href="/channelStudent/studentList" id="permission_channel_id" class="btn btn-info btn-sm">同业系统</a>&nbsp;&nbsp;
+						</shiro:hasAnyRoles>
+						<shiro:hasAnyRoles name="机构">
+							<input type="hidden" name="permission" id="permission_agency" value="1"/>
+							<a href="/channelStudent/dLstudentList" id="permission_agency_id" class="btn btn-info btn-sm">代理机构</a>&nbsp;&nbsp;
+						</shiro:hasAnyRoles>
+						<shiro:hasAnyRoles name="财务">
+							<input type="hidden" name="permission" id="permission_finance" value="1"/>
+							<a href="/commission/financeReturnCommission/list" id="permission_finance_id" class="btn btn-info btn-sm">财务查看</a>&nbsp;&nbsp;
+						</shiro:hasAnyRoles>
+						<shiro:hasAnyRoles name="佣金系统_海外操作">
+							<input type="hidden" name="permission" id="permission_commissionOverseas" value="1"/>
+							<a href="/commissionManage/list" id="permission_commissionOverseas_id" class="btn btn-info btn-sm">佣金信息</a>&nbsp;&nbsp;
+						</shiro:hasAnyRoles>
+					</div>
+				</div>
+				<div class="row rowStyle">
+					<input id="oaid" th:value="${oaid}" type="text" name="oaid" style="display: none"/>
+					<div class="col-xs-12 col-sm-6 widget-container-span ui-sortable" style="float:left" id="backlogWork">
+						<div class="widget-box ">
+							<div class="widget-header">
+								<h5>待办事项</h5>
+							</div>
+							<div class="widget-body" style="height:520px">
+								<div class="widget-main padding-4" id="message">
+									<div class="content">
+										<ul>
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_copyConsultantVisitCount" th:value="${copyConsultantVisitCount != null?copyConsultantVisitCount:0}">
+												<a style="color:#ff0000;font-size:15px;"    onclick="toVisitURL('文案顾问')" th:text=" '【文案顾问】-【'+${copyConsultantVisitCount != null?copyConsultantVisitCount:0}+'】个未回访学生'"></a>
+											</li>
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_copyManagerVisitCount" th:value="${copyManagerVisitCount != null?copyManagerVisitCount:0}">
+												<a style="color:#ff0000;font-size:15px;"    onclick="toVisitURL('文案经理')" th:text=" '【文案经理】-【'+${copyManagerVisitCount != null?copyManagerVisitCount:0}+'】个未回访学生'"></a>
+											</li>
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_directorVisitCount" th:value="${directorVisitCount != null?directorVisitCount:0}">
+												<a style="color:#ff0000;font-size:15px;"    onclick="toVisitURL('文签总监')" th:text=" '【文签总监】-【'+${directorVisitCount != null? directorVisitCount:0}+'】个未回访学生'"></a>
+											</li>
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_managerVisitCount" th:value="${managerVisitCount != null?managerVisitCount:0}">
+												<a style="color:#ff0000;font-size:15px;"    onclick="toVisitURL('总经理')" th:text=" '【总经理】-【'+${managerVisitCount != null?managerVisitCount:0}+'】个未回访学生'"></a>
+											</li>
+
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="applyResult" th:value="${workCountVO.applyResultCount}">
+												<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.applyResultCount}+'】个我提交的-待审批的Offer'" href="/workTable/studentApplyResultPage"> </a></li>
+
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="visaApply" th:value="${workCountVO.visaApplyCount}">
+												<a style="color:#ff0000;font-size:15px;" onclick="" th:text=" '【'+${workCountVO.visaApplyCount}+'】个我提交的-待审批的签证申请'" href="/workTable/visaApplyPage"></a></li>
+
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="visaResult" th:value="${workCountVO.visaResultCount}">
+												<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.visaResultCount}+'】个我提交的-待审批的签证结果'" href="/workTable/visaResultPage"></a></li>
+
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="visaRecord" th:value="${workCountVO.visaRecordCount}">
+												<a id="a_visaRecordCount" style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.visaRecordCount}+'】个我提交的-待审批的获签信息'" href="/workTable/visaRecordPage"></a></li>
+
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="studentDelay" th:value="${workCountVO.studentDelayCount}">
+												<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.studentDelayCount}+'】个我提交的-待审批的停办申请'" href="/workTable/studentDelayPage"></a></li>
+
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="schoolConfirm" th:value="${workCountVO.schoolConfirmCount}">
+												<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.schoolConfirmCount}+'】个待接受的定校方案'" href="/workTable/schoolConfirmPage"></a></li>
+
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" th:value="${unPassVisaApplyCount}" id="li_unPassVisaApply">
+												<a style="color:#ff0000;font-size:15px;"  th:text=" '【'+${unPassVisaApplyCount}+'】个我提交的-审批未通过的签证申请'" href="/workTable/toUnPassVisaApplyPage" target="_blank"></a>
+											</li>
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" th:value="${unPassVisaRecordCount}" id="li_unPassVisaRecord">
+												<a style="color:#ff0000;font-size:15px;"  th:text=" '【'+${unPassVisaRecordCount}+'】个我提交的-审批未通过的获签信息'" href="/workTable/toUnPassVisaRecordPage" target="_blank"></a>
+											</li>
+
+											<shiro:hasRole name="审批签证申请">
+												<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_toAuditVisaApplyCount" th:value="${workCountVO.toAuditVisaApplyCount}">
+													<a style="color:#ff0000;font-size:15px;"  onclick="" th:text=" '【'+${workCountVO.toAuditVisaApplyCount}+'】个待我审批的-签证申请'" href="/workTable/toAuditVisaApplyPage"></a>
+												</li>
+											</shiro:hasRole>
+											<shiro:hasRole name="审批获签信息">
+												<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="li_toAuditVisaRecordCount" th:value="${workCountVO.toAuditVisaRecordCount}">
+													<a style="color:#ff0000;font-size:15px;" onclick="" th:text=" '【'+${workCountVO.toAuditVisaRecordCount}+'】个待我审批的-获签信息'" href="/workTable/toAuditVisaRecordPage"></a>
+												</li>
+											</shiro:hasRole>
+											<shiro:hasRole name="审批coe信息">
+												<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="toAuditCOE" th:value="${workCountVO.toAuditCOECount}">
+													<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.toAuditCOECount}+'】个待我审批的-COE/CAS/I-20/Receipt'" href="/workTable/toAuditCOEPage"></a></li>
+											</shiro:hasRole>
+											<shiro:hasAnyRoles name="文案顾问,文案经理">
+												<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="myFirstBonusUnAudit" th:value="${workCountVO.myFirstBonusUnAuditCount}">
+													<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.myFirstBonusUnAuditCount}+'】个我提交的-待审批的首次寄出'" href="/firstBonusList"></a></li>
+											</shiro:hasAnyRoles>
+											<shiro:hasRole name="文案经理">
+												<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;" id="FirstBonusToAudit" th:value="${workCountVO.FirstBonusToAuditCount}">
+													<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.FirstBonusToAuditCount}+'】个待我审批的首次寄出'" href="/toAuditFirstBonusList"></a></li>
+											</shiro:hasRole>
+											<!--<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" id="studentSettle" th:value="${workCountVO.studentSettleCount}">-->
+											<!--<a style="color:#ff0000;font-size:15px;"   onclick="" th:text=" '【'+${workCountVO.studentSettleCount}+'】个我提交的-待审批的结案申请'" href="/workTable/studentSettlePage"></a></li>-->
+											<li class="header smaller lighter pStyle LiRed"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden; cursor: hand;cursor: pointer;">
+												<a style="color:#ff0000;font-size:15px;"   onclick="" th:text="审批人清单" href="/workTable/toAuditUserList"></a>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 col-sm-6 widget-container-span ui-sortable" style="float:left" id="work_list">
+						<div class="widget-box ">
+							<div class="widget-header">
+								<h5>工作消息</h5>
+								<span class="tipStyle_2" th:text="${workTableCountVo.workNotRead}"></span>
+							</div>
+							<div class="widget-body" style="height:520px">
+								<input id="pageIndex_work" th:value="${pageIndex}" type="text" name="pageIndex" style="display: none"/>
+								<input id="pageCount_work" th:value="${workTableCountVo.workPageCount}" type="text" name="pageCount_work" style="display: none"/>
+								<input id="work_size" th:value="${work_size}" type="text" name="warning_size" style="display: none"/>
+								<div class="widget-main padding-4" id="workList">
+									<div class="content">
+										<input id="work_div" th:value="${workList}" type="text" name="workList" style="display: none"/>
+										<ul th:each="item :${workList}">
+											<input id="work_id" th:value="${item.id}" type="text" name="id" style="display: none"/>
+											<input id="work_url" th:value="${item.url}" type="text" name="id" style="display: none"/>
+
+											<a  style="cursor: hand;cursor: pointer;"   th:id="${item.id}+_+${item.url}"  onclick="readType(id)">
+												<li  class="header smaller lighter pStyle LiGreen" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==false">
+													<span style="color:#66DD00">[未读]</span>
+													<span th:text="${item.content}"></span>
+												</li>
+											</a>
+
+											<a  style="cursor: hand;cursor: pointer;"   th:id="${item.id}+_+${item.url}"  onclick="readType(id)">
+												<li class="header smaller lighter pStyle LiBlack"  style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==true">
+													<span >[已读]</span>
+													<span th:text="${item.content}"></span>
+												</li>
+											</a>
+										</ul>
+									</div>
+								</div>
+								<div class="row" style="position:absolute;bottom:10px; right:20px;">
+									<div class="col-sm-12">
+										<div class="pull-left">
+											<div class="dataTables_info" ></div>
+										</div><div class="pull-right"><div class="dataTables_paginate paging_bs_normal" >
+										<ul class="pagination">
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="work_first">第一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="work_up">上一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="work_down">下一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="work_last">最后一页</span>
+										</ul>
+									</div>
+									</div>
+										<div class="clearfix"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-xs-12 col-sm-6 widget-container-span ui-sortable" style="float:left" id="warning_list">
+						<div class="widget-box">
+							<div class="widget-header">
+								<h5>预警通知</h5>
+								<span class="tipStyle_1" th:text="${workTableCountVo.warningNotRead}"></span>
+							</div>
+							<div class="widget-body" style="height:520px">
+								<input id="pageIndex_warning" th:value="${pageIndex}" type="text" name="pageIndex" style="display: none"/>
+								<input id="pageCount_warning" th:value="${workTableCountVo.warningPageCount}" type="text" name="pageIndex" style="display: none"/>
+								<input id="warning_size" th:value="${warning_size}" type="text" name="warning_size" style="display: none"/>
+								<div class="widget-main padding-4" id = "warningList">
+									<div class="content">
+										<input id="warning_div" th:value="${warningList}" type="text" name="warningList" style="display: none"/>
+										<ul th:each="item :${warningList}" id = "warning_item" >
+											<li  class="header smaller lighter pStyle LiRed" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==false"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span style="color:#FF0000">[未读]</span>
+												<span th:text="${item.content}"></span></a></li>
+											<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==true"><a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)"><span >[已读]</span>
+												<span th:text="${item.content}"></span></a></li>
+										</ul>
+									</div>
+								</div>
+								<div class="row" style="position:absolute;bottom:10px; right:20px;">
+									<div class="col-sm-12">
+										<div class="pull-left">
+											<div class="dataTables_info" ></div>
+										</div><div class="pull-right"><div class="dataTables_paginate paging_bs_normal" >
+										<ul class="pagination">
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="warning_first">第一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="warning_up">上一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="warning_down">下一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="warning_last">最后一页</span>
+										</ul>
+									</div>
+									</div>
+										<div class="clearfix"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<shiro:hasAnyRoles name="文案顾问,文案经理,外联顾问,总经理,运营人员">
+						<div id="container" style="width: 50%;height: 570px; margin: 0 auto;float:right"></div>
+					</shiro:hasAnyRoles>
+					<div class="col-xs-12 col-sm-6 widget-container-span ui-sortable" style="float:left" id="approval_list">
+						<div class="widget-box ">
+							<div class="widget-header">
+								<h5>审批消息</h5>
+								<span class="tipStyle_3" th:text="${workTableCountVo.approvalNotRead}"></span>
+							</div>
+							<div class="widget-body" style="height:520px">
+								<input id="pageIndex_approval" th:value="${pageIndex}" type="text" name="pageIndex" style="display: none"/>
+								<input id="pageCount_approval" th:value="${workTableCountVo.approvalPageCount}" type="text" name="pageIndex" style="display: none"/>
+								<input id="approval_size" th:value="${approval_size}" type="text" name="warning_size" style="display: none"/>
+								<div class="widget-main padding-4" id = "approvalList">
+									<div class="content" >
+										<input id="approval_div" th:value="${approvalList}" type="text" name="approvalList" style="display: none"/>
+										<ul  th:each="item:${approvalList}">
+											<a style="cursor: hand;cursor: pointer;" th:id="${item.id}+_+${item.url}"  onclick="readType(id)">
+												<li  class="header smaller lighter pStyle LiYellow" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==false"><span style="color:#DAA520">[未读]</span>
+													<span th:text="${item.content}"></span>
+												</li>
+											</a>
+											<a style="color:#0c0c0c" th:id="${item.id}+_+${item.url}"  onclick="readType(id)">
+												<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;" th:if="${item.readStatus}==true">
+													<span >[已读]</span>
+													<span th:text="${item.content}"></span>
+												</li>
+											</a>
+										</ul>
+									</div>
+								</div>
+								<div class="row" style="position:absolute;bottom:10px; right:20px;">
+									<div class="col-sm-12">
+										<div class="pull-left">
+											<div class="dataTables_info" ></div>
+										</div><div class="pull-right"><div class="dataTables_paginate paging_bs_normal" >
+										<ul class="pagination">
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="approval_first">第一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="approval_up">上一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="approval_down">下一页</span>
+											<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="approval_last">最后一页</span>
+										</ul>
+									</div>
+									</div>
+										<div class="clearfix"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--<div class="col-xs-12 col-sm-6 widget-container-span ui-sortable"  id="newsInfo_list">-->
+					<!--<div class="widget-box">-->
+					<!--<div class="widget-header">-->
+					<!--<h5>系统公告</h5>-->
+					<!--</div>-->
+					<!--<div class="widget-body" style="height:520px">-->
+					<!--<div class="widget-main padding-4">-->
+					<!--<input id="pageIndex_affiche" th:value="${pageIndex}" type="text" name="pageIndex" style="display: none"/>-->
+					<!--<input id="pageCount_affiche" th:value="${workTableCountVo.affichePageCount}" type="text" name="pageIndex" style="display: none"/>-->
+					<!--<div class="content" id="newsInfoList">-->
+					<!--<input id="newsInfo_div" th:value="${newsInfoList}" type="text" name="newsInfoList" style="display: none"/>-->
+					<!--<ul th:each="item :${newsInfoList}" ld="nwsInfoList" >-->
+					<!--<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">-->
+					<!--&lt;!&ndash;<span th:text="${item.content}"></span></li>&ndash;&gt;-->
+					<!--<a href="#" th:onclick="'javascript:toNewsURL('+${item.id}+');'" th:text="${item.content}"/></li>-->
+					<!--</ul>-->
+					<!--</div>-->
+					<!--</div>-->
+					<!--<div class="row" style="position:absolute;bottom:10px; right:20px;">-->
+					<!--<div class="col-sm-12">-->
+					<!--<div class="pull-left">-->
+					<!--<div class="dataTables_info" ></div>-->
+					<!--</div><div class="pull-right"><div class="dataTables_paginate paging_bs_normal" >-->
+					<!--<ul class="pagination">-->
+					<!--<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="affiche_first">第一页</span>-->
+					<!--<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="affiche_up">上一页</span>-->
+					<!--<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="affiche_down">下一页</span>-->
+					<!--<span class="label label-xlg label-primary arrowed arrowed-right" style="cursor: hand;cursor: pointer;" id="affiche_last">最后一页</span>-->
+					<!--</ul>-->
+					<!--</div>-->
+					<!--</div>-->
+					<!--<div class="clearfix"></div>-->
+					<!--</div>-->
+					<!--</div>-->
+					<!--</div>-->
+					<!--</div>-->
+					<!--</div>-->
+				</div>
+			</div>
+
+		</div>
+
+		<div th:include="fragments/bottom::bottom"></div>
+	</div>
+
+
+	<a href="#" id="btn-scroll-up"
+	   class="btn-scroll-up btn btn-sm btn-inverse"> <i
+			class="icon-double-angle-up icon-only bigger-110"></i>
+	</a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+	 aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content"></div>
+	</div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/js/jquery-2.1.4.js}"></script>
+<script th:src="@{/business/workTable/table.js}"></script>
+<script th:src="@{/assets/js/chosen.jquery.min.js}"></script>
+<script th:src="@{/highcharts/highcharts.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+
+    $(function(){
+        if($("#warning_size").val() >0){
+        }else{
+            $("#warning_list").attr("style","display:none");
+        }
+        if($("#approval_size").val() >0){
+        }else{
+            $("#approval_list").attr("style","display:none");
+        }
+        if($("#work_size").val() >0){
+        }else{
+            $("#work_list").attr("style","display:none");
+        }
+    })
+
+
+
+    //		if($("#studentSettle").val() == "") {
+    //            $("#studentSettle").hide();
+    //        }
+    if($("#applyResult").val() == ""){
+        $("#applyResult").hide();
+    }
+    if($("#visaApply").val() == ""){
+        $("#visaApply").hide();
+    }
+    if($("#visaRecord").val() == ""){
+        $("#visaRecord").hide();
+    }
+
+    if($("#visaResult").val() == ""){
+        $("#visaResult").hide();
+    }
+    if($("#studentDelay").val() == ""){
+        $("#studentDelay").hide();
+    }
+
+    $("li[id $= 'VisitCount']").each(function () {
+        if($(this).val() == "0"){
+            $(this).hide();
+        }
+    });
+
+    if($("#schoolConfirm").val() == 0){
+        $("#schoolConfirm").hide();
+    }
+    if($("#toAuditGetVisa").val() == 0){
+        $("#toAuditGetVisa").hide();
+    }
+    if($("#toAuditCOE").val() == 0){
+        $("#toAuditCOE").hide();
+    }
+    if($("#myFirstBonusUnAudit").val() == 0){
+        $("#myFirstBonusUnAudit").hide();
+    }
+    if($("#FirstBonusToAudit").val() == 0){
+        $("#FirstBonusToAudit").hide();
+    }
+
+    if($("#li_unPassVisaApply").val() == 0)
+        $("#li_unPassVisaApply").hide();
+    if($("#li_unPassVisaRecord").val() == 0)
+        $("#li_unPassVisaRecord").hide();
+    if($("#li_toAuditVisaApplyCount").val() == 0)
+        $("#li_toAuditVisaApplyCount").hide();
+    if($("#li_toAuditVisaRecordCount").val() == 0)
+        $("#li_toAuditVisaRecordCount").hide();
+
+    //弹出框展示公告详情
+    function toNewsURL(id){
+        layer.open({
+            title: '公告详情',
+            type: 2,
+            area: ['700px', '450px'],
+            fixed: false, //不固定
+            content: '/news/detailPage?id=' + id,
+            btn: ['确定']
+        });
+    }
+    /**
+     * 工作消息
+     */
+    //第一页
+    $("#work_first").click(function(){
+        if(parseInt($("#pageIndex_work").val()) == 0){
+        }else{
+            postData(0,3);
+        }
+
+    });
+    //下一页
+    $("#work_down").click(function(){
+        if((parseInt($("#pageIndex_work").val())+1)*10 >= parseInt($("#pageCount_work").val())){
+        }else{
+            postData(parseInt($("#pageIndex_work").val())+1,3);
+        }
+    });
+    //上一页
+    $("#work_up").click(function(){
+        if(parseInt($("#pageIndex_work").val()) == 0){
+
+        }else{
+            postData(parseInt($("#pageIndex_work").val())-1,3);
+        }
+
+
+    });
+    //最后一页
+    $("#work_last").click(function(){
+        if(parseInt(parseInt(parseInt($("#pageIndex_work").val())+1)*10) >= parseInt($("#pageCount_work").val())){
+        }else{
+            postData(Math.ceil(parseInt($("#pageCount_work").val()/10)),3);
+        }
+    });
+
+    /**
+     * 审批消息
+     */
+    //第一页
+    $("#approval_first").click(function(){
+        if(parseInt($("#pageIndex_approval").val()) == 0){
+        }else{
+            postData(0,2);
+        }
+
+    });
+    //下一页
+    $("#approval_down").click(function(){
+        if((parseInt($("#pageIndex_approval").val())+1)*10 >= parseInt($("#pageCount_approval").val())){
+        }else{
+            postData(parseInt($("#pageIndex_approval").val())+1,2);
+        }
+    });
+    //上一页
+    $("#approval_up").click(function(){
+        if(parseInt($("#pageIndex_approval").val()) == 0){
+        }else{
+            postData(parseInt($("#pageIndex_approval").val()-1),2);
+        }
+
+    });
+    //最后一页
+    $("#approval_last").click(function(){
+        if(parseInt(parseInt(parseInt($("#pageIndex_approval").val())+1)*10) >= parseInt($("#pageCount_approval").val())){
+        }else{
+            postData(Math.ceil(parseInt($("#pageCount_approval").val()/10)),2);
+        }
+    });
+
+    /**
+     * 预警消息
+     */
+    //第一页
+    $("#warning_first").click(function(){
+        if(parseInt($("#pageIndex_warning").val()) == 0){
+        }else{
+            postData(0,1);
+        }
+
+    });
+    //下一页
+    $("#warning_down").click(function(){
+        if((parseInt($("#pageIndex_warning").val())+1)*10 >= parseInt($("#pageCount_warning").val())){
+        }else{
+            postData(parseInt($("#pageIndex_warning").val())+1,1);
+        }
+    });
+    //上一页
+    $("#warning_up").click(function(){
+        if(parseInt($("#pageIndex_warning").val()) == 0){
+
+        }else{
+            postData(parseInt($("#pageIndex_warning").val()-1),1);
+        }
+    });
+    //最后一页
+    $("#warning_last").click(function(){
+        if(parseInt(parseInt(parseInt($("#pageIndex_warning").val())+1)*10) >= parseInt($("#pageCount_warning").val())){
+        }else{
+            postData(Math.ceil(parseInt($("#pageCount_warning").val()/10)),1);
+        }
+    });
+
+    /**
+     * 系统公告
+     */
+    //第一页
+    $("#affiche_first").click(function(){
+        if(parseInt($("#pageIndex_affiche").val()) == 0){
+
+        }else{
+            postNewsInfoData(0);
+        }
+
+    });
+    //下一页
+    $("#affiche_down").click(function(){
+        if((parseInt($("#pageIndex_affiche").val())+1)*10 >= parseInt($("#pageCount_affiche").val())){
+        }else{
+            postNewsInfoData(parseInt($("#pageIndex_affiche").val())+1);
+        }
+    });
+    //上一页
+    $("#affiche_up").click(function(){
+        if(parseInt($("#pageIndex_affiche").val()) == 0){}else{
+            postNewsInfoData(parseInt($("#pageIndex_affiche").val()-1));
+        }
+
+    });
+    //最后一页
+    $("#affiche_last").click(function(){
+        if(parseInt(parseInt(parseInt($("#pageIndex_affiche").val())+1)*10) >= parseInt($("#pageCount_affiche").val())){
+        }else{
+            postNewsInfoData(Math.ceil(parseInt($("#pageCount_affiche").val()/10)));
+        }
+    });
+
+    function postData(pageIndex,type) {
+        if(type == 3){
+            $("#workList").html("");
+        }else if(type == 2){
+            $("#approvalList").html("");
+        }else if(type == 1){
+            $("#warningList").html("");
+        }
+
+        if(type == 3){
+            $("#pageIndex_work").attr("value",pageIndex);
+        }else if(type == 2){
+            $("#pageIndex_approval").attr("value",pageIndex);
+        }else if(type == 1){
+            $("#pageIndex_warning").attr("value",pageIndex);
+        }
+        var dataModel={
+            "oaid":$("#oaid").val(),
+            "taskType":type,
+            "pageIndex":pageIndex,
+
+        }
+        console.log(dataModel);
+        $.post("/workTable/workJson", {"data": JSON.stringify(dataModel)},function(data,status) {
+            if(type == 3){
+                $("#workList").html(data);
+            }else if(type == 2){
+                $("#approvalList").html(data);
+            }else if(type == 1){
+                $("#warningList").html(data);
+            }
+        });
+    }
+
+    function postNewsInfoData(pageIndex) {
+        $("#newsInfoList").html("");
+        $("#pageIndex_affiche").attr("value",pageIndex);
+        var dataModel={
+            "pageIndex":pageIndex,
+        }
+        console.log(dataModel);
+        $.post("/workTable/newsInfo", {"data": JSON.stringify(dataModel)},function(data,status) {
+            $("#newsInfoList").html(data);
+        });
+    }
+
+    function readType(id){
+        var strs = id.split("_");
+        var id = strs[0];
+        var url = strs[1];
+        $.ajax({
+            type:"get",
+            url:"/workTable/updateRead?id="+id,
+            success:function(data){
+                window.open(url);
+
+            }
+        });
+    }
+
+    function toVisitURL(role) {
+        window.open("/toDoVisitList?role=" + role, target = "_blank");
+    }
+</script>
+</body>
+</html>

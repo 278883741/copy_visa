@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+
+    .DTFC_LeftBodyLiner {
+        height: 910px ! important;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">佣金统计管理</h3>
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <label>发出日期：</label>
+                                            <input type="text" id="sendDateStart" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>-
+                                            <input type="text" id="sendDateEnd" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>到账日期：</label>
+                                            <input type="text" id="returnDateStart" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>-
+                                            <input type="text" id="returnDateEnd" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>获签日期：</label>
+                                            <input type="text" id="visaDateStart" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>-
+                                            <input type="text" id="visaDateEnd" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>获签国家：</label>
+                                            <select type="" class="form-control input-sm" id="nation"
+                                                    style="width:125px;">
+                                                <option value="-1">请选择</option>
+                                                <option value="0">非澳洲</option>
+                                                <option th:each="country:${countryInfoList}" th:value="${country.id}" th:text="${country.countryName}"></option>
+                                            </select>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <button type="button" id="query" class="btn btn-success ">查询</button>
+                                            <button type="reset" class="btn btn-warning">清空</button>
+                                            <button type="button" id="report" class="btn btn-success">导出</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th>澳际学号</th>
+                                            <th>姓名</th>
+                                            <th>拼音</th>
+                                            <th>出生日期</th>
+                                            <th>获签日期</th>
+                                            <th>获签国家</th>
+                                            <th>顾问</th>
+                                            <th>代理名称</th>
+                                            <th>学校类型</th>
+                                            <th>学校名称</th>
+                                            <th>开学时间</th>
+                                            <th>上课校区</th>
+                                            <th>课程名称</th>
+                                            <th>专业名称</th>
+                                            <th>学校学号</th>
+                                            <th>课程周数</th>
+                                            <th>学费</th>
+                                            <th>结佣状态</th>
+                                            <th>INVNO</th>
+                                            <th>INV发出日期</th>
+                                            <th>INV金额</th>
+                                            <th>INGST</th>
+                                            <th>INV税后金额</th>
+                                            <th>到账日期</th>
+                                            <th>到账金额</th>
+                                            <th>到账GST</th>
+                                            <th>到账税后金额</th>
+                                            <th>银行手续费</th>
+                                            <th>账户金额</th>
+                                            <th>差额</th>
+                                            <th>差额原因</th>
+                                            <th>结佣备注</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script type="text/javascript">
+
+    var oTable1;
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+                "aLengthMenu": [50, 100, 200, 500],  //用户可自选每页展示数量
+                <!--"sScrollY": "450px",-->
+                "scrollX": true,
+                "scrollCollapse": true,
+                "bProcessing": true,//显示搜索样式
+                "bDeferRender": true,//延迟加载表格
+//            <!--"fixedColumns": { //固定列的配置项-->
+//        <!--"leftColumns": 1, //固定左边第一列-->
+//                <!--},-->
+
+                "bFilter": false,//是否使用搜索
+                "bProcessing": true,
+                "bDeferRender": true,//
+                "sPaginationType": "bs_normal",//分页样式
+                "bRetrieve": true,//是否调用后台
+                "bServerSide": true,//是否以后台分页
+                "sAjaxSource": "/report/commission/list/data",//请求路径
+                "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "sendDateBegin", "value": $("#sendDateStart").val() == ""? null: $("#sendDateStart").val()},
+                    {"name": "sendDateEnd", "value": $("#sendDateEnd").val() == ""? null: $("#sendDateEnd").val()},
+                    {"name": "returnDateStart", "value": $("#returnDateStart").val() == ""? null: $("#returnDateStart").val()},
+                    {"name": "returnDateEnd", "value": $("#returnDateEnd").val() == ""? null: $("#returnDateEnd").val()},
+                    {"name": "visaDateStart", "value": $("#visaDateStart").val() == ""? null: $("#visaDateStart").val()},
+                    {"name": "visaDateEnd", "value": $("#visaDateEnd").val() == ""? null: $("#visaDateEnd").val()},
+                    {"name": "nationId", "value": $("#nation").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "POST",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+                "bSort": true,
+                "aoColumns": [
+                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {"sClass": "center", "bSortable": false, "mData": "studentNo"},
+                {"sClass": "center", "bSortable": false, "mData": "studentName"},
+                {"sClass": "center", "bSortable": false, "mData": "spelling"},
+                {"sClass": "center", "bSortable": false, "mData": "birthday"},
+                {"sClass": "center", "bSortable": false, "mData": "visaDate"},
+                {"sClass": "center", "bSortable": false, "mData": "nationName"},
+                {"sClass": "center", "bSortable": false, "mData": "consulter"},
+                {"sClass": "center", "bSortable": false, "mData": "agentName"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.collegeType == "" || data.collegeType == null) {
+                            return "";
+                        } else {
+                            if (data.collegeType == "1") {
+                                return "主课";
+                            } else if (data.collegeType == "2") {
+                                return "语言";
+                            } else if (data.collegeType == "3") {
+                                return "预备";
+                            } else {
+                                return "";
+                            }
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "schoolName"},
+                {"sClass": "center", "bSortable": false, "mData": "startDate"},
+                {"sClass": "center", "bSortable": false, "mData": "schoolArea"},
+                {"sClass": "center", "bSortable": false, "mData": "courseName"},
+                {"sClass": "center", "bSortable": false, "mData": "majorName"},
+                {"sClass": "center", "bSortable": false, "mData": "schoolNo"},
+                {"sClass": "center", "bSortable": false, "mData": "studyWeek"},
+                {"sClass": "center", "bSortable": false, "mData": "tuition"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.status == "1") {
+                            return "未开始";
+                        } else if (data.status == "2") {
+                            return "进行中";
+                        } else if (data.status == "3") {
+                            return "已结束";
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "invoiceNo"},
+                {"sClass": "center", "bSortable": false, "mData": "sendDate"},
+                {"sClass": "center", "bSortable": false, "mData": "invoiceMoney"},
+                {"sClass": "center", "bSortable": false, "mData": "invoiceGst"},
+                {"sClass": "center", "bSortable": false, "mData": "invoiceSum"},
+                {"sClass": "center", "bSortable": false, "mData": "returnDate"},
+                {"sClass": "center", "bSortable": false, "mData": "actualAmount"},
+                {"sClass": "center", "bSortable": false, "mData": "accountGst"},
+                {"sClass": "center", "bSortable": false, "mData": "accountSum"},
+                {"sClass": "center", "bSortable": false, "mData": "bankFee"},
+                {"sClass": "center", "bSortable": false, "mData": "accountMoney"},
+                {"sClass": "center", "bSortable": false, "mData": "balance"},
+                {"sClass": "center", "bSortable": false, "mData": "balanceType"},
+                {"sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.schoolRemark == null || data.schoolRemark == "") {
+                            return ""
+                        }
+                        if (data.schoolRemark.length > 6) {
+                            return '<a href="javascript:void(0);" id="' + data.id + '" onclick="toTipContent(' + data.id + ',\'' + data.schoolRemark.replace(/\r\n/mg, '  ') + '\')" >' + data.schoolRemark.substring(0, 7) + "..." + '</a>';
+                        } else {
+                            return data.schoolRemark;
+                        }
+                        return data.schoolRemark;
+
+                    }
+                }
+            ],
+                "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                    "sZeroRecords": "对不起，查询不到任何相关数据",
+                    "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                    "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                    "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                    "sProcessing": "正在加载中...",
+                    "sSearch": "搜索",
+                    "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                    "oPaginate": {
+                    "sFirst": "第一页",
+                        "sPrevious": " 上一页 ",
+                        "sNext": " 下一页 ",
+                        "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+
+    })
+
+    $("#empty").click(function ( ) {
+        $("#student_no").val("");
+        location.href = '/transfer/list';
+    })
+
+    $('.checkall').on('click', function () {
+        if (this.checked) {
+            $(this).attr('checked','checked')
+            $('.checkchild').each(function () {
+                this.checked = true;
+            });
+        } else {
+            $(this).removeAttr('checked')
+            $('.checkchild').each(function () {
+                this.checked = false;
+            });
+        }
+    });
+
+    //批量编辑
+    $('#btnAll').on('click',function(){
+        var number = '';
+        var arr = '';
+        $('input:checkbox[name=checkchild]:checked').each(function(k){
+            if(k == 0){
+                number = $(this).val();
+            }else{
+                number += ','+$(this).val();
+            }
+            if(k == 0){
+                arr = 1 ;
+            } else if(k > 0){
+                arr=number.split(",").length;
+            }else{
+                arr = 0 ;
+            }
+        })
+    });
+
+    $('#report').on('click',function(){
+        window.location.href="/report/commission/toExcel";
+    });
+
+    function toInvoiceEdit(invoiceNo){
+        window.location.href = "/invoice/edit?invoiceNo="+invoiceNo;
+    }
+
+    function toTipContent(id, content) {
+        layer.tips(content, $("#" + id), {
+            tips: [1, '#3595CC'],
+            time: 3000
+        });
+    }
+
+
+</script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

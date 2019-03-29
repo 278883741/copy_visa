@@ -1,0 +1,26 @@
+<div class="supplementInfo form-group" th:style="${result == true}? 'height:auto;': 'display:none'">
+    <label id="supplementText"
+           class="col-sm-1 control-label no-padding-right blue">审批信息</label>
+</div>
+<div class="form-group" th:style="${result == true}? 'height:auto;': 'display:none'">
+    <table class="table" style="width:560px;margin-left:25%;" border="1" cellspacing="4"
+               cellpadding="1">
+            <tr>
+                <td align="center">审批结果</td>
+                <td align="center">审批人</td>
+                <td align="center">审批时间</td>
+                <td align="center">审批意见</td>
+            </tr>
+            <tr th:each="auditResult : ${auditResultInfoList}" th:switch="${auditResult != null}? ${auditResult.applyStatus}">
+                <td align="center" th:case="1">不同意</td>
+                <td align="center" th:case="2">同意</td>
+                <td align="center" th:case="*">无</td>
+                <td align="center" th:text="${auditResult != null}? ${auditResult.operatorName}"></td>
+                <td align="center" th:text="${auditResult != null and auditResult.createTime != null}? ${#dates.format(auditResult.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                <td align="center" th:text="${auditResult != null}? ${auditResult.reason}"></td>
+            </tr>
+    </table>
+</div>
+<style>
+
+</style>

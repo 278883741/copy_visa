@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<div class="main-container" id="main-container">
+
+    <input type="hidden" name="info" id="info" th:value="${info}"/>
+
+    <div class="form-group auditResult_content">
+        <div class="form-group" style="margin-top: 40px;">
+            <table class="table" width="450" border="1" cellspacing="4"
+                               cellpadding="1">
+                <tr>
+                    <td align="center">审批结果</td>
+                    <td align="center">审批人</td>
+                    <td align="center">审批时间</td>
+                </tr>
+                <tr >
+                    <td style="text-align: center; vertical-align: middle;"
+                                    th:text="已审核"></td>
+                    <td style="text-align: center; vertical-align: middle;"
+                                    th:text="${info.operatorName}"></td>
+                    <td style="text-align: center; vertical-align: middle;"
+                                    th:text="${info.createTime!=null}?${#dates.format(info.createTime, 'yyyy-MM-dd')}"></td>
+
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/student/settle.js}" charset="UTF-8"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    /*]]>*/
+</script>
+</body>
+</html>

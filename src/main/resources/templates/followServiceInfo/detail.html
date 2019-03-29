@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+    .input-unit{
+        width: 65px;
+        height: 25px;
+        display: block;
+        float: left;
+        background-color: #abbac3;
+        line-height: 25px;
+        text-align: center;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li><i class="icon-home home-icon"></i>首页</li>-->
+                    <!--<li>学生列表</li>-->
+                    <!--<li>后续管理</li>-->
+                    <!--<li>查看后续申请</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <h3 class="header smaller lighter blue">后续申请详情</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="id" th:value="${followService != null}? ${followService.id}"/>
+                    <input type="hidden" name="studentNo" id="studentNo" th:value="${followService != null}? ${followService.studentNo}"/>
+                    <input type="hidden" name="offerAttachment" id="offerAttachment" th:value="${followService != null}? ${followService.attachment}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">服务类型：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="visitType" disabled="disabled" name="visitType" style="width:190px;height:25px;" required="required">
+                                        <option th:selected="${followService!=null}? ${followService.visitType==1}" value="1">接机</option>
+                                        <option th:selected="${followService!=null}? ${followService.visitType==2}" value="2">保险</option>
+                                        <option th:selected="${followService!=null}? ${followService.visitType==3}" value="3">监护</option>
+                                        <option th:selected="${followService!=null}? ${followService.visitType==4}" value="4">主课住宿</option>
+                                        <option th:selected="${followService!=null}? ${followService.visitType==5}" value="5">语言住宿</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue">购买途径：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="applyWay" disabled="disabled" name="applyWay" style="width:190px;height:25px;" required="required">
+                                        <option th:selected="${followService!=null}? ${followService.applyWay==1}" value="1">学校</option>
+                                        <option th:selected="${followService!=null}? ${followService.applyWay==2}" value="2">合作机构</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >是否已付后续费用：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="paymentStatus" disabled="disabled" name="paymentStatus" style="width:190px;height:25px;" required="required">
+                                        <option value="">请选择</option>
+                                        <option th:selected="${followService!=null}? ${followService.paymentStatus == true}" value="1">是</option>
+                                        <option th:selected="${followService!=null}? ${followService.paymentStatus == false}" value="0">否</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue" >费用：</label>
+                                    <input class="col-sm-1" id="fee" name="fee" disabled="disabled" style="width:125px" th:value="${followService != null}? ${followService.fee}"/>
+                                    <input type="hidden" id="feeUnit" th:value="${followService != null}? ${followService.feeUnit}" />
+                                    <span class="input-unit">
+                                        <select class="input-unit" id="feeUnitSelect" name="feeUnit" disabled="disabled">
+                                            <option th:each="currency : ${currencyInfos}" th:class="${currency.id}" th:value="${currency.id}" th:text="${currency.enName}"></option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <div class="form-group insurance-control" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险类型：</label>
+                                    <select class="col-sm-3 form-control input-sm" id="insuranceType" disabled="disabled" name="insuranceType" style="width:190px;height:25px;" required="required">
+                                        <option value="-1">请选择</option>
+                                        <option th:selected="${followService!=null}? ${followService.insuranceType==1}" value="1">OSHC</option>
+                                        <option th:selected="${followService!=null}? ${followService.insuranceType==2}" value="2">OVHC</option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险开始时间：</label>
+                                    <input id="safeStartTime" class="Wdate col-sm-3" style="width: 190px" name="safeStartTime" disabled="disabled" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           th:value="${followService.safeStartTime != null}? ${#dates.format(followService.safeStartTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group insurance-control" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" >保险结束时间：</label>
+                                    <input id="safeEndTime" class="Wdate col-sm-3" style="width: 190px" name="safeEndTime" disabled="disabled" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           th:value="${followService.safeEndTime != null}? ${#dates.format(followService.safeEndTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                    <!--<label class="col-sm-3 control-label no-padding-right blue" >保险长度：</label>-->
+                                    <!--<input class="col-sm-1" id="insuranceLength" name="insuranceLength" disabled="disabled" style="width:125px" th:value="${followService != null}? ${followService.insuranceLength}"/><span class="input-unit">月</span>-->
+                                </div>
+                                <div class="form-group agency-control" style="height:29px">
+                                    <div>
+                                        <label class="col-sm-3 control-label no-padding-right blue" >合作机构：</label>
+                                        <input type="hidden" id="agencyCode" th:value="${followService != null}? ${followService.agency}"/>
+                                        <select class="col-sm-3 form-control input-sm" id="agency" disabled="disabled" name="agency" style="width:190px;height:25px;" required="required">
+                                            <option value="-1">请选择</option>
+                                            <option th:each="agency : ${agencyInfos}" th:class="${agency.agencyType + ' agency'}" th:value="${agency.id}" th:text="${agency.agencyName}"></option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group " style="height:230px" id="upload_offer">
+                                    <label class="col-sm-3 control-label no-padding-right blue">申请表附件：</label>
+                                    <input type="hidden" name="attachment" id="input_fileName"/>
+                                    <div class="col-sm-6" style="padding-left: 0px;">
+                                        <div class="widget-header">
+                                            <h4>文件上传</h4>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <span id = "offer_attachment" style="display: none"><span id = "offerAttachment_show" th:text="${followService.attachment != null}?${followService.attachment}"></span><span class="btn btn-sm btn-primary _visa_file" th:value="${followService.attachment != null}?${followService.attachment}" style="left:9%" id = "">预览</span><a th:href="${followService.attachment != null}?${followService.attachment}" download="offer信息下载" ><span class="btn btn-sm btn-primary" style="left:15%" id = "offer_upload">下载</span></a></span>
+                                                <input name ="fileInput" multiple="" type="file" id="id-input-file-3" />
+                                                <label>
+                                                    <input type="checkbox" name="file-format" id="id-file-format" class="ace" />
+                                                </label>
+                                                <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="height:100px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">备注：</label>
+                                    <div class="col-sm-3" style="padding-left: 0px;">
+                                        <textarea rows="5" cols="76" name="comment" id="textarea_comment" th:text="${followService!=null}? ${followService.applyContent}" disabled="disabled"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="submits_callback">返回</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+                <!-- 文件上传 -->
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                </form>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/followService/detail.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript"></script>
+<script>
+
+    var data_offer = $("#offerAttachment").val();
+    $("#offerAttachment_show").text(data_offer.substring(0,50)+"...");
+
+    $("#offer_show").click(function(){
+        window.open($("#offerAttachment").val());
+    })
+
+    if(data_offer != ''){
+        $("#upload_offer").attr("style","height:270px");
+        $("#offer_attachment").show();
+        $("input").attr("disabled", "disabled");
+        upLoadImg()
+    }else{
+        $("input").attr("disabled", "disabled");
+        upLoadImg();
+    }
+
+    function upLoadImg(){
+        $('#id-input-file-3').ace_file_input({
+            style:'well',
+            btn_choose:'Drop files here or click to choose',
+            btn_change:null,
+            no_icon:'icon-cloud-upload',
+            droppable:true,
+            thumbnail:'small',//large | fit
+            before_change:function(files, dropped) {
+                return true;
+            },
+            before_remove : function() {
+                return true;
+            },
+            preview_error : function(filename, error_code) {
+            }
+        }).on('change', function(){
+            $("#form_file").ajaxSubmit(function(message) {
+                console.log(message);
+                var fileName = message.obj;
+                var code = message.code;
+                if(code == "1"){
+                    layer.msg("请上传正确的文件格式!")
+                }else if(message.success){
+                    $("#input_fileName").val(fileName);
+                    $("#offerAttachment").val(fileName);
+                    layer.msg("上传成功!");
+                }
+            });
+        });
+    }
+
+    $("#submits_callback").click(function(){
+        window.location.href = "/followService/list?studentNo="+$("#studentNo").val();
+    })
+</script>
+</body>
+</html>

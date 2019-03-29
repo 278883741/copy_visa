@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.CommissionVisaMessageMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.CommissionVisaMessage">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="visa_record_result_id" jdbcType="INTEGER" property="visaRecordResultId" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="course_type" jdbcType="VARCHAR" property="courseType" />
+    <result column="visa_date" jdbcType="TIMESTAMP" property="visaDate" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="course_name" jdbcType="VARCHAR" property="courseName" />
+    <result column="major_name" jdbcType="VARCHAR" property="majorName" />
+    <result column="send_commission_status" jdbcType="BIT" property="sendCommissionStatus" />
+    <result column="before_data" jdbcType="VARCHAR" property="beforeData" />
+    <result column="after_data" jdbcType="VARCHAR" property="afterData" />
+  </resultMap>
+
+    <update id="updateInflowTypeByVisaRecordResultId">
+        update commission_visa_message set inflow_type = #{inflowType},send_commission_status = #{sendCommissionStatus} , before_data = #{beforeData} , after_data =#{afterData}  where visa_record_result_id  = #{visaCommissionId}
+    </update>
+
+</mapper>

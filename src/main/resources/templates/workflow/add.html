@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+
+            <div class="page-content">
+
+                <h3 class="header smaller lighter blue">添加审批流程</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+
+                <form method="post" id="add">
+
+                    <input type="hidden" id="hidden"/>
+                    <div class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">用户组：</label>
+                                    <select name="userGroup" id="userGroup">
+                                        <option value="">--请选择用户组--</option>
+                                        <option th:each="item: ${uGroup}" th:value="${item.id}"
+                                                th:text="${item.groupName}"></option>
+                                    </select>
+
+
+                                </div>
+
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue">流程：</label>
+                                    <select name="caseId" id="caseId">
+                                        <option value="">--请选择流程--</option>
+                                        <option th:each="item: ${caseList}" th:value="${item.code}"
+                                                th:text="${item.name}"></option>
+                                    </select>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="addWorkFlow">保存</button>
+                        <button type="button" class="btn btn-primary" onclick="window.history.back(-1); ">返回</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/business/role/add.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    $(function () {
+        $("#caseId").change(function () {
+
+            var userGroup = $('#userGroup option:selected').val();
+
+            var caseId = $('#caseId option:selected').val();
+
+            if (userGroup == "") {
+
+                layer.msg("请选择用户组！", {
+                    icon: 2
+                })
+                return false;
+            }
+
+            if (caseId == "") {
+                layer.msg("请选择审批场景！", {
+                    icon: 2
+                })
+                return false;
+            }
+
+            $.ajax({
+                url: "/workflow/addCheck",
+                type: "post",
+                data: {
+                    userGroup: userGroup,
+                    caseId: caseId,
+                },
+                success: function (data) {
+
+                    if (!data.state) {
+
+                        layer.msg(data.msg, {
+                            icon: 2
+                        })
+                        $("#hidden").val(0);
+                    } else {
+                        $("#hidden").val(1);
+                    }
+
+                }
+            })
+        });
+
+        $("#addWorkFlow").click(function () {
+
+            var hidden = $("#hidden").val();
+
+            if (hidden != 0) {
+                $("#addWorkFlow").attr("disabled", "disabled");
+                $.ajax({
+                    url: "/workflow/add",
+                    type: "post",
+                    data: $("#add").serialize(),
+                    success: function (data) {
+                        if (!data) {
+                            layer.msg("此用户组的该场景已存在！", {
+                                icon: 2
+                            })
+                        } else {
+                            window.open('/workflow/list');
+                        }
+
+                    }
+                })
+
+            } else {
+                layer.msg("当前用户组的该审批场景已存在，请重新选择！", {
+                    icon: 2
+                })
+            }
+        });
+    });
+
+    /*]]>*/
+</script>

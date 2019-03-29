@@ -1,0 +1,8 @@
+<div class="content" id="newsInfoList" xmlns:th="http://www.w3.org/1999/xhtml">
+	<input id="newsInfo_div" th:value="${newsInfoList}" type="text" name="newsInfoList" style="display: none"/>
+	<ul th:each="item :${newsInfoList}" ld="nwsInfoList" >
+		<li class="header smaller lighter pStyle LiBlack" style="text-overflow:ellipsis;white-space:nowrap;overflow:hidden;">
+			<!--<span th:text="${item.content}"></span></li>-->
+			<a href="#" th:onclick="'javascript:toNewsURL('+${item.id}+');'" th:text="${item.content}"/></li>
+	</ul>
+</div>

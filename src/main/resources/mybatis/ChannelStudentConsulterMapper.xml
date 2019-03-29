@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.ChannelStudentConsulterMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.ChannelStudentConsulter">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="consulter" jdbcType="VARCHAR" property="consulter" />
+    <result column="consulter_no" jdbcType="VARCHAR" property="consulterNo" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+  </resultMap>
+    <select id="getConsulterByNo" resultType="java.lang.String">
+      select consulter from channel_student_consulter where consulter_no = ${consulterNo}
+    </select>
+  <select id="selectEmailByConsulterNo" resultType="java.lang.String">
+    select email from channel_student_consulter where consulter_no = ${consulterNo}
+  </select>
+</mapper>

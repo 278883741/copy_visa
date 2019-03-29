@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .left-title{
+        width:35%;
+    }
+    .right-input{
+        width:55%;
+    }
+</style>
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <form id="modify">
+            <div class="page-content">
+                <input type="hidden" name="id" th:value="${invoice != null}? ${invoice.id}"/>
+                <input type="hidden" name="schoolId" th:value="${invoice != null}? ${invoice.schoolId}"/>
+                <input type="hidden" name="studentNo" th:value="${invoice != null}? ${invoice.studentNo}"/>
+                <input type="hidden" name="tuition" th:value="${invoice != null}? ${invoice.tuition}"/>
+                <input type="hidden" name="invoiceGstRate" th:value="${invoice != null}? ${invoice.invoiceGstRate}"/>
+                <input type="hidden" name="schoolRate" th:value="${invoice != null}? ${invoice.rate}"/>
+                <input type="hidden" name="type" value="3"/>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">银行账户：</label>
+                    <input type="hidden" class="col-sm-1" id="oldBankAccount"  th:value="${invoice != null}? ${invoice.bankAccount}"/>
+                    <select type="" class="col-sm-1" name="bankAccount" id="bankAccount"
+                            style="height:25px; width:165px">
+                        <option value="">请选择</option>
+                        <option th:each="bankAccount : ${bankAccountList }" th:value="${bankAccount.accountNumber}" th:text="${bankAccount.accountName}"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">到账日期：</label>
+                    <input class="col-sm-1" name="returnDate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})" readonly="readonly"
+                           th:value="${invoice != null and invoice.returnDate != null}? ${#dates.format(invoice.returnDate, 'yyyy-MM-dd')}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">账户币种：</label>
+                    <input type="hidden" class="col-sm-1" id="oldCurrency"  th:value="${invoice != null}? ${invoice.accountCurrency}"/>
+                    <select type="" class="col-sm-1" id="currency" name="accountCurrency" style="height:25px; width:165px">
+                        <option value="">请选择</option>
+                        <option th:each="currency : ${currencyInfos }" th:value="${currency.enName}" th:text="${currency.enName}"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">到账金额：</label>
+                    <input class="col-sm-1 capital" name="actualAmount"  th:value="${invoice != null}? ${invoice.actualAmount}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">银行手续费：</label>
+                    <input class="col-sm-1 capital" name="bankFee"  th:value="${invoice != null}? ${invoice.bankFee}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">差额原因：</label>
+                    <input class="col-sm-1" name="balanceType"  th:value="${invoice != null}? ${invoice.balanceType}"/>
+                </div>
+                <div class="form-group" style="height:29px">
+                    <label class="left-title control-label no-padding-right blue">结佣备注：</label>
+                    <input class="col-sm-1" name="schoolRemark"  th:value="${invoice != null}? ${invoice.schoolRemark}"/>
+                </div>
+            </div>
+            </form>
+            <!-- /.page-content -->
+        </div>
+
+    </div>
+
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script type="text/javascript">
+$(function(){
+    var oldCurrency = $("#oldCurrency").val();
+    $("#currency option[value='" + oldCurrency + "']").attr("selected", true);
+
+    var oldBankAccount = $("#oldBankAccount").val();
+    $("#bankAccount option[value='" + oldBankAccount + "']").attr("selected", true);
+})
+
+/*<![CDATA[*/
+
+function changeCountry(){
+    var nationId = $("#nationId").val();
+    if(nationId != null && nationId != ''){
+        var nationName = $("#nationId option[value="+nationId+"]").text();
+        $("#nationName").val(nationName);
+    }
+}
+
+/*]]>*/
+</script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

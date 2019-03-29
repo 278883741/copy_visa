@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <!--<li>首页</li>-->
+                    <li>学生列表</li>
+                    <li>院校列表</li>
+                    <li>补件列表</li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div th:include="fragments/student_info::student_info"
+                                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                                <h3 class="header smaller lighter blue">补件信息列表</h3>
+                                <input type="hidden" name="applyId" id="applyId"
+                                       th:value="${#httpServletRequest.getParameter('applyId')}"/>
+                                <input type="hidden" name="studentNo" id="studentNo"
+                                       th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <span>快递单号</span>
+                                            <input type="text" id="value" class="form-control input-sm" placeholder=""
+                                                   style="width:100px;"/>
+                                        </div>
+                                        <!--<div class="form-group">-->
+                                        <!--<label for="audit_status">认证状态：</label>-->
+                                        <!--<select type="" class="form-control input-sm" id="audit_status" style="width:100px;">-->
+                                        <!--<option value="" selected="selected">&#45;&#45;全部&#45;&#45;</option>-->
+                                        <!--<option value="1" >认证已通过</option>-->
+                                        <!--<option value="2" >认证未通过</option>-->
+                                        <!--<option value="0" >待认证</option>-->
+                                        <!--</select>-->
+                                        <!--</div>-->
+                                        <button type="button" id="query" class="btn btn-success ">查询</button>
+                                        <button type="reset" class="btn btn-warning">清空</button>
+                                        <a data-toggle="modal" class="btn btn-info pull-right"
+                                           href="javascript:void(0);" onclick="toAddURL(applyId,studentNo);">添加补件</a>
+                                        <a href="javascript:void(0)" onclick="collegeList(studentNo)"
+                                           data-toggle="modal" data-target="#myModal"
+                                           class="btn btn-info pull-right">院校列表</a>
+                                        <a href="javascript:void(0)" onclick="returnStudentList(studentNo)"
+                                           data-toggle="modal" data-target="#myModal"
+                                           class="btn btn-info pull-right">学生列表</a>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <input type="hidden" id = "resDomain" th:value="${resDomain}"/>
+                                        <thead>
+                                        <tr>
+                                            <!--<th class="hide">id</th>-->
+                                            <th>寄件类型</th>
+                                            <th>寄出日期</th>
+                                            <th>快递公司名称</th>
+                                            <th>快递单号</th>
+                                            <th>附件</th>
+                                            <th>创建日期</th>
+                                            <th>操作人</th>
+                                            <th class="hidden-480">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<script th:src="@{/business/supplement/supplementList.js}" charset="UTF-8"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    var oTable1;
+    var applyId = $("#applyId").val();
+    var studentNo = $("#studentNo").val();
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource": "/supplementInfo_query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": $("#applyId").val()},
+                    {"name": "expressNo", "value": $("#value").val() == "" ? null : $("#value").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+//                {"sClass": "center", "bVisible": false, "mData": "id"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.supplementType == 1) return "首次递交";
+                            if (data.supplementType == 2) return "补件";
+                            if (data.supplementType == 3) return "邮寄最终成绩单/疫苗表日期";
+                            if (data.supplementType == 4) return "邮寄录取包裹";
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "sendDate_string"},
+                {"sClass": "center", "bSortable": false, "mData": "expressCompanyName"},
+                {"sClass": "center", "bSortable": false, "mData": "expressNo"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.supplementAttachment == null || data.supplementAttachment == "") {
+                                return null;
+                            }
+                            else {
+                                var showImg = '<a onclick="showAttachment(\'' + data.supplementAttachment + '\')">查看</a>';
+                                return showImg;
+                            }
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "createTime_string"},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var check = '<a class="blue" href="javascript:void(0);" onclick="toDetail(' + data.id + ',' + applyId + ',\'' + studentNo + '\')">\n' +
+                            '<i class="icon-zoom-in bigger-130"></i></a>\n';
+                        var editOperation = '<a class="green" href="javascript:void(0);" onclick="toEditURL(' + data.id + ',\'' + studentNo + '\')">\n' +
+                            '<i class="icon-pencil bigger-130"></i></a>\n';
+                        var deleteOperation = '<a class="red" href="javascript:void(0);"  onclick="toDeleteURL(' + data.id + ',this)">\n' +
+                            '<i class="icon-trash bigger-130"></i></a>\n' +
+                            '</div>';
+                        if (data.supplementType == 1) {
+                            return styleDiv + check;
+                        }
+                        else {
+                            return styleDiv + check + editOperation + deleteOperation;
+                        }
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+    })
+
+    function showAttachment(showAttachment) {
+//        if (showAttachment.indexOf($("#resDomain").val()) == -1) {
+//            window.open($("#resDomain").val() + URLencode(showAttachment));
+//        } else {
+//            window.open(URLencode(showAttachment));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":showAttachment},function (data,status) {
+            window.open(data);
+        });
+//        window.open(showAttachment);
+    }
+
+    function toDeleteURL(id, ele) {
+//        if(confirm("您确定要删除吗？")){
+//            $.post("/supplementInfo/Action_del",{"id":id},function(data,status){
+//                if(parseInt(data) > 0) {
+//                    $(ele).parent("div").parent("td").parent("tr").remove();
+//                    layer.msg('操作成功', {
+//                        time: 1000,
+//                        btn: ['ok']
+//                    });
+//                }
+//            });
+//        }
+        parent.layer.confirm('是否执行' + '删除' + '功能？', {
+            icon: 2,
+            btn: ['确认', '取消']
+            , btn1: function (index, layero) {
+                $.ajax({
+                    url: "/supplementInfo/Action_del",
+                    type: "POST",
+                    data: {
+                        id: id,
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.code == 0) {
+                            layer.confirm('操作成功！', {
+                                icon: 1,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                        if (data.code == 1) {
+                            layer.confirm('操作失败，请联系管理员！', {
+                                icon: 2,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                        if (data.code == 2) {
+                            layer.confirm('当前登录人不是此条记录的操作人，无法删除！', {
+                                icon: 2,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

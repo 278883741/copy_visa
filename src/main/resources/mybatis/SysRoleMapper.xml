@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysRoleMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysRole">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="role_name" jdbcType="VARCHAR" property="roleName" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+
+  <select id="getRoleIdByUserId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    SELECT ur.role_id
+    FROM sys_user_role ur, ( SELECT id FROM sys_user WHERE delete_status = 0 and enable_status = 1) uid
+    WHERE uid.id = ur.user_id AND ur.delete_status = 0 AND uid.id = #{userId}
+  </select>
+
+  <!--根据员工工号查询角色信息-->
+  <select id="getRoleByOaId" resultType="string" parameterType="string">
+    select role_name from sys_role where delete_status = 0 and id in (select role_id from sys_user_role where oaid=#{oaId} and delete_status = 0)
+  </select>
+  <select id="getOaidByRoleName" resultType="com.aoji.model.SysUserRole">
+    SELECT
+	sur.oaid
+    FROM
+	sys_role sr
+    LEFT   JOIN sys_user_role sur ON sr.id = sur.role_id
+    WHERE
+	sr.delete_status = 0 and sur.delete_status = 0
+    AND sr.role_name = #{channelmanager}
+    GROUP BY sur.oaid
+
+  </select>
+</mapper>

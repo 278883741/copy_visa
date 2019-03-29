@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li><a href="#">系统管理</a></li>
+                    <li><a href="/member/list">修改用户组</a></li>
+                </ul>
+            </div>
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">修改用户组</h3>
+                                <br/>
+                                <input id="id" th:value="${id}" type="text" name="id" style="display: none"/>
+                                <div  class="tab-pane fade in active">
+                                    <div class="container">
+                                        <div class="form-horizontal">
+                                            <div class="form-group" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 小组名称：</label>
+                                                    <input id = "group_name" class = " col-sm-3" style="width: 190px" th:value="${userGroup!=null}? ${userGroup.groupName}" />
+                                                <label class="col-sm-3 control-label no-padding-right"> 所属国家组：</label>
+                                                    <input id = "group_nation" class = " col-sm-3" style="width: 190px" th:value="${userGroup!=null}? ${userGroup.nation}" onclick="selectNation()"/>
+                                            </div>
+                                            <div class="form-group" style="height:32px">
+                                                <label class="col-sm-3 control-label no-padding-right"> 操作人：</label>
+                                                <input id = "group_operator" class="Wdate col-sm-3" style="width: 190px" th:value="${userGroup!=null}? ${userGroup.operatorNo}"  readOnly="true"/>
+                                                <label class="col-sm-3 control-label no-padding-right"> 操作时间：</label>
+                                                <input id = "group_time" class="Wdate col-sm-3" style="width: 190px" th:value="${userGroup!=null}? ${#dates.format(userGroup.createTime, 'yyyy-MM-dd')}"  readOnly="true"/>
+                                            </div>
+
+                                            <!-- 审批内容 -->
+                                            <div class="form-group" style="margin-top:60px;">
+                                                <div th:each="item : ${list_case_8}" class="form-group" style="height:29px;margin-top: 20px;">
+                                                    <label class="col-sm-3 control-label no-padding-right blue">
+                                                        审批结果：<span th:text="${item.applyStatus_string}"></span>
+                                                    </label>
+                                                    <label class="col-sm-2 control-label no-padding-right blue">
+                                                        审批人：<span th:text="${item.operatorName}"></span>
+                                                    </label>
+                                                    <label class="col-sm-2 control-label no-padding-right blue">
+                                                        审批时间：<span th:text="${item.createTime_string}"></span>
+                                                    </label>
+                                                    <label class="col-sm-2 control-label no-padding-right blue">
+                                                        审批意见：<span th:text="${item.reason}"></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="btn_return">返回</button>
+                <button type="button" class="btn btn-primary" id="btn_save">保存</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/userGroup/userGroup.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script type="text/javascript">
+
+    $(function(){
+        if($("#group_nation").val()=="102"){
+            $("#group_nation").val("英国组");
+        }else if($("#group_nation").val()=="101"){
+            $("#group_nation").val("澳洲组");
+        }else if($("#group_nation").val()=="103"){
+            $("#group_nation").val("加拿大组");
+        }else if($("#group_nation").val()=="104"){
+            $("#group_nation").val("美国组");
+        }else if($("#group_nation").val()=="105"){
+            $("#group_nation").val("新西兰组");
+        }else if($("#group_nation").val()=="106"){
+            $("#group_nation").val("亚洲组");
+        }else if($("#group_nation").val()=="107"){
+            $("#group_nation").val("英港组");
+        }else if($("#group_nation").val()=="108"){
+            $("#group_nation").val("欧洲组");
+        }
+    })
+
+    $(function () {
+        $("#btn_save").click(function(){
+            postData(2);
+        });
+        $("#btn_return").click(function () {
+            postData(1);
+        });
+    });
+    function postData(type) {
+        if(type == '1'){
+            location.href = "/userGroup";
+        }else if(type == '2'){
+            var dataModel={
+                "id":$("#id").val(),
+                "groupName":$("#group_name").val(),//小组名称
+                "nation":$("#group_nation").val()//申请结果方式
+            }
+            dataModel["type"] = type;
+            console.log(dataModel);
+            $.post("/userGroup/save", {"data": JSON.stringify(dataModel)},function(data,status) {
+                if (data) {
+                    location.href = "/userGroup";
+                    $(".alert-success").text("操作成功").show();
+                    $('#alert').attr('class', 'alert alert-success').show();
+                    setTimeout(function () {
+                        $('#alert').hide();
+                        $("#myModal").modal("hide");
+                        window.location.href = window.location.href;
+                    }, 2000);
+
+                } else {
+                    $('#alertText').text('操作失败');
+                    $('#alert').attr('class', 'alert alert-danger').show();
+                    setTimeout("$('#alert').hide()", 2000);
+                    $("#myModal").modal("hide");
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>

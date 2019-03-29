@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.StudentCopyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.StudentCopyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="copy_url" jdbcType="VARCHAR" property="copyUrl" />
+    <result column="student_confirm_url" jdbcType="VARCHAR" property="studentConfirmUrl" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+  </resultMap>
+    <select id="getStudentCopyInfoByApplyId" resultType="com.aoji.model.StudentCopyInfo">
+      select id from student_copy_info where student_no = #{studentNo} and apply_id = #{applyId} and delete_status = 0
+    </select>
+</mapper>

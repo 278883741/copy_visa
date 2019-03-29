@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <!--<li>首页</li>-->
+                    <li>学生列表</li>
+                    <li>院校列表</li>
+                    <li id="name0">coe列表</li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div th:include="fragments/student_info::student_info"
+                                     th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                                <h3 class="header smaller lighter blue" id="name1">coe信息列表</h3>
+                                <input type="hidden" name="applyId" id="applyId"
+                                       th:value="${#httpServletRequest.getParameter('applyId')}"/>
+                                <input type="hidden" name="studentNo" id="studentNo"
+                                       th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                                <input type="hidden" id="resDomain" th:value="${resDomain}"/>
+                                <input type="hidden" name="nationId" id="nationId" th:value="${nationId}"/>
+                                <shiro:hasPermission name="coe信息_删除">
+                                    <input type="hidden" name="isConnector" id="isConnector" th:value="1"/>
+                                </shiro:hasPermission>
+                                <shiro:hasPermission name="院校申请列表_查看">
+                                    <input type="hidden" name="checkPermission" id="checkPermission" th:value="true"/>
+                                </shiro:hasPermission>
+                                <shiro:hasRole name="运营人员">
+                                    <input type="hidden" name="operator" id="operator" th:value="1"/>
+                                </shiro:hasRole>
+                                <shiro:hasRole name="外联经理">
+                                    <input type="hidden" name="connectorLeader" id="connectorLeader" th:value="1"/>
+                                </shiro:hasRole>
+                                <input type="hidden"  id="applyStatus" th:value="${applyStatus}"/>
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <!--<span>申请编号</span>-->
+                                            <!--<input type="text" id="value" class="form-control input-sm" placeholder="" style="width:100px;"/>-->
+                                        </div>
+                                        <!--<div class="form-group">-->
+                                        <!--<label for="audit_status">认证状态：</label>-->
+                                        <!--<select type="" class="form-control input-sm" id="audit_status" style="width:100px;">-->
+                                        <!--<option value="" selected="selected">&#45;&#45;全部&#45;&#45;</option>-->
+                                        <!--<option value="1" >认证已通过</option>-->
+                                        <!--<option value="2" >认证未通过</option>-->
+                                        <!--<option value="0" >待认证</option>-->
+                                        <!--</select>-->
+                                        <!--</div>-->
+                                        <!--<button type="button" id="query" class="btn btn-success ">查询</button>-->
+                                        <!--<button type="reset" class="btn btn-warning">清空</button>-->
+                                        <a data-toggle="modal" class="btn btn-info pull-right"
+                                           href="javascript:void(0);" onclick="toAddURL(applyId,studentNo);" id="name4">添加申请</a>
+                                        <a href="javascript:void(0)" onclick="collegeList(studentNo)"
+                                           data-toggle="modal" data-target="#myModal"
+                                           class="btn btn-info pull-right">院校列表</a>
+                                        <a href="javascript:void(0)" onclick="returnStudentList(studentNo)"
+                                           data-toggle="modal" data-target="#myModal"
+                                           class="btn btn-info pull-right">学生列表</a>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <!--<th class="hide">id</th>-->
+                                            <th>学号</th>
+                                            <th>姓名</th>
+                                            <th id="name2">coe申请附件</th>
+                                            <th id="name3">coe结果附件</th>
+                                            <th>操作日期</th>
+                                            <th>操作人</th>
+                                            <th class="hidden-480">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<script th:src="@{/business/CoeApply/list.js}" charset="UTF-8"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+
+<script th:src="@{/js/upload/filePath.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    /*<![CDATA[*/
+
+    var oTable1;
+    var applyId = $("#applyId").val();
+    var studentNo = $("#studentNo").val();
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource": "/coeApply_query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "applyId", "value": $("#applyId").val()},
+                    {"name": "studentNo", "value": $("#studentNo").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+//                {"sClass": "center", "bVisible": false, "mData": "id"},
+                {"sClass": "center", "bSortable": false, "mData": "studentNo"},
+                {"sClass": "center", "bSortable": false, "mData": "studentName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.applyAttachment == null || data.applyAttachment == "") {
+                                return null;
+                            }
+                            else {
+                                var showImg = '<a onclick="showAttachment(\'' + data.applyAttachment + '\')">查看</a>';
+                                return showImg;
+                            }
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.attachment == null || data.attachment == "") {
+                                return null;
+                            }
+                            else {
+                                var showImg = '<a onclick="showAttachment(\'' + data.attachment + '\')">查看</a>';
+                                return showImg;
+                            }
+                        }
+                },
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                        function (data) {
+                            if (data.updateTime != null) {
+                                return getTimeString_day(new Date(data.updateTime))
+                            } else {
+                                return "";
+                            }
+                        }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {
+                    "sClass": "center", "bSortable": false, "mData": function (data) {
+                        var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                        var check = '<a class="blue" href="javascript:void(0);" onclick="toDetail(' + data.id + ',' + applyId + ',\'' + studentNo + '\')">\n' +
+                            '<i class="icon-zoom-in bigger-130"></i></a>\n';
+                        var confirm = '<a class="blue" href="javascript:void(0);" onclick="toConfirm(' + data.id + ')">\n' +
+                            '<i class="icon-ok-sign bigger-130"></i></a>\n';
+                        var editOperation = '<a class="green" href="javascript:void(0);" onclick="toEditURL(' + data.id + ',\'' + studentNo + '\')">\n' +
+                            '<i class="icon-pencil bigger-130"></i></a>\n';
+                        var deleteOperation = '<a class="red" href="javascript:void(0);"  onclick="toDelete(' + data.id + ',this)">\n' +
+                            '<i class="icon-trash bigger-130"></i></a>\n' +
+                            '</div>';
+
+                        var result = styleDiv + editOperation;
+
+                        if($("#checkPermission").val() == "true"){
+                            return result;
+                        }
+
+                        if($("#isConnector").val() == "1"){
+                            if(data.confirmOperatorNo == null || data.confirmOperatorNo == ""){
+                                result += confirm;
+                            }else{
+                                result += "已确认";
+                            }
+                            if($("#operator").val() == "1" && data.applyStatus == 2){
+                                result += deleteOperation;
+                            }
+                            if($("#connectorLeader").val() == "1" && data.applyStatus == 1){
+                                result += deleteOperation;
+                            }
+                        }else{
+                            if(data.confirmOperatorNo == null || data.confirmOperatorNo == ""){
+                                result += "未确认";
+                            }else{
+                                result += "已确认";
+                            }
+                        }
+
+                        return result;
+
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+        });
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+    })
+
+    function getTimeString_day(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m : '0' + m;
+        var d = date.getDate();
+        d = d >= 10 ? d : '0' + d;
+        return y + '-' + m + '-' + d;
+    }
+
+    function showAttachment(showAttachment) {
+//        if (showAttachment.indexOf($("#resDomain").val()) == -1) {
+//            window.open($("#resDomain").val() + URLencode(showAttachment));
+//        } else {
+//            window.open(URLencode(showAttachment));
+//        }
+        $.post("/getPrivateUrl",{"fileUrl":showAttachment},function (data,status) {
+            window.open(data);
+        });
+//        window.open(showAttachment);
+    }
+
+    $(function(){
+        if($("#checkPermission").val() == "true"){
+            $("#name4").hide();
+        }
+    });
+
+    /*]]>*/
+</script>
+</body>
+</html>

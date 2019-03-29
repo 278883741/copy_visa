@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.SysAccessLogMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.SysAccessLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="member_id" jdbcType="VARCHAR" property="memberId" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="access_type" jdbcType="VARCHAR" property="accessType" />
+    <result column="ip_address" jdbcType="VARCHAR" property="ipAddress" />
+    <result column="request_url" jdbcType="VARCHAR" property="requestUrl" />
+    <result column="request_param" jdbcType="VARCHAR" property="requestParam" />
+    <result column="response" jdbcType="VARCHAR" property="response" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+</mapper>

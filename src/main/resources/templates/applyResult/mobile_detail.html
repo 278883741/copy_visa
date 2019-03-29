@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+    .Wlabel{width:50%;height:26px;float:left;}
+    .Wselec{width:40%;height:26px!important;float:left;border:1px solid ;padding-left:10px!important;}
+    .Wselec1{height:26px;width:40%;float:left;border:1px solid ;padding-left:10px}
+</style>
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+
+                    <!--<li><a href="#">用户管理</a></li>-->
+                    <!--<li><a href="/member/list">用户列表</a></li>-->
+                    <!--&lt;!&ndash;<li class="active">内容列表</li>&ndash;&gt;-->
+                <!--</ul>-->
+            <!--</div>-->
+
+            <div class="page-content">
+
+                <h3 class="header smaller lighter blue">申请结果信息</h3>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="id" id="id" th:value="${applyResult.id}"/>
+                    <input id="auditStatus" th:value="${applyResult.auditStatus !=null} ? ${applyResult.auditStatus}" type="text" name="auditStatus" style="display: none"/>
+                    <input id="canApprove" th:value="${canApprove}" type="text"  style="display: none"/>
+                    <input id="offerAttachment" th:value="${applyResult!=null}? ${applyResult.offerAttachment}" type="text"  style="display: none"/>
+                    <input id="studentNo" th:value="${apply.studentNo !=null} ? ${apply.studentNo }" type="text" name="studentNo" style="display: none"/>
+                    <input id="updateTime" th:value="${applyResult.updateTime !=null} ? ${#dates.format(applyResult.updateTime, 'yyyy-MM-dd HH:mm:ss')}" type="text" name="studentNo" style="display: none"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" > 学生学号：</label>
+                                    <input readonly="readonly" class="Wdate col-sm-2 Wselec"  name="result.replyDeadline" th:value="${studentNo}"/>
+                                </div>
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" > 学生姓名：</label>
+                                    <input readonly="readonly" class="Wdate col-sm-2 Wselec"  name="result.replyDeadline" th:value="${studentName}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" > 院校名称：</label>
+                                    <input  class="Wdate col-sm-2 Wselec"  id="collegeName" th:value="${apply.collegeName}" disabled="disabled"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" > 课程名称：</label>
+                                    <input  class="Wdate col-sm-2 Wselec"  id="majorName" th:value="${apply.courseName}" disabled="disabled"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel"  > 专业名称：</label>
+                                    <input  class="Wdate col-sm-2 Wselec"  id="courseName" th:value="${apply.majorName}" disabled="disabled" />
+                                </div>
+
+
+                                <div class="form-group" style="height: 29%;">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="resultType"> 申请结果：</label>
+                                    <select disabled="disabled" class="col-sm-3 form-control input-sm Wselec" id="resultType" >
+                                        <option value="1" th:selected="${applyResult!=null}? ${applyResult.resultType==1}">录取</option>
+                                        <option value="2" th:selected="${applyResult!=null}? ${applyResult.resultType==2}">拒绝</option>
+                                        <option value="3" th:selected="${applyResult!=null}? ${applyResult.resultType==3}">满位</option>
+                                        <option value="4" th:selected="${applyResult!=null}? ${applyResult.resultType==4}">waiting list</option>
+                                        <option value="5" th:selected="${applyResult!=null}? ${applyResult.resultType==5}">预录取</option>
+                                        <option value="6" th:selected="${applyResult!=null}? ${applyResult.resultType==6}">其他</option>
+                                        <option value="7" th:selected="${applyResult!=null}? ${applyResult.resultType==7}">收条</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="resultDateView"> 结果到达日期：</label>
+                                    <input readonly="readonly" class="Wdate Wselec" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           id="resultDate" name="resultDateView" th:value="${applyResult!=null}?  ${#dates.format(applyResult.resultDate, 'yyyy-MM-dd HH:mm:ss')}" required="required"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="resultType"> 回复方式：</label>
+                                    <select disabled="disabled" class="col-sm-3 form-control input-sm Wselec" id="replyWay">
+                                        <option value="1" th:selected="${applyResult!=null}? ${applyResult.replyWay==1}">传真</option>
+                                        <option value="2" th:selected="${applyResult!=null}? ${applyResult.replyWay==2}">电话</option>
+                                        <option value="3" th:selected="${applyResult!=null}? ${applyResult.replyWay==3}">电子版</option>
+                                        <option value="4" th:selected="${applyResult!=null}? ${applyResult.replyWay==4}">扫描件</option>
+                                        <option value="5" th:selected="${applyResult!=null}? ${applyResult.replyWay==5}">其他</option>
+                                    </select>
+                                </div>
+                                <div  class="form-group reject" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="replyReason"> 拒绝原因：</label>
+                                    <textarea class="col-sm-2 Wselec1" readonly="readonly" name="result.replyReason " id="replyReason" th:text="${applyResult!=null}? ${applyResult.replyReason}" required="required" th:title="${applyResult!=null}? ${applyResult.replyReason}" />
+
+                                </div>
+                                <div  class="form-group reject" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="argueDate"> Argue日期：</label>
+                                    <input readonly="readonly" class="Wdate Wselec" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           id="argueDate" name="result.argueDate" th:value="${applyResult.argueDate!=null}? ${#dates.format(applyResult.argueDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group offerInfo" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel replyDeadlineTag" for="resultDateView"> 回复offer截止日期：</label>
+                                    <input readonly="readonly" class="Wdate col-sm-2 Wselec" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           id="replyDeadline" name="result.replyDeadline" th:value="${applyResult.replyDeadline!=null}? ${#dates.format(applyResult.replyDeadline, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="operatorNo"> 录入人：</label>
+                                    <input readonly="readonly" class="col-sm-2 Wselec" name="operatorNo" th:value="${applyResult!=null}? ${applyResult.operatorName}" required="required"/>
+                                </div>
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="createdView"> 录入时间：</label>
+                                    <input readonly="readonly" class="Wdate Wselec" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           id="createTime" name="createdView" th:value="${applyResult!=null}? ${#dates.format(applyResult.createTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="offerType">offer类型：</label>
+                                    <select disabled="disabled" class="form-control input-sm Wselec" id="offerType"  required="required">
+                                        <option value="0">请选择</option>
+                                        <option value="1" th:selected="${applyResult!=null}? ${applyResult.offerType==1}">无条件offer</option>
+                                        <option value="2" th:selected="${applyResult!=null}? ${applyResult.offerType==2}">只有语言条件offer</option>
+                                        <option value="3" th:selected="${applyResult!=null}? ${applyResult.offerType==3}">只有学术条件offer</option>
+                                        <option value="4" th:selected="${applyResult!=null}? ${applyResult.offerType==4}">其他条件offer</option>
+                                    </select>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel"> 押金支付截止日：</label>
+                                    <input class="Wdate col-sm-2 Wselec" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           id="depositPaymentDeadline" name="apply.depositPaymentDeadline" th:value="${apply.depositPaymentDeadline!=null}? ${#dates.format(apply.depositPaymentDeadline, 'yyyy-MM-dd HH:mm:ss')}" readonly="readonly"/>
+                                </div>
+                                <!--<div class="form-group" style="height:29px">-->
+                                    <!--<label class="col-sm-3 control-label no-padding-right blue Wlabel" for="courseLength">课程长度：</label>-->
+                                    <!--<input class="col-sm-2 Wselec" name="apply.courseLength" th:value="${apply!=null}?  ${apply.courseLength}"  readonly="readonly"/>-->
+                                <!--</div>-->
+                                <div class="form-group" style="height:29%">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="createdView"> offer附件：</label>
+                                    <a th:href="${applyResult!=null}? ${applyResult.offerAttachment}" target="_blank"><span  id="offer_href"></span></a>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel" for="resultomment"> 备注：</label>
+                                    <textarea class="col-sm-2 Wselec1" name="result.resultComment"  th:text="${applyResult!=null}? ${applyResult.resultComment}" readonly="readonly"/>
+                                </div>
+                                <div class="form-group"   style="height:29px;" id="audit_button">
+                                    <label class="col-sm-3 control-label no-padding-right blue Wlabel">
+                                        待审批人OA：<span th:text="${toAudit_apply!=null}? ${toAudit_apply.oaid + '-' +  toAudit_apply.oaName}:当前审批流程已结束"></span>
+                                    </label>
+                                </div>
+                                <!-- 审批内容 -->
+                                <div class="form-group" style="margin-top: 40px;" th:unless="${#lists.isEmpty(list_case_3)}">
+                                    <input id="show_audit" value="1" style="display: none"/>
+                                    <table class="table" width="450" border="1" cellspacing="4" style="margin-top: 50px"
+                                           cellpadding="1">
+                                        <tr>
+                                            <td align="center">审批结果</td>
+                                            <td align="center">审批人</td>
+                                            <td align="center">审批时间</td>
+                                            <td align="center">审批意见</td>
+                                        </tr>
+                                        <tr th:each="item,iterStat:${list_case_3}">
+                                            <td style="text-align: center; vertical-align: middle;" th:text="${item.applyStatus_string}"></td>
+                                            <td style="text-align: center; vertical-align: middle;" th:text="${item.operatorName}"></td>
+                                            <td style="text-align: center; vertical-align: middle;" th:text="${#dates.format(item.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                            <td style="text-align: center; vertical-align: middle;" th:text="${item.reason}"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!--<button type="button" id="returnPage" class="btn btn-primary" data-dismiss="modal">返回</button>-->
+                        <button type="button" class="btn btn-primary" id="btn_approval" onclick="approve()"  >审批</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/business/applyResult/edit.js}"></script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var toAudit_apply = [[${toAudit_apply}]];
+    if(!toAudit_apply){
+        $("#btn_approval").hide();
+        $("#audit_button").hide();
+    }
+    $('#resultType').change(function(){
+        changeStatus();
+    })
+    function changeStatus(){
+        //拒绝
+        if($('#resultType').children('option:selected').val()==2){
+            $(".replyDeadlineTag").html("回复offer截止日期:");
+            $(".studentConfirmDateTag").html("学生确认offer回复日期:");
+            $(".createTimeTag").html("实际操作接受offer日期:");
+            $(".schoolReplyDateTag").html("学校确认offer回复日期:");
+            $(".reject").show();
+            $(".offerInfo").children('input:not(":disabled")').val("");
+            $(".offerInfo").hide();
+            $(".acceptOffer").children('input:not(":disabled")').val(""); //清空接受信息
+            $("#offerType option[value="+$("#offerType").val()+"]").removeAttr("selected");
+            $("#offerType option[value='0']").attr("selected", true);
+            $(".acceptOffer").hide();
+            $("#upload_offer").show();
+            //录取
+        }else if($('#resultType').children('option:selected').val()==1){
+            $(".replyDeadlineTag").html("回复offer截止日期:");
+            $(".studentConfirmDateTag").html("学生确认offer回复日期:");
+            $(".createTimeTag").html("实际操作接受offer日期:");
+            $(".schoolReplyDateTag").html("学校确认offer回复日期:");
+            $(".reject").children('input').val("");
+            $(".reject").hide();
+            $(".offerInfo").show();
+            $(".acceptOffer").show();
+        }else if($('#resultType').children('option:selected').val()==4){
+            $(".replyDeadlineTag").html("回复waiting list截止日期:");
+            $(".studentConfirmDateTag").html("学生确认waiting list回复日期:");
+            $(".createTimeTag").html("实际操作接受日期waiting list日期:");
+            $(".schoolReplyDateTag").html("学校确认waiting list回复日期:");
+            $(".reject").children('input').val("");
+            $(".reject").hide();
+            $(".offerInfo").show();
+            $(".acceptOffer").children('input:not(":disabled")').val(""); //清空接受信息
+            $("#offerType option[value="+$("#offerType").val()+"]").removeAttr("selected");
+            $("#offerType option[value='0']").attr("selected", true);
+            $(".acceptOffer").hide();
+        }else if($('#resultType').children('option:selected').val()==5){
+            $(".replyDeadlineTag").html("回复预录取截止日期:");
+            $(".studentConfirmDateTag").html("学生确认预录取回复日期:");
+            $(".createTimeTag").html("实际操作接受日期预录取日期:");
+            $(".schoolReplyDateTag").html("学校确认预录取回复日期:");
+            $(".reject").children('input').val("");
+            $(".reject").hide();
+            $(".offerInfo").show();
+            $(".acceptOffer").children('input:not(":disabled")').val(""); //清空接受信息
+            $("#offerType option[value='0']").removeAttr("selected");
+            $("#offerType option[value='0']").attr("selected", true);
+            $(".acceptOffer").hide();
+            //满位
+        }else if($('#resultType').children('option:selected').val()==3){
+            $(".replyDeadlineTag").html("回复offer截止日期:");
+            $(".studentConfirmDateTag").html("学生确认offer回复日期:");
+            $(".createTimeTag").html("实际操作接受offer日期:");
+            $(".schoolReplyDateTag").html("学校确认offer回复日期:");
+            $(".reject").children('input').val(""); //清空拒绝信息
+            $(".reject").hide();
+            $(".offerInfo").children('input:not(":disabled")').val("");
+            $(".offerInfo").hide();
+            $(".acceptOffer").children('input:not(":disabled")').val(""); //清空接受信息
+            $("#offerType option[value="+$("#offerType").val()+"]").removeAttr("selected");
+            $("#offerType option[value='0']").attr("selected", true);
+            $(".acceptOffer").hide();
+            $("#upload_offer").show();
+        }else  if($('#resultType').children('option:selected').val()==6) {
+            $(".replyDeadlineTag").html("回复offer截止日期:");
+            $(".studentConfirmDateTag").html("学生确认offer回复日期:");
+            $(".createTimeTag").html("实际操作接受offer日期:");
+            $(".schoolReplyDateTag").html("学校确认offer回复日期:");
+            $(".reject").hide();
+            $(".offerInfo").children('input:not(":disabled")').val("");
+            $(".offerInfo").hide();
+            $(".acceptOffer").children('input:not(":disabled")').val(""); //清空接受信息
+            $("#offerType option[value=" + $("#offerType").val() + "]").removeAttr("selected");
+            $("#offerType option[value='0']").attr("selected", true);
+            $(".acceptOffer").hide();
+            $("#upload_offer").show();
+        }
+    }
+    changeStatus();
+
+    if($("#offerAttachment").val() != ""){
+        $("#offer_href").text($("#offerAttachment").val().substring(0,30)+"...");
+    }
+
+    var id_data = [[${applyResult.id}]]
+    var applyid_data = [[${apply.id}]]
+
+
+
+
+//    $(function() {
+//        if ($("#canApprove").val()) {
+//            $("#btn_approval").show();
+//        }
+//        if ($("#auditApply").val() == "true") {
+//            $("#audit_button").show();
+//        }
+//    })
+    $("#returnPage").click(function(){
+        window.history.go(-1);
+    });
+    //审批
+    function approve(){
+        console.log("修改时间:"+$("#updateTime").val());
+        var id = id_data;
+        layer.prompt({
+            formType: 2,
+            title: '请添加备注',
+            btn: ['通过', '拒绝'],
+            yes: function (index, layero) {
+                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                var reason = layero.find('.layui-layer-input').val();
+                $.ajax({
+                    url: "/applyResult/approve",
+                    type: "post",
+                    data: {
+                        applyId:applyid_data,
+                        id: id,
+                        type: 2,
+                        remark: reason,
+                        studentNo:$("#studentNo").val(),
+                        updateTime:$("#updateTime").val(),
+                    },
+                    success: function (data) {
+                        layer.close(loadIndex);
+                        layer.close(index);
+                        console.log("后台返回:"+data);
+                        console.log("后台返回:"+data.errorCode);
+                        if (data.result) {
+                            layer.msg(data.errorMsg, {time: 1000});
+                            window.location.reload();
+                        } else if(data.errorCode == "2"){
+                            parent.layer.confirm('需审批内容已修改,请重新审批', {
+                                icon: 1,
+                                btn: ['确定']
+                            },function(){
+                                window.location.replace(window.location.href)
+                            });
+                        }else if(data.errorCode == "1"){
+                            layer.msg(data.errorMsg, {time: 1000});
+                            window.location.reload();
+                        }else if(data.errorCode == "3"){
+                            parent.layer.confirm(data.errorMsg, {
+                                icon: 1,
+                                btn: ['确定']
+                            },function(){
+                                window.location.replace(window.location.href)
+                            });
+                        }
+                    },
+                })
+            },
+            btn2: function (index, layero) {
+                var loadIndex = layer.load(1, {shade: [0.5, '#393D49']});
+                var reason = layero.find('.layui-layer-input').val();
+                $.ajax({
+                    url: "/applyResult/approve",
+                    type: "post",
+                    data: {
+                        applyId:applyid_data,
+                        id: id,
+                        type: 1,
+                        remark: reason,
+                        studentNo:$("#studentNo").val(),
+                        updateTime:$("#updateTime").val(),
+                    },
+                    success: function (data) {
+                        layer.close(loadIndex);
+                        console.log("后台返回:"+data);
+                        console.log("后台返回:"+data);
+                        if (data.result) {
+                            layer.msg(data.errorMsg, {time: 1000});
+                            window.location.reload();
+                        } else if(data.errorCode == "2"){
+                            parent.layer.confirm('需审批内容已修改,请重新审批', {
+                                icon: 1,
+                                btn: ['确定']
+                            },function(){
+                                window.location.replace(window.location.href)
+                            });
+                        }else if(data.errorCode == "1"){
+                            layer.msg(data.errorMsg, {time: 1000});
+                            window.location.reload();
+                        }else if(data.errorCode == "3"){
+                            parent.layer.confirm(data.errorMsg, {
+                                icon: 1,
+                                btn: ['确定']
+                            },function(){
+                                window.location.replace(window.location.href)
+                            });
+                        }
+                    }
+                })
+            }
+        })
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

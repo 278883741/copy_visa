@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<head th:include="fragments/head::header" />
+<style>
+    .error {
+        color: #F00
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">佣金记录列表</h3>
+                                <div class="table-header">
+                                    <form class="form-inline">
+                                        <input type="hidden" id="operatorNo" th:value="${session.user.oaid}"/>
+                                        <div class="form-group">
+                                            <label>佣金日期：</label>
+                                            <input id="dateStart" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width: 160px;margin:5px 0;height:27px;"
+                                                   required="required"/>
+                                            --
+                                            <input id="dateEnd" class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width: 160px;margin:5px 0;height:27px;"
+                                                   required="required"/>
+                                        </div>
+                                        <a data-toggle="modal" class="btn btn-info pull-right"
+                                           href="javascript:void(0);" onclick="toAddURL();">添加</a>
+                                        <button type="button" id="query" class="btn btn-success pull-right">查询</button>
+                                        <button type="reset" class="btn btn-warning pull-right">清空</button>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>佣金日期</th>
+                                            <th>国家</th>
+                                            <th>院校名称</th>
+                                            <th>账户</th>
+                                            <th>金额</th>
+                                            <th>币种</th>
+                                            <th>类型</th>
+                                            <th>invoice编号</th>
+                                            <th>目标数</th>
+                                            <th>创建时间</th>
+                                            <th>操作人</th>
+                                            <th class="hidden-480" width="200px">操作</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/date-time/moment.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/business/student/studentList.js}" charset="UTF-8"></script>
+<script type="text/javascript">
+    var oTable1;
+    jQuery(function($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter" : false,//是否使用搜索
+            "bProcessing" : true,
+            "bDeferRender" : true,//
+            "sPaginationType" : "bs_normal",//分页样式
+            "bRetrieve" : true,//是否调用后台
+            "bServerSide" : true,//是否以后台分页
+            "sAjaxSource" : "/commission/record/list/query",//请求路径
+            "fnServerData" : function(sSource, aoData, fnCallback) {
+                aoData.push(
+                    {name: 'dateStart', value: $("#dateStart").val() == "" ? null : $.trim($("#dateStart").val())},
+                    {name: 'dateEnd', value: $("#dateEnd").val() == "" ? null : $.trim($("#dateEnd").val())}
+                )
+                $.ajax({
+                    "dataType" : 'json',
+                    "type" : "GET",
+                    "url" : sSource,
+                    "data" : aoData,
+                    "success" : fnCallback
+                });
+            },
+            "aaSorting" : [ [ 0, "desc" ] ],
+            "bSort":true,
+            "aoColumns" : [
+//                {"sClass": "center", "bVisible": false, "mData": "id"},//此列不显示
+                {"sClass": "center", "bSortable": false, "mData": function (data) {
+                    if (data.commissionDate != null) {
+                        return getTimeString_day(new Date(data.commissionDate))
+                    } else {
+                        return "";
+                    }
+                }},
+                {"sClass": "center", "bSortable": false, "mData": "nationName"},
+                {"sClass": "center", "bSortable": false,"mData": "collegeName"},
+                {"sClass": "center", "bSortable": false, "mData": "account"},
+                {"sClass": "center", "bSortable": false, "mData": "money"},
+                {"sClass": "center", "bSortable": false, "mData": "currency"},
+                {"sClass": "center", "bSortable": false, "mData": function (data) {
+                    if (data.commissionType == 1) {
+                        return "市场费"
+                    }
+                    if (data.commissionType == 2) {
+                        return "Bonus"
+                    }
+                    if (data.commissionType == 3) {
+                        return "后续佣金"
+                    }
+                    if (data.commissionType == 4) {
+                        return "外训机票款"
+                    }else {
+                        return "";
+                    }
+                }},
+                {"sClass": "center", "bSortable": false, "mData": "invoiceId"},
+                {"sClass": "center", "bSortable": false, "mData": "targetNum"},
+                {"sClass": "center", "bSortable": false, "mData": function (data) {
+                    if (data.createTime != null) {
+                        return getTimeString_day(new Date(data.createTime))
+                    } else {
+                        return "";
+                    }
+                }},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {"sClass": "center", "bSortable": false, "mData": function (data) {
+                    var styleDiv = '<div class="visible-md visible-lg hidden-sm hidden-xs action-buttons">';
+                    var editOperation = '<a class="green" href="javascript:void(0);" onclick="toEditURL(' + data.id + ')">\n' +
+                        '<i class="icon-pencil bigger-130"></i></a>\n';
+                    var deleteOperation = '<a class="red" href="javascript:void(0);"  onclick="toDeleteURL(' + data.id + ',this)">\n' +
+                        '<i class="icon-trash bigger-130"></i></a>\n' +
+                        '</div>';
+
+                    return styleDiv + editOperation + deleteOperation;
+                }}
+            ],
+            "oLanguage" : {
+                "sLengthMenu" : "每页 _MENU_条 ",
+                "sZeroRecords" : "对不起，查询不到任何相关数据",
+                "sInfo" : "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty" : "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered" : "数据表中共为 _MAX_ 条记录)",
+                "sProcessing" : "正在加载中...",
+                "sSearch" : "搜索",
+                "sUrl" : "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate" : {
+                    "sFirst" : "第一页",
+                    "sPrevious" : " 上一页 ",
+                    "sNext" : " 下一页 ",
+                    "sLast" : " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        $("#query").click(function() {
+            oTable1.fnDraw();
+        })
+
+    })
+    function toAttachment(attachment){
+        window.open(attachment);
+    }
+
+    function getTimeString_day(date) {
+        var y = date.getFullYear();
+        var m = date.getMonth() + 1;
+        m = m >= 10 ? m : '0' + m;
+        var d = date.getDate();
+        d = d >= 10 ? d : '0' + d;
+        return y + '-' + m + '-' + d;
+    }
+
+    function toAddURL() {
+        window.open('/commission/record/add',target="_self");
+    }
+
+    function toEditURL(id){
+        window.open('/commission/record/edit?id='+id,target="_self");
+    }
+
+    function toDeleteURL(id, ele) {
+        parent.layer.confirm('是否执行' + '删除' + '功能？', {
+            icon: 2,
+            btn: ['确认', '取消']
+            , btn1: function (index, layero) {
+                $.ajax({
+                    url: "/commission/delete",
+                    type: "POST",
+                    data: {
+                        id: id,
+                    },
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        if (data.code == 0) {
+                            layer.confirm('操作成功！', {
+                                icon: 1,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                        if (data.code == 1) {
+                            layer.confirm('操作失败，请联系管理员！', {
+                                icon: 2,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                        if (data.code == 2) {
+                            layer.confirm('当前登录人不是此条记录的操作人，无法删除！', {
+                                icon: 2,
+                                btn: ['确认']
+                                , btn1: function (index, layero) {
+                                    $("#query").click();
+                                    parent.layer.closeAll();
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

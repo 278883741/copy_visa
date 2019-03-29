@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/fixedColumns.dataTables.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<link rel="stylesheet" th:href="@{/assets/css/jquery.dataTables.min.css}"/>
+<head th:include="fragments/head::header"/>
+<style type="text/css">
+    .error {
+        color: #F00
+    }
+
+    .DTFC_LeftBodyLiner {
+        height: 910px ! important;
+    }
+
+    #sample-table-2{
+        width: 100% !important;
+    }
+
+
+    .layui-layer-tips{
+        word-break: break-all;
+    }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+            <!--<ul class="breadcrumb">-->
+            <!--<li><i class="icon-home home-icon"></i>首页</li>-->
+            <!--<li>系统管理</li>-->
+            <!--<li>转案管理</li>-->
+            <!--</ul>-->
+            <!--</div>-->
+
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">添加Invoice</h3>
+                                <div class="table-header">
+                                    <form class="form-inline" id="edit">
+                                        <input type="hidden" id="schoolIdStrOld" th:value="${schoolIdStr}"/>
+                                        <input type="hidden" id="tempKey" name="tempKey" th:value="${tempKey}"/>
+                                        <input type="hidden" id="schoolIdStr" name="schoolIdStr"/>
+                                        <input type="hidden" id="type" name="type" value="1"/>
+                                        <div class="form-group">
+                                            <label>InvoiceNo：</label>
+                                            <input type="text" id="invoiceNo" name="invoiceNo" class="form-control input-sm"
+                                                   placeholder="" style="width:100px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>创建日期：</label>
+                                            <input type="text" id="sendDate" name="sendDate" readonly="readonly" class="form-control input-sm" onclick="WdatePicker({dateFmt:'yyyy-MM-dd'})"
+                                                   style="width:120px; height:30px"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>佣金比例：</label>
+                                            <input type="number" id="schoolRate" name="schoolRate" class="form-control input-sm capital" placeholder=""
+                                                   style="width:100px;"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>GST比例：</label>
+                                            <input type="number" id="gstRate" name="invoiceGstRate" class="form-control input-sm capital" placeholder=""
+                                                   style="width:100px;"/>
+                                        </div>
+                                        <!--<div class="form-group">-->
+                                            <!--<label>银行账户：</label>-->
+                                            <!--<select type="" class="form-control input-sm" name="bankAccount"-->
+                                                    <!--style="width:125px;">-->
+                                                <!--<option value="">请选择</option>-->
+                                                <!--<option th:each="bankAccount : ${bankAccountList }" th:value="${bankAccount.accountNumber}" th:text="${bankAccount.accountName}"></option>-->
+                                            <!--</select>-->
+                                        <!--</div>-->
+                                        <button type="button" id="save" class="btn btn-success">保存</button>
+                                        <button type="button" id="cancel" class="btn btn-warning">取消</button>
+                                    </form>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover"
+                                           style="white-space: nowrap;">
+                                        <thead>
+                                        <tr>
+                                            <th class="hide">id</th>
+                                            <th class="center">
+                                                <input type="checkbox" class="checkall" onclick="checkAll(this)"/>
+                                            </th>
+                                            <!--<th>操作</th>-->
+                                            <th>澳际学号</th>
+                                            <th>拼音</th>
+                                            <th>出生日期</th>
+                                            <th>学校学号</th>
+                                            <th>获签国家</th>
+                                            <th>学校类型</th>
+                                            <th>结佣归属</th>
+                                            <th>课程名称</th>
+                                            <th>专业名称</th>
+                                            <th>学费</th>
+                                            <th>课程周数</th>
+                                            <th>开学时间</th>
+                                            <th>结佣比例</th>
+                                            <th>INV-币种</th>
+                                            <th>INV-金额</th>
+                                            <th>INV-GST</th>
+                                            <th>INV-税后金额</th>
+                                            <th>备注</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.page-content -->
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script charset="UTF-8" th:src="@{/assets/js/1.10.15/jquery.dataTables.min.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script charset="UTF-8" th:src="@{/assets/js/dataTables.fixedColumns.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script src="/assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+<script src="/business/invoice/add.js"></script>
+<script th:src="@{/business/common.js}"></script>
+<!--图片查看器-->
+<script type="text/javascript">
+
+</script>
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+</body>
+</html>

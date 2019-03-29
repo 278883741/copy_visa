@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header"/>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li><a href="#">院校申请</a></li>
+                    <li><a href="/member/list">申请结果录入</a></li>
+                </ul>
+            </div>
+
+            <div class="page-content">
+                <div th:include="fragments/student_info::student_info" th:style="${session.studentInfoKey == null}? 'display:none'"></div>
+                <h3 class="header smaller lighter blue">申请结果信息</h3>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="apply.id" id="applyId" th:value="${apply.id}"/>
+                    <input type="hidden" name="result.id" id="id" th:value="${applyResult.id}"/>
+                    <div class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="resultType">
+                                        申请结果：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="resultType"
+                                            name="result.resultType" style="width:190px;height:25px;">
+                                        <option value="1"
+                                                th:selected="${applyResult!=null}? ${applyResult.resultType==1}">录取
+                                        </option>
+                                        <option value="2"
+                                                th:selected="${applyResult!=null}? ${applyResult.resultType==2}">拒绝
+                                        </option>
+                                        <option value="3"
+                                                th:selected="${applyResult!=null}? ${applyResult.resultType==3}">满位
+                                        </option>
+                                        <option value="4"
+                                                th:selected="${applyResult!=null}? ${applyResult.resultType==4}">waiting
+                                            list
+                                        </option>
+                                        <option value="5"
+                                                th:selected="${applyResult!=null}? ${applyResult.resultType==5}">预录取
+                                        </option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 回复日期：</label>
+                                    <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="resultDate" name="result.resultDate"
+                                           th:value="${applyResult!=null}?  ${#dates.format(applyResult.resultDate, 'yyyy-MM-dd HH:mm:ss')}"
+                                           required="required"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="replyWay">
+                                        回复方式：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="replyWay"
+                                            name="result.replyWay" style="width:190px;height:25px;">
+                                        <option value="1"
+                                                th:selected="${applyResult!=null}? ${applyResult.replyWay==1}">传真
+                                        </option>
+                                        <option value="2"
+                                                th:selected="${applyResult!=null}? ${applyResult.replyWay==2}">电话
+                                        </option>
+                                        <option value="3"
+                                                th:selected="${applyResult!=null}? ${applyResult.replyWay==3}">电子版
+                                        </option>
+                                        <option value="4"
+                                                th:selected="${applyResult!=null}? ${applyResult.replyWay==4}">扫描件
+                                        </option>
+                                        <option value="5"
+                                                th:selected="${applyResult!=null}? ${applyResult.replyWay==5}">其他
+                                        </option>
+                                    </select>
+                                    <div class="acceptOffer">
+                                        <label class="col-sm-3 control-label no-padding-right blue" for="offerType">offer类型：</label>
+                                        <select class="form-control input-sm" id="offerType" name="result.offerType"
+                                                style="width:190px;height:25px;" required="required">
+                                            <option value="1"
+                                                    th:selected="${applyResult!=null}? ${applyResult.offerType==1}">
+                                                无条件offer
+                                            </option>
+                                            <option value="2"
+                                                    th:selected="${applyResult!=null}? ${applyResult.offerType==2}">
+                                                只有语言条件offer
+                                            </option>
+                                            <option value="3"
+                                                    th:selected="${applyResult!=null}? ${applyResult.offerType==3}">
+                                                只有学术条件offer
+                                            </option>
+                                            <option value="4"
+                                                    th:selected="${applyResult!=null}? ${applyResult.offerType==4}">
+                                                其他条件offer
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group reject" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="replyReason">
+                                        拒绝原因：</label>
+                                    <input class="col-sm-2" name="result.replyReason"
+                                           th:value="${applyResult!=null}? ${applyResult.replyReason}"
+                                           required="required"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="argueDate">
+                                        Argue日期：</label>
+                                    <input class="Wdate" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="argueDate" name="result.argueDate"
+                                           th:value="${applyResult.argueDate!=null}? ${#dates.format(applyResult.argueDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group offerInfo" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue replyDeadlineTag">
+                                        回复offer截止日期：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="replyDeadline" name="result.replyDeadline"
+                                           th:value="${applyResult.replyDeadline!=null}? ${#dates.format(applyResult.replyDeadline, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue studentConfirmDateTag">
+                                        学生确认offer回复日期：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="studentReplyDate" name="result.studentReplyDate"
+                                           th:value="${applyResult!=null}? ${applyResult.studentReplyDate}"/>
+                                </div>
+                                <div class="form-group offerInfo" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue createTimeTag">
+                                        实际操作接受offer日期：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="createTime"
+                                           th:value="${applyResult.createTime!=null}? ${#dates.format(applyResult.createTime, 'yyyy-MM-dd HH:mm:ss')}"
+                                           readonly="readonly"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue schoolReplyDateTag">
+                                        学校确认offer回复日期：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="schoolReplyDate" name="result.schoolReplyDate"
+                                           th:value="${applyResult.schoolReplyDate!=null}? ${#dates.format(applyResult.schoolReplyDate, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"
+                                           for="courseType">课程类型：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="courseType"
+                                            name="apply.courseType" style="width:190px;height:25px;">
+                                        <option value="1" th:selected="${apply!=null}? ${apply.courseType==1}">语言
+                                        </option>
+                                        <option value="2" th:selected="${apply!=null}? ${apply.courseType==2}">预备
+                                        </option>
+                                        <option value="3" th:selected="${apply!=null}? ${apply.courseType==3}">主课
+                                        </option>
+                                    </select>
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="majorName">
+                                        专业名称：</label>
+                                    <select type="" class="col-sm-3 form-control input-sm" id="majorName"
+                                            name="apply.majorName" style="width:190px;height:25px;">
+                                    </select>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 开课日期：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="courseStartTime" name="apply.courseStartTime"
+                                           th:value="${apply.courseStartTime!=null}? ${#dates.format(apply.courseStartTime, 'yyyy-MM-dd HH:mm:ss')}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="schoolArea">
+                                        所在校区：</label>
+                                    <input class="col-sm-2" name="apply.schoolArea"
+                                           th:value="${apply!=null}?${apply.schoolArea}" required="required"/>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 押金支付截止日：</label>
+                                    <input class="Wdate col-sm-2" onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"
+                                           style="width: 190px"
+                                           id="depositPaymentDeadline" name="apply.depositPaymentDeadline"
+                                           th:value="${apply.depositPaymentDeadline!=null}? ${#dates.format(apply.depositPaymentDeadline, 'yyyy-MM-dd "/>
+                                </div>
+                                <div class="form-group acceptOffer" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"
+                                           for="courseLength">课程长度：</label>
+                                    <input class="col-sm-2" name="apply.courseLength"
+                                           th:value="${apply!=null}?  ${apply.courseLength}" required="required"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="resultomment">
+                                        备注：</label>
+                                    <textarea class="col-sm-2" name="result.resultComment"
+                                              style="width:560px;height:100px;"
+                                              th:value="${applyResult!=null}? ${applyResult.resultComment}"
+                                              required="required"></textarea>
+                                </div>
+                                <!--<div class="form-group" style="height:29px">-->
+                                <!--<label class="col-sm-3 control-label no-padding-right blue" for="createdView"> offer附件：</label>-->
+                                <!--<input class="col-sm-3" id="offerAttachment" name="offerAttachment" readonly="readonly" th:value="${applyResult!=null}? ${applyResult.offerAttachment}" style="display: none;"/>-->
+                                <!--<a href="javascript:void(0);" id="imageUploadLink">[点我上传]</a>-->
+                                <!--<input type="file" onchange="uploadImage('offerAttachment','','','applyResult');" id="fileInput" style="display:none;"-->
+                                <!--name="fileInput"/>-->
+                                <!--</div>-->
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data">
+                    <div class="tab-pane fade in active ">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="row" style="margin-top: 25px;">
+                                    <div class="col-sm-12 offerInfo">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label no-padding-right no-padding-left blue">offer附件：</label>
+                                            <div class="col-sm-6" style="padding-left: 0px;">
+                                                <div class="widget-header">
+                                                    <h4>文件上传</h4>
+                                                </div>
+                                                <div class="widget-body">
+                                                    <div class="widget-main">
+                                                        <input name="fileInput" multiple="" type="file"
+                                                               id="id-input-file-3"/>
+                                                        <label>
+                                                            <input type="checkbox" name="file-format"
+                                                                   id="id-file-format" class="ace"/>
+                                                        </label>
+                                                        <input name="privateAccess" type="hidden" value="true"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" id="returnPage" data-dismiss="modal">
+                                        关闭
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="submits">保存</button>
+                                </div>
+                                <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <span id="alertText"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/uploadimg.js}" charset="UTF-8"></script>
+<script th:src="@{/js/common/ajaxfileupload.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $('#id-input-file-3').ace_file_input({
+            style: 'well',
+            btn_choose: 'Drop files here or click to choose',
+            btn_change: null,
+            no_icon: 'icon-cloud-upload',
+            droppable: true,
+            thumbnail: 'small',//large | fit
+            before_change: function (files, dropped) {
+                return true;
+            },
+            before_remove: function () {
+                return true;
+            },
+            preview_error: function (filename, error_code) {
+                //name of the file that failed
+                //error_code values
+                //1 = 'FILE_LOAD_FAILED',
+                //2 = 'IMAGE_LOAD_FAILED',
+                //3 = 'THUMBNAIL_FAILED'
+                //alert(error_code);
+            }
+        }).on('change', function () {
+            //console.log($(this).data('ace_input_files'));
+            //console.log($(this).data('ace_input_method'));
+            $("#form_file").ajaxSubmit(function (message) {
+                console.log(message);
+                var fileName = message.obj;
+                var code = message.code;
+                if(code == "1"){
+                    layer.msg("请上传正确的文件格式!")
+                }else if(message.success){
+                    $("#input_fileName").val(fileName);
+                    layer.msg("上传成功!");
+                }
+//                if (message) {
+//                    $(".alert-success").text("上传成功").show();
+//                    $('#alert').attr('class', 'alert alert-success').show();
+//                    setTimeout("$('#alert').hide()", 2000);
+//                    $("#myModal").modal("hide");
+//                } else {
+//                    $('#alertText').text('上传失败');
+//                    $('#alert').attr('class', 'alert alert-danger').show();
+//                    setTimeout("$('#alert').hide()", 2000);
+//                    $("#myModal").modal("hide");
+//                }
+            });
+        });
+
+        $("#submits").click(function () {
+
+            //if ($("#edit").valid()) {
+            $.ajax({
+                url: "/applyResult/save",
+                type: "post",
+                data: $("#edit").serialize(),
+                success: function (data) {
+                    if (data) {
+                        $(".alert-success").text("操作成功").show();
+                        $('#alert').attr('class',
+                            'alert alert-success').show();
+                        setTimeout("$('#alert').hide()", 2000);
+                        $("#myModal").modal("hide");
+
+                    } else {
+                        $('#alertText').text('操作失败');
+                        $('#alert').attr('class',
+                            'alert alert-danger').show();
+                        setTimeout("$('#alert').hide()", 2000);
+                        $("#myModal").modal("hide");
+                    }
+                }
+            });
+            //}
+        })
+
+        //监听modal关闭事件，清除整个页面的缓存数据
+        $("#myModal").on("hidden.bs.modal", function () {
+            $(this).removeData("bs.modal");
+        });
+
+        $("#returnPage").click(function () {
+            window.history.go(-1);
+        });
+
+        $('#resultType').change(function () {
+            changeStatus();
+        })
+
+        function changeStatus() {
+            //拒绝
+            if ($('#resultType').children('option:selected').val() == 2) {
+                $(".reject").show();
+                $(".offerInfo").hide();
+                $(".acceptOffer").hide();
+                //录取
+            } else if ($('#resultType').children('option:selected').val() == 1) {
+                $(".reject").hide();
+                $(".offerInfo").show();
+                $(".acceptOffer").show();
+            } else if ($('#resultType').children('option:selected').val() == 4) {
+                $(".replyDeadlineTag").html("回复waiting list截止日期:");
+                $(".studentConfirmDateTag").html("学生确认waiting list回复日期:");
+                $(".createTimeTag").html("实际操作接受日期waiting list日期:");
+                $(".schoolReplyDateTag").html("学校确认waiting list回复日期:");
+                $(".reject").hide();
+                $(".offerInfo").show();
+                $(".acceptOffer").hide();
+            } else if ($('#resultType').children('option:selected').val() == 5) {
+                $(".replyDeadlineTag").html("回复预录取截止日期:");
+                $(".studentConfirmDateTag").html("学生确认预录取回复日期:");
+                $(".createTimeTag").html("实际操作接受日期预录取日期:");
+                $(".schoolReplyDateTag").html("学校确认预录取回复日期:");
+                $(".reject").hide();
+                $(".offerInfo").show();
+                $(".acceptOffer").hide();
+                //满位
+            } else if ($('#resultType').children('option:selected').val() == 3) {
+                $(".reject").hide();
+                $(".offerInfo").hide();
+                $(".acceptOffer").hide();
+
+            }
+        }
+
+        changeStatus();
+    });
+</script>
+</body>
+</html>

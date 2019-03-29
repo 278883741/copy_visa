@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.VisaApplyInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.VisaApplyInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="visa_way" jdbcType="INTEGER" property="visaWay" />
+    <result column="visa_type" jdbcType="INTEGER" property="visaType" />
+    <result column="send_date" jdbcType="TIMESTAMP" property="sendDate" />
+    <result column="visa_comment" jdbcType="VARCHAR" property="visaComment" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_time" jdbcType="TIMESTAMP" property="deleteTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="apply_audit_status" jdbcType="INTEGER" property="applyAuditStatus" />
+    <result column="ds160_no" jdbcType="VARCHAR" property="ds160No" />
+    <result column="ds160_answer" jdbcType="VARCHAR" property="ds160Answer" />
+    <result column="check_no" jdbcType="VARCHAR" property="checkNo" />
+    <result column="check_name" jdbcType="VARCHAR" property="checkName" />
+    <result column="student_visa_status" jdbcType="BIT" property="studentVisaStatus" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="payment_slip" jdbcType="VARCHAR" property="paymentSlip" />
+    <!-- 学生双签留学国家 - 对应double_sign_info表id -->
+    <result column="student_nation" jdbcType="INTEGER" property="studentNation" />
+
+  </resultMap>
+
+
+
+  <select id="getUnPassVisaApplyList" resultType="java.util.Map" parameterType="java.lang.String">
+    SELECT visaApply.*,studentInfo.student_name from
+    (
+      (SELECT id,student_no,operator_name,create_time from visa_apply_info where apply_audit_status = 4 and operator_no = #{oaId} and delete_status = 0) as visaApply
+       LEFT JOIN
+      (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+       ON visaApply.student_no = studentInfo.student_no
+    )
+  </select>
+
+  <select id="selectToAuditList" resultMap="BaseResultMap" parameterType="java.lang.String">
+
+    SELECT visaApply.* from
+    (
+      SELECT * from visa_apply_info where student_no in
+      (
+        SELECT student_no from student_info where nation_id in
+        (
+          SELECT id from country_info where country_group in
+          (
+            SELECT nation from user_group where id in
+            (
+              SELECT group_id from user_group_relation where oaid = #{oaid} and delete_status = 0
+            ) and delete_status = 0
+          )
+        )
+      )
+    ) as visaApply INNER JOIN (SELECT DISTINCT(business_id) FROM audit_apply_info where delete_status = 0 and case_id = 5) as audit
+    on visaApply.id = audit.business_id
+  </select>
+
+  <select id="getManageList" resultType="java.util.Map" parameterType="java.util.Map">
+   SELECT id, visaApply.student_no as student_no,student_name,ifnull(studentInfo.copy_operator,'')as copy_operator,ifnull(nation_name,'') as nation_name,ifnull(studentInfo.branch_name,'') as branch_name,
+   apply_audit_status,ifnull(visaApply.student_visa_status,'')as student_visa_status,ifnull(send_date,'') as send_date,ifnull(visaApply.create_time,'') as create_time,ifnull(operator_name,'') as operator_name ,ifnull(visa_way,'') as visa_way,
+   ifnull(visaResult.visa_id,'')as visa_id,ifnull(visaResult.visa_status,'')as visa_status,ifnull(visaResult.create_time,'')as visaResult_createTime
+    from
+    (
+      (
+        SELECT * FROM visa_apply_info WHERE delete_status = 0
+        <if test="searchOption.studentNo != null and searchOption.studentNo != ''">
+          and student_no = #{searchOption.studentNo}
+        </if>
+        <if test="searchOption.isAudited != null and searchOption.isAudited == 1">
+          AND apply_audit_status in (3,4)
+        </if>
+        <if test="searchOption.isAudited != null and searchOption.isAudited == 0">
+          AND apply_audit_status in (1,2)
+        </if>
+        <if test="searchOption.studentVisaStatus != null and searchOption.studentVisaStatus != -999">
+          AND student_visa_status = #{searchOption.studentVisaStatus}
+        </if>
+        <if test="searchOption.sendDateStart != null and searchOption.sendDateStart !=''">
+          AND send_date &gt;= DATE_FORMAT(#{searchOption.sendDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="searchOption.sendDateEnd != null and searchOption.sendDateEnd !=''">
+          AND send_date &lt;= DATE_FORMAT(#{searchOption.sendDateEnd}, '%Y-%m-%d %T')
+        </if>
+        <if test="searchOption.createDateStart != null and searchOption.createDateStart !=''">
+          AND create_time &gt;= DATE_FORMAT(#{searchOption.createDateStart}, '%Y-%m-%d %T')
+        </if>
+        <if test="searchOption.createDateEnd != null and searchOption.createDateEnd !=''">
+          AND create_time &lt;= DATE_FORMAT(#{searchOption.createDateEnd}, '%Y-%m-%d %T')
+        </if>
+      ) as visaApply
+    INNER JOIN
+      (
+        SELECT student_no,student_name, nation_id ,nation_name,copy_operator,branch_name from student_info where delete_status = 0
+        <if test="searchOption.studentName != null and searchOption.studentName != ''">
+          and student_name LIKE CONCAT('%',#{searchOption.studentName},'%' )
+        </if>
+        <if test="searchOption.copyOperator != null and searchOption.copyOperator != ''">
+          and copy_operator LIKE CONCAT('%',#{searchOption.copyOperator},'%' )
+        </if>
+        <if test="searchOption.nationId != null and searchOption.nationId != '-999'">
+          and nation_id = #{searchOption.nationId}
+        </if>
+        <if test="searchOption.branchId != null and searchOption.branchId != '-999'">
+          and branch_id = #{searchOption.branchId}
+        </if>
+      ) as studentInfo
+    ON visaApply.student_no = studentInfo.student_no
+    LEFT OUTER JOIN
+    (
+      SELECT visa_id,visa_status,create_time from visa_result_info where delete_status = 0
+    )as visaResult
+    ON visaApply.id = visaResult.visa_id
+    )
+    WHERE 1 = 1
+    <if test="searchOption.hasVisaResult == 1">
+      AND visaResult.visa_id is not null
+    </if>
+    <if test="searchOption.hasVisaResult == 0">
+      AND visaResult.visa_id is null
+    </if>
+    <if test="searchOption.visaResultIsAudited != null and searchOption.visaResultIsAudited == 1">
+      AND visaResult.visa_status = 3 or visaResult.visa_status = 4
+    </if>
+    <if test="searchOption.visaResultIsAudited != null and searchOption.visaResultIsAudited == 0">
+      AND visaResult.visa_status = 1 or visaResult.visa_status = 2
+    </if>
+    <if test="searchOption.visaResultCreateDateStart != null and searchOption.visaResultCreateDateStart !=''">
+      AND visaResult.create_time &gt;= DATE_FORMAT(#{searchOption.visaResultCreateDateStart}, '%Y-%m-%d %T')
+    </if>
+    <if test="searchOption.visaResultCreateDateEnd != null and searchOption.visaResultCreateDateEnd !=''">
+      AND visaResult.create_time &lt;= DATE_FORMAT(#{searchOption.visaResultCreateDateEnd}, '%Y-%m-%d %T')
+    </if>
+    ORDER BY visaApply.create_time desc
+  </select>
+
+  <select id="getToAuditListWithMySubmited" resultType="java.util.Map" parameterType="java.util.Map">
+    SELECT visaApply.*,studentInfo.student_name from
+    (
+      (SELECT id,student_no,operator_name,create_time FROM visa_apply_info where delete_status = 0 and apply_audit_status = 1 and operator_no = #{oaId}) as visaApply
+      INNER JOIN
+      (SELECT student_no,student_name from student_info where delete_status = 0) as studentInfo
+      on visaApply.student_no = studentInfo.student_no
+    )
+  </select>
+</mapper>

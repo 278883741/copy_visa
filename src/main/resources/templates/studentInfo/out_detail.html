@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}"/>
+<head th:include="fragments/head::header"/>
+<style>
+    .error {
+        color: #F00
+    }
+
+    .contract_info {
+        float: left;
+        width: 560px;
+        min-height: 100px;
+        height: auto;
+        border: 1px solid #a09a9a;
+    }
+
+    .hidden_outInput {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+<body>
+<div class="navbar navbar-default" id="navbar" style="height:45px">
+    <script type="text/javascript">
+        try {
+            ace.settings.check('navbar', 'fixed')
+        } catch (e) {
+        }
+    </script>
+    <div class="navbar-container" id="navbar-container">
+        <div class="navbar-header pull-left">
+            <a href="#" class="navbar-brand">
+                <small>
+                    <i class="icon-leaf"></i>
+                    欢迎：查看学生相关信息
+                </small>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div class="main-content">
+            <div class="page-content" style="margin-right: 100px">
+                <br/><br/>
+                <div class="tab-pane fade in active ">
+                    <div class="container">
+                        <div class="form-horizontal ">
+                            <input type="hidden" id="resDomain" th:value="${resDomain}"/>
+                            <input name="privateAccessAttachment" id="privateAccessAttachment" type="hidden" value="true"/>
+                            <h3 class="header smaller lighter blue">学生基本信息</h3>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">姓名：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.studentName}"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">拼音：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.pinyin}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">潜在编号：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.potentialNo}"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">微信：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       value=""/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">性别：</label>
+                                <div th:switch="${studentDetail != null}? ${studentDetail.gender}">
+                                    <input class="col-sm-1" th:case="0" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value="男"/>
+                                    <input class="col-sm-1" th:case="1" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value="女"/>
+                                    <input class="col-sm-1" th:case="*" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value=""/>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue">邮编：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.zipCode}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">是否有监护人：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null and studentDetail.familyMemberList != null}? '是': '否'"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">是否有教育经历：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null and studentDetail.educationList != null}? '是': '否'"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">生日：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.birthday}"/>
+                                <label class="col-sm-3 control-label no-padding-right blue">联系方式：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       value=""/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">电子邮箱：</label>
+                                <div style="width:150px; float:left">
+                                        <span class="input-icon input-icon-right">
+                                            <input class="col-sm-1" readonly="readonly" id="email-account"
+                                                   style="width: 150px"
+                                                   th:value="${studentDetail != null}? ${studentDetail.email}"/>
+                                        </span>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">身份证号：</label>
+                                <input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.idNo}"/>
+                            </div>
+                            <div class="form-group" style="height:29px">
+
+                                <label class="col-sm-3 control-label no-padding-right blue"
+                                       style="float:left">学生状态：</label>
+                                <div th:switch="${studentInfo != null}? ${studentInfo.studentStatus}">
+                                    <input class="col-sm-1" th:case="1" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value="正常"/>
+                                    <input class="col-sm-1" th:case="2" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value="停办"/>
+                                    <input class="col-sm-1" th:case="*" readonly="readonly" name="zipCode"
+                                           style="width: 150px" value=""/>
+                                </div>
+                                <label class="col-sm-3 control-label no-padding-right blue">内网学号：</label>
+                                <input class="col-sm-1" readonly="readonly" name="studentNo" style="width: 150px"
+                                       th:value="${studentInfo != null}? ${studentInfo.studentNo}"/>
+
+                            </div>
+                            <div class="form-group" style="height:29px">
+                                <label class="col-sm-3 control-label no-padding-right blue">家庭住址：</label>
+                                <input class="col-sm-1" readonly="readonly" name="studentNo" style="width: 150px"
+                                       th:value="${studentDetail != null}? ${studentDetail.address}"/>
+                            </div>
+
+                            <br/><br/>
+
+
+                            <div class="fm-group">
+                                <h3 class="header smaller lighter blue">院校申请列表</h3>
+                                <input type="hidden" name="studentNo" id="studentNo"
+                                       th:value="${#httpServletRequest.getParameter('studentNo')}"/>
+                                <div class="table-responsive">
+                                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <span id="alertText"></span>
+                                    </div>
+                                    <table id="sample-table-2" class="table table-striped table-bordered table-hover">
+
+                                        <thead>
+                                        <tr>
+                                            <th>申请状态</th>
+                                            <th>申请类型</th>
+                                            <th>院校名称</th>
+                                            <th>课程名称</th>
+                                            <th>专业名称</th>
+                                            <th>操作人</th>
+                                            <th>操作时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="apply : ${applyList != null}? ${applyList}"
+                                            th:switch="${apply.applyStatusCode}">
+                                            <td th:case="1">获签</td>
+                                            <td th:case="0">拒签</td>
+                                            <td th:case="2">撤签</td>
+                                            <td th:case=""></td>
+                                            <td th:text="${visa.resultTime!=null}? ${#dates.format(visa.resultTime, 'yyyy-MM-dd')}"></td>
+                                            <td th:text="${visa.operatorName}"></td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="fm-group">
+                                <div th:if="${settle != null}">
+                                    <h3 class="header smaller lighter blue">结案信息</h3>
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label no-padding-right blue">结案原因：</label>
+                                        <div th:switch="${settle != null}? ${settle.reason}">
+                                            <input class="col-sm-3" th:case="1" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="单文书结案"/>
+                                            <input class="col-sm-3" th:case="2" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="单申请结案"/>
+                                            <input class="col-sm-3" th:case="3" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="其他"/>
+                                            <input class="col-sm-3" th:case="4" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="自动结案"/>
+                                            <input class="col-sm-3" th:case="5" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="退费结案"/>
+                                        </div>
+                                        <label class="col-sm-1 control-label no-padding-right blue">审核状态：</label>
+                                        <div th:switch="${settle != null}? ${settle.auditStatus}">
+                                            <input class="col-sm-3" th:case="1" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="已递交"/>
+                                            <input class="col-sm-3" th:case="2" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="审核中"/>
+                                            <input class="col-sm-3" th:case="3" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="审核通过"/>
+                                            <input class="col-sm-3" th:case="4" readonly="readonly" name="zipCode"
+                                                   style="width: 150px" value="审核不通过"/>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label no-padding-right blue">操作时间：</label>
+                                        <input class="col-sm-1" readonly="readonly" name="createTime"
+                                               style="width: 150px"
+                                               th:value="${settle.createTime!=null}? ${#dates.format(settle.createTime, 'yyyy-MM-dd')}"/>
+                                        <label class="col-sm-1 control-label no-padding-right blue">结案类型：</label>
+                                        <input class="col-sm-1" readonly="readonly" name="endCaseReason"
+                                               style="width: 150px"
+                                               th:value="${settle != null}? ${settle.endCaseReason}"/>
+                                        <label class="col-sm-1 control-label no-padding-right blue">操作人：</label>
+                                        <input class="col-sm-1" readonly="readonly" name="operatorName"
+                                               style="width: 150px"
+                                               th:value="${settle != null}? ${settle.operatorName}"/>
+                                    </div>
+                                    <br/>
+                                    <input id="show_audit" value="1" style="display: none"/>
+                                    <div class="table-responsive" th:if="${auditResultInfoList!=null}" >
+                                        <table id="sample-table-4" class="table table-striped table-bordered table-hover">
+                                            <!-- <h3 class="header smaller lighter blue">结案审批信息</h3>-->
+                                            <tr>
+
+                                                <td align="center" class="col-sm-1 control-label center blue">审批结果</td>
+                                                <td align="center" class="col-sm-1 control-label center blue">审批人</td>
+                                                <td align="center" class="col-sm-1 control-label center blue">审批时间</td>
+                                                <td align="center" class="col-sm-1 control-label center blue">审批意见</td>
+                                            </tr>
+                                            <tr   th:each="item,iterStat:${auditResultInfoList}">
+                                                <td style="text-align: center; vertical-align: middle;" th:text="${item.applyStatus_string}"></td>
+                                                <td style="text-align: center; vertical-align: middle;" th:text="${item.operatorName}"></td>
+                                                <td style="text-align: center; vertical-align: middle;" th:text="${item.createTime !=null} ? ${#dates.format(item.createTime, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                                <td style="text-align: center; vertical-align: middle;" th:text="${item.reason}"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <br/>
+                                </div>
+                                <!--<div class="form-group" style="margin-top: 40px;" th:unless="${#lists.isEmpty(auditResultInfoList)}">
+
+
+                                </div>-->
+                                <h3 class="header smaller lighter blue" th:if="${visas != null }">签证结果</h3>
+                                <div class="form-group" th:if="${visas != null }  ">
+                                    <div class="col-sm-6">
+                                        <div class="table-responsive">
+                                            <table id="sample-table-11"
+                                                   class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>签证结果</th>
+                                                    <th>签证结果附件</th>
+                                                    <th>获签日期</th>
+                                                    <th>操作人</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="visa : ${visas != null}  ? ${visas}"
+                                                    th:switch="${visa.visaResult}">
+                                                    <td th:case="1">获签</td>
+                                                    <td th:case="0">拒签</td>
+                                                    <td th:case="2">撤签</td>
+                                                    <td th:case=""></td>
+                                                    <td style="text-align: center; vertical-align: middle;">
+                                                        <a th:class="${visa.attachment}" id="1"
+                                                           onclick="showAttachment(this)">查看</a></td>
+                                                    <td th:text="${visa.resultTime!=null}? ${#dates.format(visa.resultTime, 'yyyy-MM-dd')}"></td>
+                                                    <td th:text="${visa.operatorName}"></td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!--tab页-->
+
+                            <div clasors="fm-group">
+                                <h3 class="header smaller lighter blue">个人及合同信息</h3>
+                                <div class="tabbable">
+                                    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab4">
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#home4">个人信息</a>
+                                        </li>
+
+                                        <li>
+                                            <a data-toggle="tab" href="#profile4">合同信息</a>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <!--基本信息-->
+                                        <div id="home4" class="tab-pane in active">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">美国A类：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null and studentDetail.usaAStatus}? '是': '否'"/>
+                                                <label class="col-sm-3 control-label no-padding-right blue">分支推荐：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null and studentDetail.branchRecommendStatus}? '是': '否'"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">附件费用：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.accessoriesFee}"/>
+                                                <label class="col-sm-3 control-label no-padding-right blue">要读学历：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.futureEducation}"/>
+                                                <!--<label class="col-sm-3 control-label no-padding-right blue" >其他附件：</label>-->
+                                                <!--<input class="col-sm-1" readonly="readonly" name="zipCode" style="width: 150px" value=""/>-->
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">代理类型：</label>
+                                                <div th:switch="${studentDetail != null}? ${studentDetail.agentType}">
+                                                    <input class="col-sm-1" th:case="0" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="非代理客户"/>
+                                                    <input class="col-sm-1" th:case="1" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="与代理直接签约"/>
+                                                    <input class="col-sm-1" th:case="2" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="通过代理与澳际签约"/>
+                                                    <input class="col-sm-1" th:case="*" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value=""/>
+                                                </div>
+                                                <label class="col-sm-3 control-label no-padding-right blue">是否双签：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null and studentDetail.doubleSignStatus}? '是': '否'"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">奖学金合同：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null and studentDetail.scholarshipStatus}? '是': '否'"/>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">
+                                                    学历背景：</label>
+                                                <div class="col-sm-6">
+                                                    <div class="table-responsive">
+                                                        <table id="sample-table-1"
+                                                               class="table table-striped table-bordered table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>国内学历</th>
+                                                                <th>学校名称</th>
+                                                                <th>课程名称</th>
+                                                                <th>时间</th>
+                                                            </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                            <tr th:each="edu : ${studentDetail != null}? ${studentDetail.educationList}">
+                                                                <td th:text="${edu.educationName}"></td>
+                                                                <td th:text="${edu.schoolName}"></td>
+                                                                <td th:text="${edu.courseName}"></td>
+                                                                <td th:text="${edu.schoolDate}"></td>
+                                                            </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div><!-- /.table-responsive -->
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">
+                                                    工作经历：</label>
+                                                <div class="col-sm-6">
+                                                    <div class="table-responsive">
+                                                        <table id="sample-table-21"
+                                                               class="table table-striped table-bordered table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>工作单位</th>
+                                                                <th>职位</th>
+                                                                <th>时间</th>
+                                                            </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                            <tr th:each="exp : ${studentDetail != null}? ${studentDetail.experienceList}">
+                                                                <td th:text="${exp.experienceCompany}"></td>
+                                                                <td th:text="${exp.experiencePosition}"></td>
+                                                                <td th:text="${exp.experienceDate}"></td>
+                                                            </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div><!-- /.table-responsive -->
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">
+                                                    家庭成员：</label>
+                                                <div class="col-sm-6">
+                                                    <div class="table-responsive">
+                                                        <table id="sample-table-3"
+                                                               class="table table-striped table-bordered table-hover">
+                                                            <thead>
+                                                            <tr>
+                                                                <th>姓名</th>
+                                                                <th>与本人关系</th>
+                                                                <th>职位</th>
+                                                                <th>联系方式</th>
+                                                            </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                            <tr th:each="family : ${studentDetail != null}? ${studentDetail.familyMemberList}"
+                                                                th:switch="${family.relation}">
+                                                                <td th:text="${family.memberName}"></td>
+                                                                <td th:case="0">母亲</td>
+                                                                <td th:case="1">父亲</td>
+                                                                <td th:case=""></td>
+                                                                <td th:text="${family.position}"></td>
+                                                                <td text=""></td>
+                                                            </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div><!-- /.table-responsive -->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!--合同信息-->
+                                        <div id="profile4" class="tab-pane">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">合同类型：</label>
+                                                <div th:switch="${studentDetail != null}? ${studentDetail.contractType}">
+                                                    <input class="col-sm-1" th:case="1" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="留学合同"/>
+                                                    <input class="col-sm-1" th:case="2" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="预科合同"/>
+                                                    <input class="col-sm-1" th:case="3" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="单签证合同"/>
+                                                    <input class="col-sm-1" th:case="4" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="探亲陪读游学商考合同"/>
+                                                    <input class="col-sm-1" th:case="5" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="监护人合同"/>
+                                                    <input class="col-sm-1" th:case="7" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="英语+留学"/>
+                                                    <input class="col-sm-1" th:case="26" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="单申请学校合同"/>
+                                                    <input class="col-sm-1" th:case="28" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="语言培训合同"/>
+                                                    <input class="col-sm-1" th:case="31" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="游学团组合同"/>
+                                                    <input class="col-sm-1" th:case="34" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value="ALevel合同"/>
+                                                    <input class="col-sm-1" th:case="*" readonly="readonly"
+                                                           name="zipCode" style="width: 150px" value=""/>
+                                                </div>
+                                                <label class="col-sm-3 control-label no-padding-right blue">留学国家：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.nationName}"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">分支机构：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.branchName}"/>
+                                                <label class="col-sm-3 control-label no-padding-right blue">销售顾问：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.consultorName}"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">合同名称：</label>
+                                                <input class="col-sm-6 hidden_outInput" readonly="readonly"
+                                                       onmouseover="this.title=this.value" name="zipCode"
+                                                       style="width:150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.contractName}"/>
+                                                <label class="col-sm-3 control-label no-padding-right blue">是否有优惠：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null and studentDetail.discountStatus}? '是': '否'"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">合同服务费：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.contractServiceFee}"/>
+                                                <label class="col-sm-3 control-label no-padding-right blue">拒签退费：</label>
+                                                <input class="col-sm-1" readonly="readonly" name="zipCode"
+                                                       style="width: 150px"
+                                                       th:value="${studentDetail != null}? ${studentDetail.refuseFee}"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue"
+                                                       style="float:left">合同费用：</label>
+                                                <div class="contract_info">
+                                                    <span th:each="contractFee : ${studentDetail != null}? ${studentDetail.contractFeeList}"
+                                                          th:text="${contractFee.selectStatus == true}? ${contractFee.contractFee}"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">加申费用：</label>
+                                                <div class="contract_info">
+                                                    <span th:text="${studentDetail != null and studentDetail.extraApplyFeeList != null}? ${studentDetail.extraApplyFeeList.extraApplyFeeContent}"></span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label no-padding-right blue">特别约定：</label>
+                                                <div class="contract_info">
+                                                    <p th:text="${studentDetail != null and studentDetail.specialAgreement != null}? ${studentDetail.specialAgreement.Refused}"></p>
+                                                    <p th:text="${studentDetail != null and studentDetail.specialAgreement != null}? ${studentDetail.specialAgreement.Denied}"></p>
+                                                </div>
+                                            </div>
+
+
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.main-container -->
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+    </div>
+</div>
+<div th:include="fragments/js::js"></div>
+
+<script th:src="@{/assets/js/jquery.validate.min.js}"></script>
+<script th:src="@{/assets/js/jquery.validate.zh-CN.js}"></script>
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/js/upload/filePath.js}"></script>
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+
+    var oTable1;
+    jQuery(function ($) {
+        oTable1 = $('#sample-table-2').dataTable({
+            "bFilter": false,//是否使用搜索
+            "bProcessing": true,
+            "bDeferRender": true,//
+            "sPaginationType": "bs_normal",//分页样式
+            "bRetrieve": true,//是否调用后台
+            "bServerSide": true,//是否以后台分页
+            "bAutoWidth": true,
+            "sAjaxSource": "/consultant/student/query",//请求路径
+            "fnServerData": function (sSource, aoData, fnCallback) {
+                aoData.push(
+                    {"name": "studentNo", "value": $("#studentNo").val()}
+                )
+                $.ajax({
+                    "dataType": 'json',
+                    "type": "GET",
+                    "url": sSource,
+                    "data": aoData,
+                    "success": fnCallback
+                });
+            },
+            "aaSorting": [[0, "desc"]],
+            "bSort": true,
+            "aoColumns": [
+                {
+                    "sClass": "center", "bSortable": false, "mData":
+                    function (data) {
+                        if (data.applyStatusCode == 10) return "未提交院校申请";
+                        if (data.applyStatusCode == 11) return "未补件";
+                        if (data.applyStatusCode == 20) return "未收到院校结果";
+                        if (data.applyStatusCode == 30) return "未确认录取院校";
+                        if (data.applyStatusCode == 40) return "确认录取已完成";
+                        if (data.applyStatusCode == 50) return "确认拒绝已完成";
+                        return "";
+                    }
+                },
+                {
+                    "sClass": "center", "bSortable": false, sWidth: "8%", "mData":
+                    function (data) {
+                        if (data.courseType == 1) return "语言";
+                        if (data.courseType == 2) return "预备";
+                        if (data.courseType == 3) return "主课";
+                        return "";
+                    }
+                },
+                {"sClass": "center", "bSortable": false, "mData": "collegeName"},
+                {"sClass": "center", "bSortable": false, "mData": "courseName"},
+                {"sClass": "center", "bSortable": false, "mData": "majorName"},
+                {"sClass": "center", "bSortable": false, "mData": "operatorName"},
+                {"sClass": "center", "bSortable": false, "mData": "updateTimeString"},
+                {
+                    "sClass": "center", "bSortable": false, sWidth: "15%", "mData":
+                    function (data) {
+                        var lookSchool = '<a class="blue" href="javascript:void(0);" onclick="toSaleDetail(\'' + data.id + '\')">查看</a><br></br>';
+                        /*var ifplanCourseStatus = "";
+                        if (data.planCourseStatus == 0) {
+                            var ifplanCourseStatus = '<a class="blue" href="javascript:void(0);" onclick="toPlanCourseStatus(\'' + data.id + '\')">设置为入读院校</a>';
+                        } else {
+                            var ifplanCourseStatus = "已设置为入读院校";
+                        }*/
+                        return lookSchool;
+                    }
+                },
+            ],
+            "oLanguage": {
+                "sLengthMenu": "每页 _MENU_条 ",
+                "sZeroRecords": "对不起，查询不到任何相关数据",
+                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录 ",
+                "sInfoEmpty": "显示 0 到 0 条，共 0 条记录",
+                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
+                "sProcessing": "正在加载中...",
+                "sSearch": "搜索",
+                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+                "oPaginate": {
+                    "sFirst": "第一页",
+                    "sPrevious": " 上一页 ",
+                    "sNext": " 下一页 ",
+                    "sLast": " 最后一页 "
+                }
+            }
+            //多语言配置
+
+        });
+
+
+        $("#query").click(function () {
+            oTable1.fnDraw();
+        })
+    })
+    //跳转院校详情页
+    function toSaleDetail(id) {
+        window.open('/apply/detailPage/sale?id=' + id);
+    }
+
+    function showAttachment(obj) {
+        var showAttachment = obj.getAttribute('class');
+        window.open(showAttachment);
+
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

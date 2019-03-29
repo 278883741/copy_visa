@@ -1,0 +1,34 @@
+<div th:fragment="student_info">
+    <div class="alert alert-block alert-success" style="padding:1px; margin-bottom:0px; float:right; margin-top:-8px">
+    <table id="sample-table-3" class="table table-striped table-bordered table-hover"
+           style="margin-bottom:0px; font-size:13px; width:auto; background-color:#30ccc5;">
+        <thead>
+        <tr>
+            <th style="padding:5px">姓名</th>
+            <th style="padding:5px">学号</th>
+            <th style="padding:5px">留学国家</th>
+            <th style="padding:5px">签约日期</th>
+            <th style="padding:5px">所属分支</th>
+            <th style="padding:5px">文签顾问</th>
+            <th th:style="${session.studentInfoKey != null and
+            (session.studentInfoKey.nationName == '英国' or session.studentInfoKey.nationName == '加拿大')} ?
+            'padding:5px' : 'display:none'">制作文案</th>
+            <th style="padding:5px">销售顾问</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.studentName}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.studentNo}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.nationName}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null and session.studentInfoKey.signDate != null}? ${#dates.format(session.studentInfoKey.signDate, 'yyyy-MM-dd')}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.branchName}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.copyOperator}"></td>
+            <td th:style="${session.studentInfoKey != null and (session.studentInfoKey.nationName == '英国' or session.studentInfoKey.nationName == '加拿大')} ? 'padding:5px' : 'display:none'"
+                th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.copyMaker}"></td>
+            <td style="padding:5px" th:text="${session.studentInfoKey != null}? ${session.studentInfoKey.salesConsultant}"></td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+</div>

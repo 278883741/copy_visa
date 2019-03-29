@@ -1,0 +1,159 @@
+
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<body>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="col-xs-12" >
+                    <div class="form-group" style="height:40px;margin-top:30px">
+                        <shiro:hasRole name="同业顾问">
+                            <input type="hidden" id="input_counselor" value="1"/>
+                        </shiro:hasRole>
+                        <shiro:hasRole name="机构">
+                            <input type="hidden" id="input_agent" value="1"/>
+                        </shiro:hasRole>
+                        <shiro:hasRole name="同业经理">
+                            <input type="hidden" id="input_manager" value="1"/>
+                        </shiro:hasRole>
+                        <input id = "channelStudentId" type="hidden" th:value="${channelStudentId!=null}? ${channelStudentId}" />
+                        <input id = "studentNo" type="hidden" th:value="${studentNo!=null}? ${studentNo}" />
+                        <input type="hidden" name="changeConsulter" id="changeConsulter"/>
+                        <span style="display:inline-block;width:72px;text-align:right;">咨询顾问: </span>
+                        <select class="col-sm-1 "  id="consulter" name="consulter" style="width:151px;height:30px;" required="required" onchange="selectTest(this)">
+                            <option value = "0">请选择</option>
+                            <option th:each="item:${ChannelStudentConsulterList}" th:value="${item.consulterNo}"
+                                    th:text="${item.consulter}"></option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="audit_submit" >确定</button>
+                        <button type="button" class="btn btn-default" id="audit_back"  >取消</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.core-3.5.min.js}"></script>
+<script type="text/javascript" th:src="@{/ztree/js/jquery.ztree.excheck-3.5.min.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/bootstrap/js/star-rating.min.js}"></script>
+<script th:src="@{/business/user/groupTree.js}"></script>
+<!--ueditor-->
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.config.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/ueditor.all.min.js}"></script>
+<script type="text/javascript" charset="utf-8" th:src="@{/UEditor/lang/zh-cn/zh-cn.js}"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    /*<![CDATA[*/
+    //当选择顾问的时候，获取顾问的名称
+    function selectTest(obj) {
+       $("#changeConsulter").val(obj.options[obj.selectedIndex].innerHTML);
+    }
+
+    $(function(){
+        $("#audit_back").click(function(){
+            var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+            console.log(index);
+            parent.layer.close(index);
+        })
+
+        //studentNo不为空，则是同业已审核页面跳转过来，（需更改提交按钮的ID）根据学号给学生从新分配咨询顾问
+        if($("#studentNo").val()!=null && $("#studentNo").val()!=''){
+            $("#audit_submit").attr("id","changeCopyOperatorId");
+        }
+        $("#changeCopyOperatorId").click(function(){
+            if($("#consulter").val() == "0" ||$("#consulter").val() == ""){
+                layer.msg("请选择咨询顾问",{time:1500});
+                return;
+            }
+            $.ajax({
+                url: "/channelStudent/changeSalesConsultantByStudentNo",
+                type: "post",
+                data: {studentNo : $("#studentNo").val(),consulterNo:$("#consulter").val(),consulter:$("#changeConsulter").val()},
+                success: function (data) {
+                    if (data) {
+                        layer.msg('修改成功', {time: 1000});
+                        parent.location.href = '/channelStudent/studentList';
+                    } else {
+                        layer.msg('修改失败', {time: 1000});
+                        window.parent.location.reload();
+                        parent.layer.close(index);
+                    }
+                }
+            });
+        })
+
+
+
+        $("#audit_submit").click(function(){
+            if($("#consulter").val() == "0" ||$("#consulter").val() == ""){
+                layer.msg("请选择咨询顾问",{time:1500});
+                return;
+            }
+            $.ajax({
+                url: "/channelStudent/toAudit",
+                type: "post",
+                data: {channelStudentId : $("#channelStudentId").val(),consulterNo:$("#consulter").val()},
+                success: function (data) {
+                    if (data) {
+                        layer.msg('审核成功', {time: 1000});
+                        if($("#input_counselor").val() == "1" || $("#input_manager").val() == "1") {
+                            parent.location.href = '/toAuditListTY';
+                        }
+                        else if($("#input_agent").val() == "1") {
+                            parent.location.href = '/toAuditListDL';
+                        }
+                    } else {
+                        layer.msg('审核失败', {time: 1000});
+                        window.parent.location.reload();
+                        parent.layer.close(index);
+                    }
+                }
+            });
+        })
+    })
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/font-awesome-ie7.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/jquery-ui-1.10.3.custom.min.css}" />
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<link th:href="@{/assets/css/ace.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-rtl.min.css}" rel="stylesheet" type="text/css"/>
+<link th:href="@{/assets/css/ace-skins.min.css}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" th:href="@{/My97DatePicker/skin/WdatePicker.css}"/>
+<head th:include="fragments/head::header" />
+<style>
+
+        .col-sm-3 {
+            width: 23%;
+        }
+</style>
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <!--<div class="breadcrumbs" id="breadcrumbs">-->
+                <!--<ul class="breadcrumb">-->
+                    <!--<li>首页</li>-->
+                    <!--<li>学生列表</li>-->
+                    <!--<li>学生文书列表</li>-->
+                    <!--<li>修改文书</li>-->
+                <!--</ul>-->
+            <!--</div>-->
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <h3 class="header smaller lighter blue">提交文书</h3>
+                                <br/>
+                                <form method="post" id="edit">
+                                    <input id="studentNo" th:value="${studentCopyInfo != null} ? ${studentCopyInfo.studentNo}" type="text" name="studentNo" style="display: none"/>
+                                    <input id="id" th:value="${studentCopyInfo != null} ? ${studentCopyInfo.id}" type="text" name="id" style="display: none"/>
+                                    <input id="resDomain" th:value="${resDomain}" style="display: none"/>
+                                    <input id = "applyId_1" name="applyId" style="display: none"/>
+                                    <input id="studentConfirmUrl" th:value="${studentCopyInfo.studentConfirmUrl != null} ? ${studentCopyInfo.studentConfirmUrl}" type="text" name="studentConfirmUrl" style="display: none"/>
+                                    <input id="copyUrl" th:value="${studentCopyInfo.copyUrl != null} ? ${studentCopyInfo.copyUrl}" type="text" name="copyUrl" style="display: none"/>
+                                    <input id = "studentCopy"  style="display: none" th:value="${studentCopy}"/>
+                                    <div  class="tab-pane fade in active">
+                                        <div class="container">
+                                            <div class="form-horizontal">
+                                                <div class="form-group" style="height:55px">
+                                                    <label class="col-sm-3 control-label no-padding-right blue" > 院校名称：</label>
+                                                    <select  class="col-sm-3 input-sm" id="collegeName" name="collegeName" style="width:49%;" >
+                                                        <option value="" selected="selected">请选择</option>
+                                                        <option   th:each="applyInfo:${applyInfoList}"
+                                                                  th:selected="${applyInfo.collegeName}? ${apply.id==applyInfo.id}"
+                                                                  th:text="${applyInfo.collegeName}" th:value="${applyInfo.majorName}+_+${applyInfo.courseName}+_+${applyInfo.id}"></option>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" style="height:55px">
+                                                    <label class="col-sm-3 control-label no-padding-right blue" > 课程名称：</label>
+                                                    <input  class="col-sm-3"  id="majorName" name="majorName" disabled="disabled" style="width:17%"/>
+                                                    <label class="col-sm-3 control-label no-padding-right blue" style="left: -8%;" > 专业名称：</label>
+                                                    <input  class="col-sm-3"  id="courseName" name="courseName" disabled="disabled" style="left: -8%;width: 17%;" />
+                                                    <input  class="col-sm-3"  id="applyId"  disabled="disabled" style="display: none"/>
+                                                </div>
+                                                <div class="form-group" style="height:230px" id ="studentConfirmUrl_copy">
+                                                    <label class="col-sm-3 control-label no-padding-right"> 学生确认结果：</label>
+
+                                                        <div  class="tab-pane fade in active">
+                                                            <div class="container">
+                                                                <div class="form-horizontal">
+                                                                    <div class="form-group">
+                                                                        <div class="col-sm-6" style="padding-left: 0px;" >
+                                                                            <div class="widget-header">
+                                                                                <h4>此处上传与学生沟通确认文书完成的截图</h4>
+                                                                            </div>
+                                                                            <div class="widget-body">
+                                                                                <div class="widget-main" >
+                                                                                    <span id = "copy_info" style="display: none"><span id="studentConfirmUrl_show"  th:text="${studentCopyInfo.studentConfirmUrl != null} ? ${studentCopyInfo.studentConfirmUrl}"></span><span class="btn btn-sm btn-primary" style="left:9%" id = "copy_info_show">预览</span><a href="javascript:void(0);"  id="upload_studentConfirmUrl"><span class="btn btn-sm btn-primary" style="left:15%" id = "copy_info_upload">下载</span></a></span>
+                                                                                    <input name ="fileInput" multiple="" type="file" id="id-input-file-3"/>
+                                                                                    <label>
+                                                                                        <input type="checkbox" name="file-format" id="id-file-format" class="ace"/>
+                                                                                    </label>
+                                                                                    <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                </div>
+                                                <div class="form-group" style="height:230px" id="copyUrl_copy">
+                                                    <label class="col-sm-3 control-label no-padding-right"> 文书内容：</label>
+
+                                                        <div  class="tab-pane fade in active">
+                                                            <div class="container">
+                                                                <div class="form-horizontal">
+                                                                    <div class="form-group">
+                                                                        <div class="col-sm-6" style="padding-left: 0px;" >
+                                                                            <div class="widget-header">
+                                                                                <h4>此处上传文书</h4>
+                                                                            </div>
+                                                                            <div class="widget-body">
+                                                                                <div class="widget-main">
+                                                                                    <span id = "copy_info_1" style="display: none"><span  id="copyUrl_show" th:text="${studentCopyInfo.copyUrl != null} ? ${studentCopyInfo.copyUrl}"></span><span class="btn btn-sm btn-primary" style="left:9%" id = "copy_info_show_1">预览</span><a href="javascript:void(0);"  id="upload_copyUrl"><span class="btn btn-sm btn-primary" style="left:15%" id = "copy_info_upload_1">下载</span></a></span>
+                                                                                    <input name ="fileInput" multiple="" type="file" id="id-input-file-3_1" />
+                                                                                    <label>
+                                                                                        <input type="checkbox" name="file-format" id="id-file-format_1" class="ace" />
+                                                                                    </label>
+                                                                                    <span style="color: #FF2F2F">*上传文件的格式为&nbsp;:&nbsp;&nbsp; .jpg，&nbsp;.png，&nbsp;.gif,&nbsp;.doc，&nbsp;.docx，&nbsp;.pdf,&nbsp;.eml</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                </div>
+                                                <div class="form-group" style="height:32px">
+                                                    <label class="col-sm-3 control-label no-padding-right"> 备注：</label>
+                                                    <div class="col-sm-3" style="padding-left: 0px;">
+                                                        <textarea rows="5" cols="76" name="content" id="content" th:text="${studentCopyInfo != null} ? ${studentCopyInfo.content}" ></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <form method="post" action="/upload" id="form_file_1" enctype="multipart/form-data" ></form>
+                                <form method="post" action="/upload" id="form_file" enctype="multipart/form-data" ></form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <span id="alertText"></span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btn_back">返回</button>
+                <button type="button" class="btn btn-primary" id="btn_save">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+<!-- page specific plugin scripts -->
+<script th:src="@{/business/followService/followService.js}" charset="UTF-8"></script>
+<script th:src="@{/My97DatePicker/WdatePicker.js}"></script>
+<script th:src="@{/assets/js/jquery.inputlimiter.1.3.1.min.js}"></script>
+<script th:src="@{/assets/js/jquery.maskedinput.min.js}"></script>
+<script th:src="@{/assets/js/bootstrap-tag.min.js}"></script>
+<script th:src="@{/assets/js/ace-elements.min.js}"></script>
+<script th:src="@{/assets/js/ace.min.js}"></script>
+<script th:src="@{/assets/js/jquery.form.js}"></script>
+<script th:src="@{/business/common.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script th:src="@{/js/upload/upload.js}"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var uploadResult = true;
+    var uploadResult1 = true;
+
+
+    var strs = $("#collegeName").val().split("_");
+    var majorName = strs[0];
+    if(majorName != "null"){
+        $("#majorName").val(majorName);
+    }else{
+        $("#majorName").val("");
+    }
+
+    var courseName = strs[1];
+    if(courseName != "null"){
+        $("#courseName").val(courseName);
+    }else{
+        $("#courseName").val("");
+    }
+    var applyId = strs[2];
+    $("#applyId").val(applyId);
+    $("#applyId_1").val(applyId);
+    $(function(){
+        $("#collegeName").change(function(){
+            var strs = $("#collegeName").val().split("_");
+            var majorName = strs[0];
+            if(majorName != "null"){
+                $("#majorName").val(majorName);
+            }else{
+                $("#majorName").val("");
+            }
+
+            var courseName = strs[1];
+            if(courseName != "null"){
+                $("#courseName").val(courseName);
+            }else{
+                $("#courseName").val("");
+            }
+            var applyId = strs[2];
+            $("#applyId").val(applyId);
+            $("#applyId_1").val(applyId);
+        })
+    })
+
+    $("#btn_back").click(function(){
+        window.location.href="/copyInfo?studentNo="+$("#studentNo").val();
+    })
+
+    $("#btn_file_submit").click(function(){
+        $("#form_file").submit();
+    });
+    var country = "meiguo";
+
+    var studentConfirmUrl = [[${studentCopyInfo.studentConfirmUrl}]];
+    var copyUrl = [[${studentCopyInfo.copyUrl}]];
+
+    $("#studentConfirmUrl_show").text($("#studentConfirmUrl").val().substring(0,50)+"...");
+    $("#copyUrl_show").text($("#copyUrl").val().substring(0,50)+"...");
+
+    $("#copy_info_show").click(function(){
+        if($("#studentConfirmUrl").val().indexOf($("#resDomain").val()) ==-1){
+            window.open($("#resDomain").val()+$("#studentConfirmUrl").val());
+        }else{
+            window.open($("#studentConfirmUrl").val());
+        }
+    })
+    $("#copy_info_show_1").click(function(){
+        if($("#copyUrl").val().indexOf($("#resDomain").val()) ==-1){
+            window.open($("#resDomain").val()+$("#copyUrl").val());
+        }else{
+            window.open($("#copyUrl").val());
+        }
+    })
+
+//    $("#copy_info_upload").click(function(){
+//        if($("#studentConfirmUrl").val().indexOf($("#resDomain").val()) ==-1){
+//            $("#upload_studentConfirmUrl").attr("href",$("#resDomain").val()+$("#studentConfirmUrl").val());
+//        }else{
+//            $("#upload_studentConfirmUrl").attr("href",$("#studentConfirmUrl").val());
+//        }
+//    })
+    $("#upload_studentConfirmUrl").click(function(){
+        if($("#studentConfirmUrl").val().indexOf($("#resDomain").val()) ==-1){
+            //$("#upload_studentConfirmUrl").attr("href",$("#resDomain").val()+$("#studentConfirmUrl").val());
+            window.location.href="/download?filePath="+encodeURIComponent($("#resDomain").val()+$("#studentConfirmUrl").val());
+        }else{
+            //$("#upload_studentConfirmUrl").attr("href",$("#studentConfirmUrl").val());
+            window.location.href="/download?filePath="+encodeURIComponent($("#studentConfirmUrl").val());
+        }
+    })
+//    $("#copy_info_upload_1").click(function(){
+//        if($("#copyUrl").val().indexOf($("#resDomain").val()) ==-1){
+//            $("#upload_copyUrl").attr("href",$("#resDomain").val()+$("#copyUrl").val());
+//        }else{
+//            $("#upload_copyUrl").attr("href",$("#copyUrl").val());
+//        }
+//    })
+    $("#upload_copyUrl").click(function(){
+        if($("#copyUrl").val().indexOf($("#resDomain").val()) ==-1){
+             window.location.href="/download?filePath="+encodeURIComponent($("#resDomain").val()+$("#copyUrl").val());
+        }else{
+            window.location.href="/download?filePath="+encodeURIComponent($("#copyUrl").val());
+        }
+    })
+
+    $(function(){
+        if($("#studentConfirmUrl").val() != ''){
+            $("#studentConfirmUrl_copy").attr("style","height:270px");
+            $("#copy_info").show();
+            studentConfirmUrl_upload()
+        }else{
+            studentConfirmUrl_upload();
+        }
+
+        if($("#copyUrl").val() != ''){
+            $("#copyUrl_copy").attr("style","height:270px");
+            $("#copy_info_1").show();
+            copyInfo_upload()
+        }else{
+            copyInfo_upload();
+        }
+    })
+    function studentConfirmUrl_upload(){
+            $('#id-input-file-3').ace_file_input({
+                style: 'well',
+                btn_choose: 'Drop files here or click to choose',
+                btn_change: null,
+                no_icon: 'icon-cloud-upload',
+                droppable: true,
+                thumbnail: 'small',//large | fit
+                before_change: function (files, dropped) {
+                    return true;
+                },
+                before_remove: function () {
+                    $("#studentConfirmUrl_copy").attr("style","height:270px");
+                    $("#studentConfirmUrl").val(studentConfirmUrl);
+                    return true;
+                },
+                preview_error: function (filename, error_code) {
+                }
+            }).on('change', function () {
+                //获取文件大小
+                if (!checkUp(this)) {
+                    return false;
+                }
+                uploadResult = false;
+                layer.msg('正在上传中...', {
+                    icon: 16
+                    ,shade: 0.01
+                });
+                $("#form_file").append($("#id-input-file-3").parent().children(":first"));
+                $("#form_file").hide();
+                $("#form_file").ajaxSubmit(function (message) {
+                    uploadResult = true;
+                    console.log(message);
+                    console.log("上传有误!");
+                    var fileName = message.obj;
+                    var code = message.code;
+                    if(code == "1"){
+                        console.log("上传有误!");
+                        layer.msg("请上传正确的文件格式!")
+                    }else if(message.success){
+                        $("#studentConfirmUrl_copy").attr("style","height:190px");
+                        $("#input_fileName").val(fileName);
+                        $("#studentConfirmUrl").val(fileName);
+                        layer.msg("上传成功!");
+                    }
+                });
+            });
+    }
+
+    function copyInfo_upload(){
+            $('#id-input-file-3_1').ace_file_input({
+                style: 'well',
+                btn_choose: 'Drop files here or click to choose',
+                btn_change: null,
+                no_icon: 'icon-cloud-upload',
+                droppable: true,
+                thumbnail: 'small',//large | fit
+                before_change: function (files, dropped) {
+                    return true;
+                },
+                before_remove: function () {
+                    $("#copyUrl_copy").attr("style","height:270px");
+                    $("#copyUrl").val(copyUrl);
+                    return true;
+                },
+                preview_error: function (filename, error_code) {
+                }
+            }).on('change', function () {
+                //获取文件大小
+                if (!checkUp(this)) {
+                    return false;
+                }
+                uploadResult1 = false;
+                layer.msg('正在上传中...', {
+                    icon: 16
+                    ,shade: 0.01
+                });
+                $("#form_file_1").append($("#id-input-file-3_1").parent().children(":first"));
+                $("#form_file_1").hide();
+                $("#form_file_1").ajaxSubmit(function (message) {
+                    uploadResult1 = true;
+                    console.log(message);
+                    var code = message.code;
+                    if(code == "1"){
+                        layer.msg("请上传正确的文件格式!")
+                    }else if(message.success){
+                        $("#copyUrl_copy").attr("style", "height:190px");
+                        var fileName = message.obj;
+                        $("#input_fileName_1").val(fileName);
+                        $("#copyUrl").val(fileName);
+                        layer.msg("上传成功!");
+                    }
+                });
+            });
+    }
+            $("#btn_save").click(function () {
+                if(!uploadResult || !uploadResult1){
+                    layer.msg('正在上传中,请稍后保存!');
+                }else{
+                    postData();
+                }
+            });
+
+    function postData() {
+        if($("#input_fileName_1").val() == ""){
+            boolResult = true;
+            layer.alert("请上传文书材料",{icon: 0});
+
+            return;
+        }
+        boolResult = false;
+        $.ajax({
+            url: "/studentCopyInfo/save",
+            type: "post",
+            data:$("#edit").serialize(),
+            success: function (data) {
+                if (data.result) {
+                    boolResult = true;
+                    layer.confirm('操作成功，是否跳转到列表页？', {
+                        btn: ['确定','取消'] //按钮
+                    }, function(){
+                        location.href = "/copyInfo?studentNo="+$("#studentNo").val();
+                    }, function(){
+                        window.location.replace(window.location.href)
+                    });
+                } else {
+                    boolResult = true;
+                    if(data.errorCode == "2"){
+                        layer.confirm(data.errorMsg, {
+                            btn: ['确定','取消'] //按钮
+                        }, function(){
+                            location.href = "/copyInfo?studentNo="+$("#studentNo").val();
+                        }, function(){
+                            window.location.replace(window.location.href)
+                        });
+                    }else{
+                        layer.confirm('操作失败，是否跳转到列表页？', {
+                            btn: ['确定','取消'] //按钮
+                        }, function(){
+                            location.href = "/copyInfo?studentNo="+$("#studentNo").val();
+                        }, function(){
+                            window.location.replace(window.location.href)
+                        });
+                    }
+                }
+            }
+        });
+    };
+    /*]]>*/
+</script>
+</body>
+</html>

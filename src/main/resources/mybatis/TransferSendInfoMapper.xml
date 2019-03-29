@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.TransferSendInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.TransferSendInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_no" jdbcType="VARCHAR" property="studentNo" />
+    <result column="receiver_no" jdbcType="VARCHAR" property="receiverNo" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="BIT" property="deleteStatus" />
+    <result column="operator_no" jdbcType="VARCHAR" property="operatorNo" />
+    <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
+    <result column="operator_name" jdbcType="VARCHAR" property="operatorName" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="enable_status" jdbcType="BIT" property="enableStatus" />
+    <result column="is_copy_operator" jdbcType="BIT" property="isCopyOperator" />
+    <result column="reason" jdbcType="INTEGER" property="reason" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+    <result column="apply_id" jdbcType="INTEGER" property="applyId" />
+    <result column="copy_is_change" jdbcType="BIT" property="copyIsChange" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="RelatedQueryResult" type="com.aoji.vo.TransferVO">
+    <result column="confirm_status" jdbcType="INTEGER" property="confirmStatus" />
+    <result column="confirm_date" jdbcType="TIMESTAMP" property="confirmDate" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="college_name" jdbcType="VARCHAR" property="collegeName" />
+    <result column="birthday" jdbcType="TIMESTAMP" property="birthday" />
+    <result column="contract_no" jdbcType="VARCHAR" property="contractNo" />
+    <result column="contract_type" jdbcType="INTEGER" property="contractType" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="copy_operator" jdbcType="VARCHAR" property="copyOperatorName" />
+    <result column="sales_consultant" jdbcType="VARCHAR" property="salesConsultant" />
+  </resultMap>
+
+  <!--关联查询转案信息-->
+  <select id="transferInfoRelatedQuery" parameterType="com.aoji.vo.TransferVO" resultMap="RelatedQueryResult">
+    SELECT
+    a.*, tr.create_time AS confirm_date,
+    tr.confirm_status,
+    tr. COMMENT,
+    ai.college_name,
+    si.birthday,
+    si.branch_name,
+    si.contract_no,
+    si.contract_type,
+    si.copy_operator,
+    si.sales_consultant
+    FROM
+    (select ts.* from transfer_send_info ts where 1 = 1
+    <if test="queryType == 'copy_visa'">
+      and apply_id is null
+    </if>
+    <if test="queryType == 'outreach'">
+      and apply_id is not null
+    </if>
+    <if test="operatorNo != null and receiverNo == null">
+      and operator_no = #{operatorNo}
+    </if>
+    <if test="receiverNo != null and operatorNo == null">
+      and receiver_no = #{receiverNo}
+    </if>
+    <if test="operatorNo != null and receiverNo != null">
+      and  (receiver_no = #{receiverNo} or operator_no = #{operatorNo})
+    </if>
+    <if test="studentName != null">
+      and student_name like CONCAT('%',#{studentName},'%')
+    </if>
+    <if test="studentNo != null and queryType == 'copy_visa'">
+      and student_no = #{studentNo} and apply_id is null
+    </if>
+    <if test="studentNo != null and queryType == 'outreach'">
+      and student_no = #{studentNo} and apply_id is not null
+    </if>
+    <!--apply_id是否为空来判断是文签还是外联-->
+    <if test="studentNo == null and queryType == 'copy_visa'">
+      and apply_id is null
+    </if>
+    <if test="applyId != null and queryType == 'outreach'">
+      and apply_id = #{applyId}
+    </if>
+    <if test="applyId == null and queryType == 'outreach'">
+      and apply_id is not null
+    </if>
+    ) a
+    LEFT JOIN (select * from transfer_receive_info where delete_status = 0) tr ON a.id = tr.send_id
+    LEFT JOIN apply_info ai ON a.apply_id = ai.id
+    LEFT JOIN student_info si ON a.student_no = si.student_no
+    WHERE
+    a.delete_status = 0 AND a.enable_status = 1
+    <!--操作人是经理且状态为已接受-->
+    <if test="manager == 'YES' and confirmStatus == 1">
+      AND ((tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo}) OR a.operator_no = #{operatorNo})
+    </if>
+    <!--操作人是经理且状态为已拒绝-->
+    <if test="manager == 'YES' and confirmStatus == 2">
+      AND tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo} AND a.operator_no != #{receiverNo}
+    </if>
+    <!--操作人是经理且状态为未接受-->
+    <if test="manager == 'YES' and confirmStatus == '-1'">
+      AND tr.confirm_status is null AND a.receiver_no = #{receiverNo} AND a.operator_no != #{receiverNo}
+    </if>
+    <!--操作人是顾问且状态为已接受或已拒绝-->
+    <if test="manager == 'NO' and confirmStatus != null and confirmStatus != '-1'">
+      AND tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo}
+    </if>
+    <!--操作人是顾问且状态为未接受-->
+    <if test="manager == 'NO' and confirmStatus == '-1'">
+      AND tr.confirm_status is null AND a.receiver_no = #{receiverNo}
+    </if>
+
+    <!--经理接受但为分配-->
+    <if test="confirmStatus == 3">
+      AND ((tr.confirm_status = 1 AND a.receiver_no = #{receiverNo}) AND a.operator_no != #{operatorNo})
+    </if>
+    <!--经理查看顾问未接受-->
+    <if test="confirmStatus == 4">
+      AND (a.receiver_no = #{receiverNo} OR a.operator_no = #{operatorNo}) AND tr.confirm_status is null
+    </if>
+    <!--经理查看顾问已接受-->
+    <if test="confirmStatus == 5">
+      AND (a.receiver_no = #{receiverNo} OR a.operator_no = #{operatorNo}) AND tr.confirm_status = 1
+    </if>
+    <!--经理查看顾问已拒绝-->
+    <if test="confirmStatus == 6">
+      AND (a.receiver_no = #{receiverNo} OR a.operator_no = #{operatorNo}) AND tr.confirm_status = 2
+    </if>
+    order by a.create_time desc
+  </select>
+
+  <select id="transferInfoRelatedQueryCount" parameterType="com.aoji.vo.TransferVO" resultType="java.lang.Integer">
+    SELECT count(*) FROM
+    (select ts.id, delete_status, enable_status, receiver_no, operator_no from transfer_send_info ts where 1 = 1
+    <if test="queryType == 'copy_visa'">
+      and apply_id is null
+    </if>
+    <if test="queryType == 'outreach'">
+      and apply_id is not null
+    </if>
+    <if test="operatorNo != null and receiverNo == null">
+      and operator_no = #{operatorNo}
+    </if>
+    <if test="receiverNo != null and operatorNo == null">
+      and receiver_no = #{receiverNo}
+    </if>
+    <if test="operatorNo != null and receiverNo != null">
+      and  (receiver_no = #{receiverNo} or operator_no = #{operatorNo})
+    </if>
+    <if test="studentName != null">
+      and student_name like CONCAT('%',#{studentName},'%')
+    </if>
+    <if test="studentNo != null and queryType == 'copy_visa'">
+      and student_no = #{studentNo} and apply_id is null
+    </if>
+    <if test="studentNo != null and queryType == 'outreach'">
+      and student_no = #{studentNo} and apply_id is not null
+    </if>
+    <!--apply_id是否为空来判断是文签还是外联-->
+    <if test="studentNo == null and queryType == 'copy_visa'">
+      and apply_id is null
+    </if>
+    <if test="applyId != null and queryType == 'outreach'">
+      and apply_id = #{applyId}
+    </if>
+    <if test="applyId == null and queryType == 'outreach'">
+      and apply_id is not null
+    </if>
+    ) a
+    LEFT JOIN (select confirm_status, send_id, id from transfer_receive_info where delete_status = 0) tr ON a.id = tr.send_id
+    WHERE
+    a.delete_status = 0 AND a.enable_status = 1
+    <!--操作人是经理且状态为已接受-->
+    <if test="manager == 'YES' and confirmStatus == 1">
+      AND ((tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo}) OR a.operator_no = #{operatorNo})
+    </if>
+    <!--操作人是经理且状态为已拒绝-->
+    <if test="manager == 'YES' and confirmStatus == 2">
+      AND tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo}
+    </if>
+    <!--操作人是经理且状态为未接受-->
+    <if test="manager == 'YES' and confirmStatus == '-1'">
+      AND tr.confirm_status is null AND a.receiver_no = #{receiverNo}
+    </if>
+    <!--操作人是顾问且状态为已接受或已拒绝-->
+    <if test="manager == 'NO' and confirmStatus != null and confirmStatus != '-1'">
+      AND tr.confirm_status = #{confirmStatus} AND a.receiver_no = #{receiverNo}
+    </if>
+    <!--操作人是顾问且状态为未接受-->
+    <if test="manager == 'NO' and confirmStatus == '-1'">
+      AND tr.confirm_status is null AND a.receiver_no = #{receiverNo}
+    </if>
+
+    <if test="confirmStatus == 3">
+      AND ((tr.confirm_status = 1 AND a.receiver_no = #{receiverNo}) AND a.operator_no != #{operatorNo})
+    </if>
+    <if test="confirmStatus == 4">
+      AND ((a.receiver_no = #{receiverNo}) OR a.operator_no = #{operatorNo}) AND tr.confirm_status is null
+    </if>
+    <if test="confirmStatus == 5">
+      AND ((a.receiver_no = #{receiverNo}) OR a.operator_no = #{operatorNo}) AND tr.confirm_status = 1
+    </if>
+    <if test="confirmStatus == 6">
+      AND ((a.receiver_no = #{receiverNo}) OR a.operator_no = #{operatorNo}) AND tr.confirm_status = 2
+    </if>
+  </select>
+
+  <update id="updateByStudentNoSelective" parameterType="java.util.Map">
+    update transfer_send_info
+    <set>
+      <if test="transferSendInfo.enableStatus != null">enable_status = #{transferSendInfo.enableStatus}</if>
+    </set>
+    where student_no = #{transferSendInfo.studentNo} and apply_id is null
+    <if test="!changeCopyOperator and changeCopyMaker">
+      and is_copy_operator = 0
+    </if>
+    <if test="changeCopyOperator and !changeCopyMaker">
+      and is_copy_operator = 1
+    </if>
+    <if test="transferSendInfo.enableStatus != null">
+      and enable_status != #{transferSendInfo.enableStatus}
+    </if>
+  </update>
+
+  <update id="updateByStudentNoAndId" parameterType="java.util.Map">
+    update transfer_send_info
+    <set>
+      enable_status = 0
+    </set>
+    where student_no = #{studentNo} and id != #{id} and apply_id is null
+  </update>
+
+    <update id="updateByApplyIdSelective" parameterType="com.aoji.model.TransferSendInfo">
+        update transfer_send_info
+        <set>
+            <if test="enableStatus != null">enable_status = #{enableStatus}</if>
+        </set>
+        where apply_id = #{applyId} and enable_status = 1
+    </update>
+
+  <!--根据学号查询转案结果-->
+  <select id="getTransferResult" parameterType="java.lang.String" resultMap="RelatedQueryResult">
+    select student_no, confirm_status, is_copy_operator, receiver_name, receiver_no from
+    (select id, student_no, is_copy_operator, receiver_name, receiver_no from transfer_send_info where delete_status = 0 and enable_status = 1 and apply_id is null and student_no = #{studentNo}) tsi LEFT JOIN
+    (select confirm_status, send_id from transfer_receive_info where delete_status = 0) tri
+    on tsi.id = tri.send_id
+  </select>
+
+  <select id="transferConfirmCount" resultType="java.lang.Integer" parameterType="java.lang.String">
+    select count(1) from
+    (select id from transfer_send_info where delete_status = 0 and enable_status = 1 and apply_id is null and student_no = #{studentNo}) tsi,
+    (select send_id from transfer_receive_info where delete_status = 0 and confirm_status = 1) tri
+    where tsi.id = tri.send_id
+  </select>
+
+  <!--5月28号转案重构之后废弃-->
+  <select id="queryTransferRecord" resultMap="RelatedQueryResult" parameterType="java.util.Map">
+    select send.*, receive.create_time AS confirm_date, receive.COMMENT, receive.confirm_status from
+    (select * from transfer_send_info where delete_status = 0 and apply_id is null and student_no = #{studentNo} and is_copy_operator = #{operatorType}) send left join
+    (select * from transfer_receive_info where delete_status = 0) receive
+    on send.id = receive.send_id order by send.create_time
+  </select>
+
+  <select id="queryTransferRecord2" resultMap="RelatedQueryResult" parameterType="java.util.Map">
+    select x.*, receive.confirm_date from(select * from
+    (select id, student_no, student_name from transfer_info where delete_status = 0 and transfer_type = 1 and student_no = #{studentNo}) info,
+    (select id as send_id, transfer_id, operator_no, operator_name, receive_no as receiver_no, receive_name as receiver_name, create_time, confirm_status
+    from transfer_send where delete_status = 0 and transfer_type = 2 and operator_type = #{operatorType}) send
+    where info.id = send.transfer_id) x LEFT JOIN (select send_id, create_time as confirm_date from transfer_receive where delete_status = 0) receive
+    ON x.send_id = receive.send_id order by x.create_time
+  </select>
+</mapper>

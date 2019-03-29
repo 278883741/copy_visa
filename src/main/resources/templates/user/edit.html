@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<link rel="stylesheet" th:href="@{/assets/css/colorbox.css}" />
+<!--<link rel="stylesheet" th:href="@{/css/public.css}" />-->
+<head th:include="fragments/head::header" />
+<body>
+<div th:include="fragments/top::top"></div>
+<div class="main-container" id="main-container">
+    <div class="main-container-inner">
+        <div th:include="fragments/left::left" class="sidebar" id="sidebar"></div>
+        <div class="main-content">
+            <div class="breadcrumbs" id="breadcrumbs">
+                <ul class="breadcrumb">
+                    <li><i class="icon-home home-icon"></i> <a href="#">首页</a></li>
+                    <li><a href="#">用户管理</a></li>
+                    <li><a href="/member/list">用户列表</a></li>
+                    <!--<li class="active">内容列表</li>-->
+                </ul>
+            </div>
+
+            <div class="page-content">
+
+                <h3 class="header smaller lighter blue">用户信息</h3>
+                <div id="ulId" class=""></div>
+                <br/>
+                <form method="post" id="edit">
+                    <input type="hidden" name="id" id="id" th:value="${user.id}"/>
+                    <input type="hidden" name="oaid" id="oaid" th:value="${oaid}"/>
+                    <div  class="tab-pane fade in active">
+                        <div class="container">
+                            <div class="form-horizontal">
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="username"> 用户名称：</label>
+                                    <input class="col-sm-1" style="width: 150px" id="username" name="username" th:value="${user!=null}? ${user.username}"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 操作人：</label>
+                                    <input class="col-sm-1" style="width: 150px" id="operator" name="operator" disabled="disabled" th:value="${current!=null}? ${current.username}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 分配角色：</label>
+                                    <input class="col-sm-1" style="width: 150px" name="roleTree" th:value="树形菜单选择角色" onclick="selectRole()"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue" for="operatorDate"> 操作日期：</label>
+                                    <input class="col-sm-1" style="width: 150px" name="updateTime" disabled="disabled" th:value="${user!=null}? ${#dates.format(user.updateTime, 'yyyy-MM-dd')}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 分配小组：</label>
+                                    <input class="col-sm-1" style="width: 150px" name="roleTree" th:value="树形菜单选择角色" onclick="selectGroupRole()"/>
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 工号：</label>
+                                    <input class="col-sm-1" style="width: 150px" readOnly="true" name="jobNumber" id="jobNumber" th:value="${oaid != null}?${oaid}"/>
+                                </div>
+                                <div class="form-group" style="height:29px">
+                                    <label class="col-sm-3 control-label no-padding-right blue"> 是否是组负责人：</label>
+                                    <select type="" class="col-sm-1 form-control input-sm" id = "isLeader" name="isLeader" style="width:150px;height:25px;">
+                                        <option value="1" th:selected="${userGroupRelation != null}?${userGroupRelation.leaderStatus ==true}">是</option>
+                                        <option value="2" th:selected="${userGroupRelation != null}?${userGroupRelation.leaderStatus ==false}">否</option>
+                                    </select>
+                                </div>
+                                <!--<div class="form-group" style="height:29px">-->
+                                    <!--<label class="col-sm-3 control-label no-padding-right blue" for="resultComment"> 备注：</label>-->
+                                    <!--<input class="col-sm-2" id="resultComment" name="resultComment" style="width:560px;height:100px;" th:value="${applyResult!=null}? ${applyResult.resultComment}" required="required"/>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="submits">保存</button>
+                    </div>
+
+                    <div id="alert" class="alert alert-success" style="display: none;" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <span id="alertText"></span>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+        <div th:include="fragments/bottom::bottom"></div>
+    </div>
+
+    <a href="#" id="btn-scroll-up"
+       class="btn-scroll-up btn btn-sm btn-inverse"> <i
+            class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal备注 -->
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 style="color: green" id="result">审核通过</h2>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:include="fragments/js::js"></div>
+
+
+<!-- page specific plugin scripts -->
+<script th:src="@{/assets/js/jquery.dataTables.min.js}"></script>
+<script th:src="@{/assets/js/jquery.dataTables.bootstrap.js}"></script>
+<script th:src="@{/assets/js/temp.js}" charset="UTF-8"></script>
+<script th:src="@{/business/user/edit.js}" charset="UTF-8"></script>
+<!--图片查看器-->
+<script th:src="@{/assets/js/jquery.colorbox-min.js}"></script>
+<script th:src="@{/layer/layer.js}"></script>
+<script type="text/javascript">
+    $(function () {
+
+        $("#submits").click(function () {
+
+//            if ($("#add").valid()) {
+                $.ajax({
+                    url: "/user/edit",
+                    type: "post",
+                    data:
+                        $("#edit").serialize(),
+                    success: function (data) {
+                        if (data) {
+                            layer.confirm('操作成功，是否跳转到列表页？', {
+                                btn: ['确定','取消'] //按钮
+                            }, function(){
+                                location.href = "/user";
+                            }, function(){
+                                parent.layer.close();
+                            });
+
+                        } else {
+                            layer.confirm('操作失败，是否跳转到列表页？', {
+                                btn: ['确定','取消'] //按钮
+                            }, function(){
+                                location.href = "/user";
+                            }, function(){
+                                parent.layer.close();
+                            });
+                        }
+                    }
+                });
+//            }
+        })
+
+        //监听modal关闭事件，清除整个页面的缓存数据
+        $("#myModal").on("hidden.bs.modal", function () {
+            $(this).removeData("bs.modal");
+        });
+    });
+</script>
+</body>
+</html>

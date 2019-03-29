@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aoji.mapper.BranchInfoMapper">
+  <resultMap id="BaseResultMap" type="com.aoji.model.BranchInfo">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="seriaNo" jdbcType="INTEGER" property="seriano" />
+    <result column="branch_id" jdbcType="INTEGER" property="branchId" />
+    <result column="branch_name" jdbcType="VARCHAR" property="branchName" />
+    <result column="branch_group" jdbcType="VARCHAR" property="branchGroup" />
+    <result column="isDel" jdbcType="INTEGER" property="isdel" />
+  </resultMap>
+</mapper>
